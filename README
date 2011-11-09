@@ -1,0 +1,21 @@
+Author: Sven Rhinow
+Web: www.sr-tag.de
+License: LPGL (mit Ausnahmen)
+Version: 0.5
+Ausnahmen: Ich verbiete die Benutzung dieser Software für die Firma rokamedia und deren Personen
+
+-----------------------------
+deutsch
+-----------------------------
+Dieses Contao-Backend-Modul stellt die Möglichkeit bereit Angebote,Rechnungen und Gutschriften zu erstellen.
+
+Aktuelle Funktionen:
+- Anlegen von Grundeinstellungen für alle drei Bereiche Rechnungen, Angebote und Gutschriften
+- Vorlagen für Text vor und nach den Posten
+- Vorlagen für die Posten nach Angebote, Rechnungen, und Gutschriften getrennt
+- in allen drei Bereichen kann beim Schreiben eines Postens dieser als Vorlage abgespeichert werden
+- automatische bzw wahlweise Angaben von netto oder Brutto (das System berücksichtigt das und ergänst selbst)
+- eigener Kunden - Adressen-Bereich der auf tl_member basiert und eine eigene Palette mit relevanten Angaben bereit stellt 
+- beim Anlgene in allen drei Bereichen kann per selectfeld der Textbereich mit den Adressdaten aus der Memberverwaltung befüllt und gegebenfalls nachbearbeitet werden.
+- bei den Texten kann sowohl die Vor und Abschlusstexte per Vorlagen-Selectfeld vorausgefüllt werden 
+- bei den Posten ebenfalls in allen drei Bereichen, können die Felder per VorlagenAuswahl vorausgefüllt werden
