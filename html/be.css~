@@ -1,0 +1,12 @@
+.cte_type.status1 {
+color:#CC5555;
+font-size:10px;
+}
+.cte_type.status2 {
+color:#077F00;
+font-size:10px;
+}
+.cte_type.status2 {
+color:#FFB900;
+font-size:10px;
+}
