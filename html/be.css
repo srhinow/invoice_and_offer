@@ -10,3 +10,12 @@ font-size:10px;
 color:#FFB900;
 font-size:10px;
 }
+
+.global_import{
+  background:url("icons/import.gif") no-repeat left center;
+  padding-left: 18px;
+}
+.global_export{
+  background:url("icons/export.gif") no-repeat left center;
+  padding-left: 18px;
+}

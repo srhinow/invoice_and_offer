@@ -26,4 +26,6 @@ $GLOBALS['TL_LANG']['tl_iao']['counter'] = array('Counter','');
 
 $GLOBALS['TL_LANG']['tl_iao']['credit_status'][0]    = array('nicht angenommen', '');
 $GLOBALS['TL_LANG']['tl_iao']['credit_status'][1]    = array('angenommen', '');
+
+$GLOBALS['TL_LANG']['ERR']['PermissionDenied'] = 'keine Berechtigung für %s';
 ?>

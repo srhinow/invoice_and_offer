@@ -59,7 +59,7 @@ $GLOBALS['TL_DCA']['tl_member']['config'] = array
  */
 // $GLOBALS['TL_DCA']['tl_member']['palettes']['default'] = str_replace('firstname','title,firstname',$GLOBALS['TL_DCA']['tl_member']['palettes']['default']);
 
-$GLOBALS['TL_DCA']['tl_member']['palettes']['iao_customer']   =  'myid;{personal_legend},title,firstname,lastname,dateOfBirth,gender;{address_legend:hide},company,street,postal,city,state,country;{contact_legend},phone,mobile,fax,email,website,{login_legend},login;{homedir_legend:hide},assignDir;{account_legend},disable,start,stop';
+$GLOBALS['TL_DCA']['tl_member']['palettes']['iao_customer']   =  '{import_settings:hide},myid;{personal_legend},title,firstname,lastname,dateOfBirth,gender;{address_legend:hide},company,street,postal,city,state,country;{contact_legend},phone,mobile,fax,email,website,{login_legend},login;{homedir_legend:hide},assignDir;{account_legend},disable,start,stop';
 
 $GLOBALS['TL_DCA']['tl_member']['fields']['title'] = array
 		(
@@ -73,7 +73,7 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['title'] = array
 		);
 $GLOBALS['TL_DCA']['tl_member']['fields']['myid'] = array
 		(
-			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_offer']['offer_id'],
+			'label'                   => &$GLOBALS['TL_LANG']['tl_member']['myid'],
 			'exclude'                 => true,
 			'inputType'               => 'text',
 			'eval'                    => array('rgxp'=>'alnum', 'doNotCopy'=>true, 'spaceToUnderscore'=>true, 'maxlength'=>128, 'tl_class'=>'w50'),

@@ -36,14 +36,17 @@ $GLOBALS['BE_MOD']['iao']['iao_offer'] = array
 (
 	'tables' => array('tl_iao_offer','tl_iao_offer_items'),
 	'icon'   => 'system/modules/invoice_and_offer/html/icons/16-file-page.png',
-	'stylesheet' => 'system/modules/invoice_and_offer/html/be.css'	
+	'stylesheet' => 'system/modules/invoice_and_offer/html/be.css',
+	'importOffer'=> array('iao_offer', 'importOffer'),
+	'exportOffer'=> array('iao_offer', 'exportOffer')	
 );
 $GLOBALS['BE_MOD']['iao']['iao_invoice'] = array
 (
 	'tables' => array('tl_iao_invoice','tl_iao_invoice_items'),
 	'icon'   => 'system/modules/invoice_and_offer/html/icons/kontact_todo.png',
 	'stylesheet' => 'system/modules/invoice_and_offer/html/be.css',
-	'importInvoices'=> array('iao', 'importInvoices')
+	'importInvoices'=> array('iao_invoice', 'importInvoices'),
+	'exportInvoices'=> array('iao_invoice', 'exportInvoices')
 );
 $GLOBALS['BE_MOD']['iao']['iao_credit'] = array
 (

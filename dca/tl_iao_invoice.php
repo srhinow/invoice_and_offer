@@ -72,11 +72,18 @@ $GLOBALS['TL_DCA']['tl_iao_invoice'] = array
 		(
 			'importInvoices' => array
 			(
-				'label'               => &$GLOBALS['TL_LANG']['tl_fss_items']['importInvoices'],
+				'label'               => &$GLOBALS['TL_LANG']['tl_iao_invoice']['importInvoices'],
 				'href'                => 'key=importInvoices',
-				'class'               => 'header_theme_import',
+				'class'               => 'global_import',
 				'attributes'          => 'onclick="Backend.getScrollOffset();"'
 			),
+			'exportInvoices' => array
+			(
+				'label'               => &$GLOBALS['TL_LANG']['tl_iao_invoice']['exportInvoices'],
+				'href'                => 'key=exportInvoices',
+				'class'               => 'global_export',
+				'attributes'          => 'onclick="Backend.getScrollOffset();"'
+			),			
 			'all' => array
 			(
 				'label'               => &$GLOBALS['TL_LANG']['MSC']['all'],
@@ -185,9 +192,19 @@ $GLOBALS['TL_DCA']['tl_iao_invoice'] = array
 				array('tl_iao_invoice', 'generateInvoiceTstamp')
 			)
 		),
+		'csv_export_dir' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_invoice']['csv_export_dir'],
+			'eval'                    => array('fieldType'=>'radio', 'files'=>false, 'filesOnly'=>false, 'class'=>'mandatory')
+		),	
+		'pdf_import_dir' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_invoice']['pdf_import_dir'],
+			'eval'                    => array('fieldType'=>'radio', 'files'=>false, 'filesOnly'=>false, 'class'=>'mandatory')
+		),				
 		'csv_source' => array
 		(
-			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_invoice']['invoice_date'],
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_invoice']['csv_source'],
 			'eval'                    => array('fieldType'=>'radio', 'files'=>true, 'filesOnly'=>true, 'extensions'=>'csv', 'class'=>'mandatory')
 		),		
 		'csv_posten_source' => array

@@ -31,11 +31,13 @@
   $GLOBALS['TL_LANG']['tl_iao_invoice']['deleteConfirm'] = 'Soll die Rechnung ID %s wirklich gelöscht werden?!';
   $GLOBALS['TL_LANG']['tl_iao_invoice']['show'] = array('Details anzeigen','Details der Rechnung ID %s anzeigen');
   $GLOBALS['TL_LANG']['tl_iao_invoice']['pdf'] = array('PDF generieren','eine PDF zu dieser Rechnung generieren');
+  $GLOBALS['TL_LANG']['tl_iao_invoice']['importInvoices'] = array('Import','Rechnungen aus CSV-Dateien importieren');
+  $GLOBALS['TL_LANG']['tl_iao_invoice']['exportInvoices'] = array('Export','Rechnungen und deren Posten in CSV-Dateien exportieren.');
+   
   $GLOBALS['TL_LANG']['tl_iao_invoice']['price_netto'] = array('Rechnung-Höhe (Netto)','');
   $GLOBALS['TL_LANG']['tl_iao_invoice']['price_brutto'] = array('Rechnung-Höhe (Brutto)','');
   $GLOBALS['TL_LANG']['tl_iao_invoice']['member'] = array('Kunde','');
-  $GLOBALS['TL_LANG']['tl_iao_invoice']['notice'] = array('Notiz','');
-  
+  $GLOBALS['TL_LANG']['tl_iao_invoice']['notice'] = array('Notiz','');  
   $GLOBALS['TL_LANG']['tl_iao_invoice']['invoice_date'] = array('Rechnungsdatum','wenn es leer bleibt dann wird das aktuelle Datum eingetragen. Unter normalen Umständen sollte dieses Feld leer bleiben. Es ist hauptsächlich für Importe gedacht.');
   $GLOBALS['TL_LANG']['tl_iao_invoice']['invoice_tstamp'] = array('Rechnungsdatum als Timestamp','Wenn es leer bleibt dann wird der Timestamp vom Rechungsdatum eingetragen. Unter normalen Umständen sollte dieses Feld leer bleiben. Es ist hauptsächlich für Importe gedacht.');
   $GLOBALS['TL_LANG']['tl_iao_invoice']['invoice_id'] = array('Rechnungs-ID','Dieses Feld wird hauptsächlich zum hochzählen der nächsten Rechung benötigt.');
@@ -45,13 +47,40 @@
   $GLOBALS['TL_LANG']['tl_iao_invoice']['invoice_pdf_file'] = array('Rechnungsdatei','Wenn hier eine Datei angegeben wurde wird diese statt einer generierten ausgegeben. Unter normalen Umständen sollte dieses Feld leer bleiben. Es ist hauptsächlich für Importe gedacht.');
   $GLOBALS['TL_LANG']['tl_iao_invoice']['paid_on_date'] = array('Bezahlt am','Das Datum an dem die Zahlung auf dem Konto eingegangen ist.'); 
     
+  
+  $GLOBALS['TL_LANG']['tl_iao_invoice']['csv_source'] = array('CSV der Rechnungen','z.B. tl_iao_invoice_YYYY-MM-DD.csv');
+  $GLOBALS['TL_LANG']['tl_iao_invoice']['csv_posten_source'] = array('CSV der Rechnungsposten','z.B. tl_iao_invoice_items_YYYY-MM-DD.csv');
+  $GLOBALS['TL_LANG']['tl_iao_invoice']['pdf_import_dir'] = array('Verzeichnis der Rechnungs-PDF-Dateien','Geben Sie hier das Verzeichnis an in dem die Rechnungen liegen die beim Import verknüpft werden sollen.');
+  $GLOBALS['TL_LANG']['tl_iao_invoice']['drop_first_row'] = array('erste Zeile überspringen', 'Wenn z.B. die Spaltennamen in der ersten Spalte steht müssen diese beim Import übersprungen werden.');
+  $GLOBALS['TL_LANG']['tl_iao_invoice']['drop_exist_entries'] = array('existierende Einträge in der Datenbank-Tabelle löschen', 'Alle bereits existierenden Einträge werden vor dem Import entfernt.');
+  $GLOBALS['TL_LANG']['tl_iao_invoice']['importCSV'] = array('Import starten',''); 
+  $GLOBALS['TL_LANG']['tl_iao_invoice']['csv_export_dir'] = array('Export-Ziel-Verzeichnis','Wählen Sie das Verzeichnis, in welchem die Dateien exportiert werden sollen. Beachten Sie das es Schreibrechte besitzt.'); 
+  $GLOBALS['TL_LANG']['tl_iao_invoice']['export_invoice_filename'] = array('Dateiname der Rechnungen','OHNE ENDUNG .csv');
+  $GLOBALS['TL_LANG']['tl_iao_invoice']['export_invoice_item_filename'] = array('Dateiname der Rechnungsposten','OHNE ENDUNG .csv');
+  $GLOBALS['TL_LANG']['tl_iao_invoice']['exportCSV'] = array('Export starten','');
+  
   $GLOBALS['TL_LANG']['tl_iao_invoice']['toggle'] = 'Rechnung als bezahlt/ nicht bezahlt markieren';
   $GLOBALS['TL_LANG']['tl_iao_invoice']['gender']['male'] = 'Herr';
   $GLOBALS['TL_LANG']['tl_iao_invoice']['gender']['female'] = 'Frau';
-        
+  /**
+  * Legend
+  */      
    $GLOBALS['TL_LANG']['tl_iao_invoice']['invoice_id_legend'] = 'erweiterte Rechnungs-Einstellungen';
    $GLOBALS['TL_LANG']['tl_iao_invoice']['address_legend'] = 'Adress-Angaben';
    $GLOBALS['TL_LANG']['tl_iao_invoice']['text_legend'] = 'Rechnungs-Texte';
    $GLOBALS['TL_LANG']['tl_iao_invoice']['status_legend'] = 'Status-Einstellungen';         
    $GLOBALS['TL_LANG']['tl_iao_invoice']['notice_legend'] = 'Notiz anlegen'; 
+   
+   /**
+   * Import / Export-Libs
+   */
+   $GLOBALS['TL_LANG']['tl_iao_invoice']['importlib'] = array('Import-Bibliothek auswählen','wählen Sie die Bibliothek die beim Import die Daten korrekt importiert.');
+   $GLOBALS['TL_LANG']['tl_iao_invoice']['importlib_invoiceandoffer'] = 'Invoice and Offer';   
+   $GLOBALS['TL_LANG']['tl_iao_invoice']['importlib_phprechnung'] = 'PHPRechnung';
+   
+   /**
+   * Notify
+   */
+   $GLOBALS['TL_LANG']['tl_iao_invoice']['Invoice_imported'] = 'Es wurden die Datensätze aus %s erfogreich importiert';
+   $GLOBALS['TL_LANG']['tl_iao_invoice']['Invoice_exported'] = 'Es wurden die Datensätze erfogreich exportiert';   
 ?>

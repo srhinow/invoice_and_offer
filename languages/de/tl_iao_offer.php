@@ -34,6 +34,8 @@
   $GLOBALS['TL_LANG']['tl_iao_offer']['show'] = array('Details anzeigen','Details des Angebots ID %s anzeigen');
   $GLOBALS['TL_LANG']['tl_iao_offer']['invoice'] = array('dieses Angebot als Rechnung übernehmen','Angebot ID %s als Rechnung anlegen');
   $GLOBALS['TL_LANG']['tl_iao_offer']['notice'] = array('Notiz','');
+  $GLOBALS['TL_LANG']['tl_iao_offer']['importOffer'] = array('Import','Angebote aus CSV-Dateien importieren');
+  $GLOBALS['TL_LANG']['tl_iao_offer']['exportOffer'] = array('Export','Angebote und deren Posten in CSV-Dateien exportieren.');  
   
   $GLOBALS['TL_LANG']['tl_iao_offer']['pdf'] = array('PDF generieren','eine PDF zu diesem Angebot generieren');
   $GLOBALS['TL_LANG']['tl_iao_offer']['price_netto'] = array('Angebot-Höhe (Netto)','');
@@ -46,13 +48,41 @@
   $GLOBALS['TL_LANG']['tl_iao_offer']['expiry_date'] = array('Gültig bis','Dieses Angebot ist bis zu diesem Datum gültig.');
   $GLOBALS['TL_LANG']['tl_iao_offer']['offer_pdf_file'] = array('Angebotdatei','Wenn hier eine Datei angegeben wurde wird diese statt einer generierten ausgegeben. Unter normalen Umständen sollte dieses Feld leer bleiben. Es ist hauptsächlich für Importe gedacht.');
    
+  $GLOBALS['TL_LANG']['tl_iao_offer']['csv_source'] = array('CSV der Angebote','z.B. tl_iao_offer_YYYY-MM-DD.csv');
+  $GLOBALS['TL_LANG']['tl_iao_offer']['csv_posten_source'] = array('CSV der Angebot-Posten','z.B. tl_iao_offer_items_YYYY-MM-DD.csv');
+  $GLOBALS['TL_LANG']['tl_iao_offer']['pdf_import_dir'] = array('Verzeichnis der Angebote-PDF-Dateien','Geben Sie hier das Verzeichnis an in dem die Angebote liegen die beim Import verknüpft werden sollen.');
+  $GLOBALS['TL_LANG']['tl_iao_offer']['drop_first_row'] = array('erste Zeile überspringen', 'Wenn z.B. die Spaltennamen in der ersten Spalte steht müssen diese beim Import übersprungen werden.');
+  $GLOBALS['TL_LANG']['tl_iao_offer']['drop_exist_entries'] = array('existierende Einträge in der Datenbank-Tabelle löschen', 'Alle bereits existierenden Einträge werden vor dem Import entfernt.');
+  $GLOBALS['TL_LANG']['tl_iao_offer']['importCSV'] = array('Import starten',''); 
+  $GLOBALS['TL_LANG']['tl_iao_offer']['csv_export_dir'] = array('Export-Ziel-Verzeichnis','Wählen Sie das Verzeichnis, in welchem die Dateien exportiert werden sollen. Beachten Sie das es Schreibrechte besitzt.'); 
+  $GLOBALS['TL_LANG']['tl_iao_offer']['export_offer_filename'] = array('Dateiname der Angebote','OHNE ENDUNG .csv');
+  $GLOBALS['TL_LANG']['tl_iao_offer']['export_offer_item_filename'] = array('Dateiname der Angebotposten','OHNE ENDUNG .csv');  
+  $GLOBALS['TL_LANG']['tl_iao_offer']['exportCSV'] = array('Export starten','');   
+   
   $GLOBALS['TL_LANG']['tl_iao_offer']['toggle'] = 'Angebot als angenommen/ nicht angenommen markieren';
   $GLOBALS['TL_LANG']['tl_iao_offer']['gender']['male'] = 'Herr';
   $GLOBALS['TL_LANG']['tl_iao_offer']['gender']['female'] = 'Frau';
-      
-   $GLOBALS['TL_LANG']['tl_iao_offer']['offer_id_legend'] = 'erweiterte Angebots-Einstellungen';
-   $GLOBALS['TL_LANG']['tl_iao_offer']['address_legend'] = 'Adress-Angaben';
-   $GLOBALS['TL_LANG']['tl_iao_offer']['text_legend'] = 'Angebot-Texte';
-   $GLOBALS['TL_LANG']['tl_iao_offer']['status_legend'] = 'Status-Einstellungen';         
-   $GLOBALS['TL_LANG']['tl_iao_offer']['notice_legend'] = 'Notiz anlegen'; 
+  
+  /**
+  * Legend
+  */        
+  $GLOBALS['TL_LANG']['tl_iao_offer']['offer_id_legend'] = 'erweiterte Angebots-Einstellungen';
+  $GLOBALS['TL_LANG']['tl_iao_offer']['address_legend'] = 'Adress-Angaben';
+  $GLOBALS['TL_LANG']['tl_iao_offer']['text_legend'] = 'Angebot-Texte';
+  $GLOBALS['TL_LANG']['tl_iao_offer']['status_legend'] = 'Status-Einstellungen';         
+  $GLOBALS['TL_LANG']['tl_iao_offer']['notice_legend'] = 'Notiz anlegen'; 
+  
+  /**
+  * Import / Export-Libs
+  */
+  $GLOBALS['TL_LANG']['tl_iao_offer']['importlib'] = array('Import-Bibliothek auswählen','wählen Sie die Bibliothek die beim Import die Daten korrekt importiert.');
+  $GLOBALS['TL_LANG']['tl_iao_offer']['importlib_invoiceandoffer'] = 'Invoice and Offer';   
+  $GLOBALS['TL_LANG']['tl_iao_offer']['importlib_phprechnung'] = 'PHPRechnung';
+   
+  /**
+  * Notify
+  */
+  $GLOBALS['TL_LANG']['tl_iao_offer']['Offer_imported'] = 'Es wurden die Angebot-Datensätze aus %s erfogreich importiert';
+  $GLOBALS['TL_LANG']['tl_iao_offer']['Offer_exported'] = 'Es wurden die Angebot-Datensätze erfogreich exportiert';
+  
 ?>

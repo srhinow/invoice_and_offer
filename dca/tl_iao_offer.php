@@ -70,6 +70,20 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 		),
 		'global_operations' => array
 		(
+			'importOffer' => array
+			(
+				'label'               => &$GLOBALS['TL_LANG']['tl_iao_offer']['importOffer'],
+				'href'                => 'key=importOffer',
+				'class'               => 'global_import',
+				'attributes'          => 'onclick="Backend.getScrollOffset();"'
+			),
+			'exportOffer' => array
+			(
+				'label'               => &$GLOBALS['TL_LANG']['tl_iao_offer']['exportOffer'],
+				'href'                => 'key=exportOffer',
+				'class'               => 'global_export',
+				'attributes'          => 'onclick="Backend.getScrollOffset();"'
+			),		
 			'all' => array
 			(
 				'label'               => &$GLOBALS['TL_LANG']['MSC']['all'],
@@ -196,6 +210,26 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 				array('tl_iao_offer', 'generateOfferTstamp')
 			)
 		),
+		'csv_export_dir' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_offer']['csv_export_dir'],
+			'eval'                    => array('fieldType'=>'radio', 'files'=>false, 'filesOnly'=>false, 'class'=>'mandatory')
+		),	
+		'pdf_import_dir' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_offer']['pdf_import_dir'],
+			'eval'                    => array('fieldType'=>'radio', 'files'=>false, 'filesOnly'=>false, 'class'=>'mandatory')
+		),				
+		'csv_source' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_offer']['csv_source'],
+			'eval'                    => array('fieldType'=>'radio', 'files'=>true, 'filesOnly'=>true, 'extensions'=>'csv', 'class'=>'mandatory')
+		),		
+		'csv_posten_source' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_offer']['csv_posten_source'],
+			'eval'                    => array('fieldType'=>'radio', 'files'=>true, 'filesOnly'=>true, 'extensions'=>'csv', 'class'=>'mandatory')
+		),				
 		'expiry_date' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_offer']['expiry_date'],
