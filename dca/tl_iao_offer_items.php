@@ -84,12 +84,19 @@ $GLOBALS['TL_DCA']['tl_iao_offer_items'] = array
 				'href'                => 'act=select',
 				'class'               => 'header_edit_all',
 				'attributes'          => 'onclick="Backend.getScrollOffset();" accesskey="e"'
-			)
+			),
+			'pdf' => array
+			(
+				'label'               => &$GLOBALS['TL_LANG']['tl_iao_offer_items']['pdf'],
+				'href'                => 'key=pdf&id='.$_GET['id'],
+				'class'               => 'header_generate_pdf',
+				'button_callback'     => array('tl_iao_offer_items', 'showPDF')
+			)			
 		),
 		'operations' => array
 		(
 			'edit' => array
-			(
+			(                                                               
 				'label'               => &$GLOBALS['TL_LANG']['tl_iao_offer_items']['edit'],
 				'href'                => 'act=edit',
 				'icon'                => 'edit.gif'
@@ -140,7 +147,7 @@ $GLOBALS['TL_DCA']['tl_iao_offer_items'] = array
 	'palettes' => array
 	(
 		'__selector__'                => array(),
-		'default'                     => '{templates_legend:hide},posten_template;{title_legend},headline,alias,author;{item_legend},text,price,count,vat,vat_incl;{publish_legend},published'
+		'default'                     => '{templates_legend:hide},posten_template;{title_legend},headline,alias,author;{item_legend},text,price,count,vat,vat_incl;{publish_legend},published;pagebreak_after'
 	),
 
 	// Subpalettes
@@ -253,7 +260,16 @@ $GLOBALS['TL_DCA']['tl_iao_offer_items'] = array
 			'flag'                    => 2,
 			'inputType'               => 'checkbox',
 			'eval'                    => array('doNotCopy'=>true)
-		)
+		),
+		'pagebreak_after' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_offer_items']['pagebreak_after'],
+			'exclude'                 => true,
+			'filter'                  => true,
+			'flag'                    => 1,
+			'inputType'               => 'checkbox',
+			'eval'                    => array('doNotCopy'=>true)
+		),		
 	)
 );
 
@@ -277,7 +293,12 @@ class tl_iao_offer_items extends Backend
 		parent::__construct();
 		$this->import('BackendUser', 'User');
 	}
-
+	
+ 	public function showPDF($href, $label, $title, $class)
+	{
+          
+	    return '&nbsp; :: &nbsp;<a href="contao/main.php?do=iao_offer&table=tl_iao_offer&'.$href.'" title="'.specialchars($title).'" class="'.$class.'">'.$label.'</a> ';
+	}
 
 	/**
 	 * Check permissions to edit table tl_iao_offer_items
@@ -440,10 +461,11 @@ class tl_iao_offer_items extends Backend
 	public function listItems($arrRow)
 	{
 		$time = time();
-		$key = ($arrRow['published']) ? 'published' : 'unpublished';
+		$key = ($arrRow['published']) ? ' published' : ' unpublished';
                 $vat = ($arrRow['vat_incl']==1) ? 'netto' : 'brutto';
+                $pagebreak = ($arrRow['pagebreak_after']==1) ? ' pagebreak' : '';
                 
-		return '<div class="cte_type ' . $key . '">
+		return '<div class="cte_type' . $key . $pagebreak . '">
 		<strong>' . $arrRow['headline'] . '</strong>
 		 <br />Netto: '.number_format($arrRow['price_netto'],2,',','.') .$GLOBALS['TL_CONFIG']['iao_currency_symbol'].' 
 		 <br />Brutto: ' . number_format($arrRow['price_brutto'],2,',','.') .$GLOBALS['TL_CONFIG']['iao_currency_symbol']. ' (inkl. '.$arrRow['vat'].'% MwSt.)
