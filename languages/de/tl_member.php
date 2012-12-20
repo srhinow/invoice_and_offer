@@ -24,4 +24,6 @@
  * Legends
  */    
  $GLOBALS['TL_LANG']['tl_member']['import_settings'] = 'Import-Einstellungen'; 
+ $GLOBALS['TL_LANG']['tl_member']['new']    = array('Neuer Kunde', 'Einen neuen Kunden anlegen');
+  $GLOBALS['TL_LANG']['tl_member']['title']    = array('Titel', 'z.B. Dr. oder Prof.');
 ?>

@@ -156,7 +156,7 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 	'palettes' => array
 	(
 		'__selector__'                => array(),
-		'default'                     => '{title_legend},title;{offer_id_legend:hide},offer_id,offer_id_str,offer_date,offer_tstamp,offer_pdf_file,expiry_date;{address_legend},member,address_text;{text_legend},before_template,before_text,after_template,after_text;{status_legend},published,status;{notice_legend:hide},notice'
+		'default'                     => '{title_legend},title;{offer_id_legend:hide},offer_id,offer_id_str,offer_date,offer_tstamp,offer_pdf_file,expiry_date;{address_legend},member,address_text;{text_legend},before_template,before_text,after_template,after_text;{status_legend},published,status,noVat;{notice_legend:hide},notice'
 	),
 
 	// Subpalettes
@@ -245,6 +245,7 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_offer']['offer_id'],
 			'exclude'                 => true,
+			'search'                  => true,
 			'inputType'               => 'text',
 			'eval'                    => array('rgxp'=>'alnum', 'doNotCopy'=>true, 'spaceToUnderscore'=>true, 'maxlength'=>128, 'tl_class'=>'w50'),
 			'save_callback' => array
@@ -256,6 +257,7 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_offer']['offer_id_str'],
 			'exclude'                 => true,
+			'search'                  => true,
 			'inputType'               => 'text',
 			'eval'                    => array('doNotCopy'=>true, 'spaceToUnderscore'=>true, 'maxlength'=>128, 'tl_class'=>'w50'),
 			'save_callback' => array
@@ -267,6 +269,7 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_offer']['offer_pdf_file'],
 			'exclude'                 => true,
+			'search'                  => true,
 			'inputType'               => 'fileTree',
 			'eval'                    => array('fieldType'=>'radio', 'tl_class'=>'clr','extensions'=>'pdf','files'=>true, 'filesOnly'=>true, 'mandatory'=>false)
 		),						
@@ -276,10 +279,11 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 			'exclude'                 => true,
 			'filter'                  => true,
 			'sorting'                 => true,
+			'search'                  => true,
 			'flag'                    => 11,
 			'inputType'               => 'select',
 			'options_callback'        => array('tl_iao_offer', 'getMembers'),
-			'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>true,'submitOnChange'=>true),
+			'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>true,'submitOnChange'=>true, 'chosen'=>true),
 			'save_callback' => array
 			(
 				array('tl_iao_offer', 'fillAdressText')
@@ -298,12 +302,11 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_offer']['before_template'],
 			'exclude'                 => true,
-			'filter'                  => true,
 			'sorting'                 => true,
 			'flag'                    => 11,
 			'inputType'               => 'select',
 			'options_callback'        => array('tl_iao_offer', 'getBeforeTemplate'),
-			'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>true,'submitOnChange'=>true),
+			'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>true,'submitOnChange'=>true, 'chosen'=>true),
 			'save_callback' => array
 			(
 				array('tl_iao_offer', 'fillBeforeText')
@@ -322,12 +325,11 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_offer']['before_template'],
 			'exclude'                 => true,
-			'filter'                  => true,
 			'sorting'                 => true,
 			'flag'                    => 11,
 			'inputType'               => 'select',
 			'options_callback'        => array('tl_iao_offer', 'getAfterTemplate'),
-			'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>true,'submitOnChange'=>true),
+			'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>true,'submitOnChange'=>true, 'chosen'=>true),
 			'save_callback' => array
 			(
 				array('tl_iao_offer', 'fillAfterText')
@@ -358,8 +360,17 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 			'filter'                  => true,
 			'flag'                    => 1,
 			'inputType'               => 'select',
-			'options'                 => array(1=>'nicht angenommen',2=>'angenommen'),			
+			'options'                 => &$GLOBALS['TL_LANG']['tl_iao_offer']['status_options'],			
 		),
+		'noVat' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_offer']['noVat'],
+			'exclude'                 => true,
+			'filter'                  => true,
+			'flag'                    => 1,
+			'inputType'               => 'checkbox',
+			'eval'                    => array('doNotCopy'=>true,'tl_class'=>'w50')
+		),		
 		'notice' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_offer']['notice'],
@@ -857,7 +868,7 @@ class tl_iao_offer extends Backend
 		{
 			return '';
 		}
-                
+
 		if ($this->Input->get('key') == 'pdf' && $this->Input->get('id') == $row['id'])
 		{
 		    if(!empty($row['offer_pdf_file']) && file_exists(TL_ROOT . '/' . $row['offer_pdf_file']))
@@ -873,7 +884,7 @@ class tl_iao_offer extends Backend
 			readfile(TL_ROOT . '/' . $row['offer_pdf_file']);
 		        exit();
 		    }
-		    		
+		     		
 		    if( !file_exists(TL_ROOT . '/' . $GLOBALS['TL_CONFIG']['iao_offer_pdf']) ) return;  // template file not found
 		
 		    $pdfname = 'Angebot-'.$row['offer_id_str'];
@@ -945,12 +956,12 @@ class tl_iao_offer extends Backend
                     $pdf->drawDocumentNumber($row['offer_id_str']);
 		    
 		    //Datum
-                    $pdf->drawDate(date('d.m.Y',$row['tstamp']));
+                    $pdf->drawDate(date($GLOBALS['TL_CONFIG']['dateFormat'],$row['tstamp']));
                     
 		    //gültig bis
                     $parts = explode('-',$row['expiry_date']);  
                     $newdate= mktime(0,0,0,$parts[1],$parts[2],$parts[0]);
-                    $pdf->drawExpiryDate(date('d.m.Y',$newdate));
+                    $pdf->drawExpiryDate(date($GLOBALS['TL_CONFIG']['dateFormat'],$newdate));
                     		    
 		    //Text vor der Posten-Tabelle
 		    if(strip_tags($row['before_text']))
@@ -961,7 +972,7 @@ class tl_iao_offer extends Backend
 		    
 		    //Posten-Tabelle
 		    $header = array('Menge','Beschreibung','Einzelpreis','Gesamt');
-		    $fields = $this->getPosten($this->Input->get('id'));
+		    $fields = $this->getPosten($this->Input->get('id'));		    
 		    $pdf->drawPostenTable($header,$fields);
 		    
 		    //Text vor der Posten-Tabelle
@@ -999,27 +1010,52 @@ class tl_iao_offer extends Backend
 	    
 	    if(!$id) return $posten;
 	    
+	    $this->import('iao');
+	    $this->loadLanguageFile('tl_iao_offer_items');
+	    
 	    $resultObj = $this->Database->prepare('SELECT * FROM `tl_iao_offer_items` WHERE `pid`=? AND `published`=1 ORDER BY `sorting`')->execute($id);
 	    
-	    if($resultObj->numRows > 0) while($resultObj->next())
+	    $parentObj = $this->Database->prepare('SELECT * FROM `tl_iao_offer` WHERE `id`=?')
+					->limit(1)
+					->execute($id);
+					
+	    if($resultObj->numRows <= 0) return $posten;
+	     
+	    while($resultObj->next())
 	    {
 		$resultObj->price = str_replace(',','.',$resultObj->price);
-		$einzelpreis = ($resultObj->vat_incl == 1) ? $this->getBruttoPrice($resultObj->price,$resultObj->vat) : $resultObj->price;
-		$resultObj->text = iao::changeTags($resultObj->text);
-		
-		$posten['fields'][] = array(
-		    $resultObj->count,
-		    $resultObj->text,
+		$einzelpreis = ($resultObj->vat_incl == 1) ? $this->iao->getBruttoPrice($resultObj->price,$resultObj->vat) : $resultObj->price;
+                if($resultObj->headline_to_pdf == 1) $resultObj->text = substr_replace($resultObj->text, '<p><strong>'.$resultObj->headline.'</strong><br>', 0, 3);
+                $resultObj->text = $this->iao->changeTags($resultObj->text);
+                
+		$posten['fields'][] = array
+		(
+		    $resultObj->count.' '.$GLOBALS['TL_LANG']['tl_iao_offer_items']['amountStr_options'][$resultObj->amountStr],		    
+		    $resultObj->text,		    
 		    number_format($einzelpreis,2,',','.'),
-		    number_format(($resultObj->price_brutto),2,',','.'));
-		    
-		$posten['summe']['netto'] += $resultObj->price_netto;
-		$posten['summe']['brutto'] += $resultObj->price_brutto; 
-		$posten['vat'] = $resultObj->vat;
+		    number_format($resultObj->price_brutto,2,',','.')
+		);
+		$posten['pagebreak_after'][] = $resultObj->pagebreak_after;
+		$posten['type'][] = $resultObj->type;
+				
+		if($resultObj->operator == '-')
+		{
+		    $posten['summe']['price'] -= $resultObj->operator = $resultObj->price;
+		    $posten['summe']['netto'] -= $resultObj->price_netto;
+		    $posten['summe']['brutto'] -= $resultObj->price_brutto;                 
+                }
+                else
+                {
+		    $posten['summe']['price'] += $resultObj->operator = $resultObj->price;
+		    $posten['summe']['netto'] += $resultObj->price_netto;
+		    $posten['summe']['brutto'] += $resultObj->price_brutto; 
+                }		
+
+		if($parentObj->noVat != 1) $posten['summe']['mwst'][$resultObj->vat] += $resultObj->price_brutto - $resultObj->price_netto;
 	    }
-	    $posten['summe']['mwst'] =  number_format(($posten['summe']['brutto'] - $posten['summe']['netto']),2,',','.');
-	    $posten['summe']['netto'] =  number_format($posten['summe']['netto'],2,',','.');
-	    $posten['summe']['brutto'] =  number_format($posten['summe']['brutto'],2,',','.');	    
+
+	    $posten['summe']['netto_format'] =  number_format($posten['summe']['netto'],2,',','.');
+	    $posten['summe']['brutto_format'] =  number_format($posten['summe']['brutto'],2,',','.');	    
 	    return $posten;
 	}
 		

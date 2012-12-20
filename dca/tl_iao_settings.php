@@ -43,7 +43,7 @@ $GLOBALS['TL_DCA']['tl_iao_settings'] = array
 	'palettes' => array
 	(
 		#'__selector__' => array('mail_customer'),
-		'default' => '{currency_legend:hide},iao_currency,iao_currency_symbol;{pdf_legend},iao_pdf_margins,iao_pdf_css;{standards_legend:hide},iao_tax,iao_costumer_group,iao_mailarticle;{offer_legend:hide},iao_offer_mail_from,iao_offer_startnumber,iao_offer_number_format,iao_offer_expiry_date,iao_offer_pdf;{invoice_legend:hide},iao_invoice_mail_from,iao_invoice_startnumber,iao_invoice_number_format,iao_invoice_duration,iao_invoice_pdf;{credit_legend:hide},iao_credit_mail_from,iao_credit_startnumber,iao_credit_number_format,iao_credit_expiry_date,iao_credit_pdf;{reminder_legend},iao_memory_duration,iao_memory_text,iao_memory_pdf,iao_reminder_1_duration,iao_reminder_1_text,iao_reminder_1_pdf,iao_reminder_2_duration,iao_reminder_2_text,iao_reminder_2_pdf,iao_reminder_3_duration,iao_reminder_3_text,iao_reminder_3_pdf;{secure_legend:hide},iao_ssl'
+		'default' => '{currency_legend:hide},iao_currency,iao_currency_symbol;{pdf_legend},iao_pdf_margins,iao_pdf_css;{standards_legend:hide},iao_tax,iao_costumer_group,iao_mailarticle;{offer_legend:hide},iao_offer_mail_from,iao_offer_startnumber,iao_offer_number_format,iao_offer_expiry_date,iao_offer_pdf;{invoice_legend:hide},iao_invoice_mail_from,iao_invoice_startnumber,iao_invoice_number_format,iao_invoice_duration,iao_invoice_pdf;{credit_legend:hide},iao_credit_mail_from,iao_credit_startnumber,iao_credit_number_format,iao_credit_expiry_date,iao_credit_pdf;{reminder_legend},iao_reminder_1_duration,iao_reminder_1_tax,iao_reminder_1_postage,iao_reminder_1_text,iao_reminder_1_pdf,iao_reminder_2_duration,iao_reminder_2_tax,iao_reminder_2_postage,iao_reminder_2_text,iao_reminder_2_pdf,iao_reminder_3_duration,iao_reminder_3_tax,iao_reminder_3_postage,iao_reminder_3_text,iao_reminder_3_pdf,iao_reminder_4_duration,iao_reminder_4_tax,iao_reminder_4_postage,iao_reminder_4_text,iao_reminder_4_pdf;{secure_legend:hide},iao_ssl'
 	),
 
 	// Subpalettes
@@ -217,37 +217,27 @@ $GLOBALS['TL_DCA']['tl_iao_settings'] = array
 			'inputType'               => 'checkbox',
 			'eval'                    => array('submitOnChange'=>false)
 		),
-		'iao_memory_duration' =>  array
-		(
-			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_settings']['iao_memory_duration'],
-			'exclude'                 => true,
-			'inputType'               => 'text',
-			'eval'                    => array()
-		),		
-		'iao_memory_text' => array
-		(
-			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_settings']['iao_memory_text'],
-			'exclude'                 => true,
-			'search'                  => true,
-			'inputType'               => 'textarea',
-			'eval'                    => array('rte'=>'tinyMCE','style'=>'height:60px;', 'tl_class'=>'clr'),
-			'explanation'             => 'insertTags'
-		),
-		'iao_memory_pdf' => array
-		(
-			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_settings']['iao_memory_pdf'],
-			'exclude'                 => true,
-			'inputType'               => 'fileTree',
-			'eval'                    => array('fieldType'=>'radio', 'files'=>true, 'filesOnly'=>true, 'mandatory'=>false,'extensions'=>'pdf')
-		),		
 		'iao_reminder_1_duration' =>  array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_settings']['iao_reminder_1_duration'],
 			'exclude'                 => true,
 			'inputType'               => 'text',
-			'default'		  => 7,
-			'eval'                    => array('rgxp'=>'digit')
-		),		
+			'eval'                    => array()
+		),
+		'iao_reminder_1_tax' =>  array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_settings']['iao_reminder_tax'],
+			'exclude'                 => true,
+			'inputType'               => 'text',
+			'eval'                    => array('maxlength'=>2, 'tl_class'=>'w50')
+		),
+		'iao_reminder_1_postage' =>  array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_settings']['iao_reminder_postage'],
+			'exclude'                 => true,
+			'inputType'               => 'text',
+			'eval'                    => array('maxlength'=>25, 'tl_class'=>'w50')
+		),						
 		'iao_reminder_1_text' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_settings']['iao_reminder_1_text'],
@@ -271,7 +261,21 @@ $GLOBALS['TL_DCA']['tl_iao_settings'] = array
 			'inputType'               => 'text',
 			'default'		  => 7,
 			'eval'                    => array('rgxp'=>'digit')
-		),		
+		),
+		'iao_reminder_2_tax' =>  array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_settings']['iao_reminder_tax'],
+			'exclude'                 => true,
+			'inputType'               => 'text',
+			'eval'                    => array('maxlength'=>2, 'tl_class'=>'w50')
+		),
+		'iao_reminder_2_postage' =>  array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_settings']['iao_reminder_postage'],
+			'exclude'                 => true,
+			'inputType'               => 'text',
+			'eval'                    => array('maxlength'=>25, 'tl_class'=>'w50')
+		),				
 		'iao_reminder_2_text' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_settings']['iao_reminder_2_text'],
@@ -283,7 +287,7 @@ $GLOBALS['TL_DCA']['tl_iao_settings'] = array
 		),
 		'iao_reminder_2_pdf' => array
 		(
-			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_settings']['iao_reminder_2_pdf'],
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_settings']['iao_reminder_1_pdf'],
 			'exclude'                 => true,
 			'inputType'               => 'fileTree',
 			'eval'                    => array('fieldType'=>'radio', 'files'=>true, 'filesOnly'=>true, 'mandatory'=>false,'extensions'=>'pdf')
@@ -295,7 +299,21 @@ $GLOBALS['TL_DCA']['tl_iao_settings'] = array
 			'inputType'               => 'text',
 			'default'		  => 7,
 			'eval'                    => array('rgxp'=>'digit')
-		),		
+		),
+		'iao_reminder_3_tax' =>  array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_settings']['iao_reminder_tax'],
+			'exclude'                 => true,
+			'inputType'               => 'text',
+			'eval'                    => array('maxlength'=>2, 'tl_class'=>'w50')
+		),
+		'iao_reminder_3_postage' =>  array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_settings']['iao_reminder_postage'],
+			'exclude'                 => true,
+			'inputType'               => 'text',
+			'eval'                    => array('maxlength'=>25, 'tl_class'=>'w50')
+		),				
 		'iao_reminder_3_text' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_settings']['iao_reminder_3_text'],
@@ -308,6 +326,44 @@ $GLOBALS['TL_DCA']['tl_iao_settings'] = array
 		'iao_reminder_3_pdf' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_settings']['iao_reminder_3_pdf'],
+			'exclude'                 => true,
+			'inputType'               => 'fileTree',
+			'eval'                    => array('fieldType'=>'radio', 'files'=>true, 'filesOnly'=>true, 'mandatory'=>false,'extensions'=>'pdf')
+		),		
+		'iao_reminder_4_duration' =>  array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_settings']['iao_reminder_4_duration'],
+			'exclude'                 => true,
+			'inputType'               => 'text',
+			'default'		  => 7,
+			'eval'                    => array('rgxp'=>'digit')
+		),
+		'iao_reminder_4_tax' =>  array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_settings']['iao_reminder_tax'],
+			'exclude'                 => true,
+			'inputType'               => 'text',
+			'eval'                    => array('maxlength'=>2, 'tl_class'=>'w50')
+		),
+		'iao_reminder_4_postage' =>  array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_settings']['iao_reminder_postage'],
+			'exclude'                 => true,
+			'inputType'               => 'text',
+			'eval'                    => array('maxlength'=>25, 'tl_class'=>'w50')
+		),				
+		'iao_reminder_4_text' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_settings']['iao_reminder_4_text'],
+			'exclude'                 => true,
+			'search'                  => true,
+			'inputType'               => 'textarea',
+			'eval'                    => array('rte'=>'tinyMCE','style'=>'height:60px;', 'tl_class'=>'clr'),
+			'explanation'             => 'insertTags'
+		),
+		'iao_reminder_4_pdf' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_settings']['iao_reminder_4_pdf'],
 			'exclude'                 => true,
 			'inputType'               => 'fileTree',
 			'eval'                    => array('fieldType'=>'radio', 'files'=>true, 'filesOnly'=>true, 'mandatory'=>false,'extensions'=>'pdf')

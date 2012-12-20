@@ -84,7 +84,14 @@ $GLOBALS['TL_DCA']['tl_iao_credit_items'] = array
 				'href'                => 'act=select',
 				'class'               => 'header_edit_all',
 				'attributes'          => 'onclick="Backend.getScrollOffset();" accesskey="e"'
-			)
+			),
+			'pdf' => array
+			(
+				'label'               => &$GLOBALS['TL_LANG']['tl_iao_credit_items']['pdf'],
+				'href'                => 'key=pdf&id='.$_GET['id'],
+				'class'               => 'header_generate_pdf',
+				'button_callback'     => array('tl_iao_credit_items', 'showPDF')
+			)			
 		),
 		'operations' => array
 		(
@@ -139,8 +146,10 @@ $GLOBALS['TL_DCA']['tl_iao_credit_items'] = array
 	// Palettes
 	'palettes' => array
 	(
-		'__selector__'                => array(),
-		'default'                     => '{templates_legend:hide},posten_template;{title_legend},headline,alias,author;{item_legend},text,price,count,vat,vat_incl;{publish_legend},published'
+		'__selector__'                => array('type'),
+		'default'                     => '{type_legend},type',
+		'item'                        => '{type_legend},type;{templates_legend:hide},posten_template;{title_legend},headline;{item_legend},text,price,vat,count,amountStr,vat_incl;{publish_legend},published',
+		'devider'                     => '{type_legend},type;{publish_legend},published'		
 	),
 
 	// Subpalettes
@@ -152,6 +161,16 @@ $GLOBALS['TL_DCA']['tl_iao_credit_items'] = array
 	// Fields
 	'fields' => array
 	(
+		'type' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_credit_items']['type'],
+			'default'                 => 'item',
+			'exclude'                 => true,
+			'filter'                  => true,
+			'inputType'               => 'select',
+			'options' 		  => &$GLOBALS['TL_LANG']['tl_iao_credit_items']['type_options'],
+			'eval'                    => array( 'submitOnChange'=>true)
+		),		
 		'posten_template' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_credit_items']['posten_template'],
@@ -161,7 +180,7 @@ $GLOBALS['TL_DCA']['tl_iao_credit_items'] = array
 			'flag'                    => 11,
 			'inputType'               => 'select',
 			'options_callback'        => array('tl_iao_credit_items', 'getPostenTemplate'),
-			'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>true,'submitOnChange'=>true),
+			'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>true,'submitOnChange'=>true, 'chosen'=>true),
 			'save_callback' => array
 			(
 				array('tl_iao_credit_items', 'fillPostenFields')
@@ -176,30 +195,6 @@ $GLOBALS['TL_DCA']['tl_iao_credit_items'] = array
 			'flag'                    => 1,
 			'inputType'               => 'text',
 			'eval'                    => array('mandatory'=>true, 'maxlength'=>255)
-		),
-		'alias' => array
-		(
-			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_credit_items']['alias'],
-			'exclude'                 => true,
-			'search'                  => true,
-			'inputType'               => 'text',
-			'eval'                    => array('rgxp'=>'alnum', 'unique'=>true, 'spaceToUnderscore'=>true, 'maxlength'=>128, 'tl_class'=>'w50'),
-			'save_callback' => array
-			(
-				array('tl_iao_credit_items', 'generateAlias')
-			)
-		),
-		'author' => array
-		(
-			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_credit_items']['author'],
-			'default'                 => $this->User->id,
-			'exclude'                 => true,
-			'filter'                  => true,
-			'sorting'                 => true,
-			'flag'                    => 1,
-			'inputType'               => 'select',
-			'foreignKey'              => 'tl_user.name',
-			'eval'                    => array('doNotCopy'=>true, 'mandatory'=>true, 'includeBlankOption'=>true, 'tl_class'=>'w50')
 		),
 		'text' => array
 		(
@@ -227,6 +222,16 @@ $GLOBALS['TL_DCA']['tl_iao_credit_items'] = array
 			'inputType'               => 'text',
 			'eval'                    => array('mandatory'=>true, 'maxlength'=>255, 'tl_class'=>'w50')
 		),
+		'amountStr' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_credit_items']['amountStr'],
+			'exclude'                 => true,
+			'filter'                  => true,
+			'flag'                    => 1,
+			'inputType'               => 'select',
+			'options'                 => &$GLOBALS['TL_LANG']['tl_iao_credit_items']['amountStr_options'],
+                        'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>true,'submitOnChange'=>false)
+		),		
 		'vat' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_credit_items']['vat'],
@@ -234,7 +239,8 @@ $GLOBALS['TL_DCA']['tl_iao_credit_items'] = array
 			'filter'                  => true,
 			'flag'                    => 1,
 			'inputType'               => 'select',
-			'options'                 => array(19=>'19% MwSt.',7=>'7% MwSt.',0=>'ohne MwSt.')
+			'options'            	  => &$GLOBALS['TL_LANG']['tl_iao_credit_items']['vat_options'],
+			'eval'                    => array('tl_class'=>'w50')
 		),				
 		'vat_incl' => array
 		(
@@ -243,7 +249,7 @@ $GLOBALS['TL_DCA']['tl_iao_credit_items'] = array
 			'filter'                  => true,
 			'flag'                    => 1,
 			'inputType'               => 'select',
-			'options'                 => array(1=>'netto',2=>'brutto')
+			'options'                 => $GLOBALS['TL_LANG']['tl_iao_credit_items']['vat_incl_percents'],
 		),				
 		'published' => array
 		(
@@ -277,7 +283,12 @@ class tl_iao_credit_items extends Backend
 		parent::__construct();
 		$this->import('BackendUser', 'User');
 	}
-
+	
+ 	public function showPDF($href, $label, $title, $class)
+	{
+          
+	    return '&nbsp; :: &nbsp;<a href="contao/main.php?do=iao_credit&table=tl_iao_credit&'.$href.'" title="'.specialchars($title).'" class="'.$class.'">'.$label.'</a> ';
+	}
 
 	/**
 	 * Check permissions to edit table tl_iao_credit_items
@@ -396,59 +407,30 @@ class tl_iao_credit_items extends Backend
 
 
 	/**
-	 * Autogenerate a event alias if it has not been set yet
-	 * @param mixed
-	 * @param object
-	 * @return string
-	 */
-	public function generateAlias($varValue, DataContainer $dc)
-	{
-		$autoAlias = false;
-
-		// Generate alias if there is none
-		if (!strlen($varValue))
-		{
-			$autoAlias = true;
-			$varValue = standardize($dc->activeRecord->headline);
-		}
-
-		$objAlias = $this->Database->prepare("SELECT id FROM tl_iao_credit_items WHERE alias=?")
-								   ->execute($varValue);
-
-		// Check whether the alias exists
-		if ($objAlias->numRows > 1 && !$autoAlias)
-		{
-			throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'], $varValue));
-		}
-
-		// Add ID to alias
-		if ($objAlias->numRows && $autoAlias)
-		{
-			$varValue .= '-' . $dc->id;
-		}
-
-		return $varValue;
-	}
-
-
-
-	/**
 	 * Add the type of input field
 	 * @param array
 	 * @return string
 	 */
 	public function listItems($arrRow)
-	{
+	{		 
+	    if($arrRow['type']=='devider')
+	    {
+	        return '<div class="pdf-devider"><span>PDF-Trenner</span></div>';
+	    }
+	    else
+	    {		    
 		$time = time();
-		$key = ($arrRow['published']) ? 'published' : 'unpublished';
+		$key = ($arrRow['published']) ? ' published' : ' unpublished';
                 $vat = ($arrRow['vat_incl']==1) ? 'netto' : 'brutto';
-                
-		return '<div class="cte_type ' . $key . '">
+                $pagebreak = ($arrRow['pagebreak_after']==1) ? ' pagebreak' : '';
+                                
+		return '<div class="cte_type' . $key . $pagebreak . '">
 		<strong>' . $arrRow['headline'] . '</strong>
 		 <br />Netto: '.number_format($arrRow['price_netto'],2,',','.') .$GLOBALS['TL_CONFIG']['iao_currency_symbol'].' 
 		 <br />Brutto: ' . number_format($arrRow['price_brutto'],2,',','.') .$GLOBALS['TL_CONFIG']['iao_currency_symbol']. ' (inkl. '.$arrRow['vat'].'% MwSt.)
 		 <br />'.$arrRow['text'].'
 		 </div>' . "\n";
+	    }		 
 	}
 
 	/**
@@ -556,63 +538,6 @@ class tl_iao_credit_items extends Backend
 	 {
 	     return ($netto / 100) * ($vat + 100);
 	 }	 
-	/**
-	 * Get all articles and return them as array
-	 * @param object
-	 * @return array
-	 */
-	public function getArticleAlias(DataContainer $dc)
-	{
-		$arrPids = array();
-		$arrAlias = array();
-
-		if (!$this->User->isAdmin)
-		{
-			foreach ($this->User->pagemounts as $id)
-			{
-				$arrPids[] = $id;
-				$arrPids = array_merge($arrPids, $this->getChildRecords($id, 'tl_page', true));
-			}
-
-			if (empty($arrPids))
-			{
-				return $arrAlias;
-			}
-
-			$objAlias = $this->Database->prepare("SELECT a.id, a.title, a.inColumn, p.title AS parent FROM tl_article a LEFT JOIN tl_page p ON p.id=a.pid WHERE a.pid IN(". implode(',', array_map('intval', array_unique($arrPids))) .") ORDER BY parent, a.sorting")
-									   ->execute($dc->id);
-		}
-		else
-		{
-			$objAlias = $this->Database->prepare("SELECT a.id, a.title, a.inColumn, p.title AS parent FROM tl_article a LEFT JOIN tl_page p ON p.id=a.pid ORDER BY parent, a.sorting")
-									   ->execute($dc->id);
-		}
-
-		if ($objAlias->numRows)
-		{
-			$this->loadLanguageFile('tl_article');
-
-			while ($objAlias->next())
-			{
-				$arrAlias[$objAlias->parent][$objAlias->id] = $objAlias->title . ' (' . (strlen($GLOBALS['TL_LANG']['tl_article'][$objAlias->inColumn]) ? $GLOBALS['TL_LANG']['tl_article'][$objAlias->inColumn] : $objAlias->inColumn) . ', ID ' . $objAlias->id . ')';
-			}
-		}
-
-		return $arrAlias;
-	}
-
-
-
-	/**
-	 * Return the link picker wizard
-	 * @param object
-	 * @return string
-	 */
-	public function pagePicker(DataContainer $dc)
-	{
-		$strField = 'ctrl_' . $dc->field . (($this->Input->get('act') == 'editAll') ? '_' . $dc->id : '');
-		return ' ' . $this->generateImage('pickpage.gif', $GLOBALS['TL_LANG']['MSC']['pagepicker'], 'style="vertical-align:top; cursor:pointer;" onclick="Backend.pickPage(\'' . $strField . '\')"');
-	}
 
 
 	/**
@@ -693,7 +618,7 @@ class tl_iao_credit_items extends Backend
 	}
 	
 	/**
-	 * Generate a button to put a posten-template for invoices
+	 * Generate a button to put a posten-template for credit
 	 * @param array
 	 * @param string
 	 * @param string
@@ -720,14 +645,15 @@ class tl_iao_credit_items extends Backend
 		    $postenset = array(
 		    'tstamp' => time(),
 		    'headline' => $result->headline,
-		    'alias' => $result->alias,
+		    'headline_to_pdf' => $result->headline_to_pdf,
 		    'sorting' => $result->sorting,
-		    'author' => $result->author,
 		    'date' => $result->date,
 		    'time' => $result->time,
 		    'text' => $result->text,
 		    'count' => $result->count,
 		    'price' => $result->price,
+		    'amountStr' => $result->amountStr,
+		    'operator' => $result->operator,
 		    'price_netto' => $result->price_netto,
 		    'price_brutto' => $result->price_brutto,
 		    'published' => $result->published,
@@ -747,8 +673,9 @@ class tl_iao_credit_items extends Backend
 		$href.='&amp;ptid='.$row['id'];
 		return '<a href="'.$this->addToUrl($href).'" title="'.specialchars($title).'"'.$attributes.'>'.$this->generateImage($icon, $label).'</a> ';			       
         }
+        
         /**
-	 * get all invoice-posten-templates
+	 * get all credit-posten-templates
 	 * @param object
 	 * @throws Exception
 	 */

@@ -116,7 +116,7 @@ $GLOBALS['TL_DCA']['tl_iao_posten_templates'] = array
 	'palettes' => array
 	(
 		'__selector__'                => array(),
-		'default'                     => 'position;{title_legend},headline,alias,author;{item_legend},text,price,count,vat,vat_incl;{publish_legend},published'
+		'default'                     => 'position;{title_legend},headline,headline_to_pdf;{item_legend},text,price,vat,count,amountStr,operator,vat_incl;{publish_legend},published'
 	),
 
 	// Subpalettes
@@ -137,32 +137,17 @@ $GLOBALS['TL_DCA']['tl_iao_posten_templates'] = array
 			'sorting'                 => true,
 			'flag'                    => 1,
 			'inputType'               => 'text',
-			'eval'                    => array('mandatory'=>true, 'maxlength'=>255)
+			'eval'                    => array('mandatory'=>true, 'maxlength'=>255, 'tl_class'=>'w50')
 		),
-		'alias' => array
+		'headline_to_pdf' => array
 		(
-			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_posten_templates']['alias'],
-			'exclude'                 => true,
-			'search'                  => true,
-			'inputType'               => 'text',
-			'eval'                    => array('rgxp'=>'alnum', 'unique'=>true, 'spaceToUnderscore'=>true, 'maxlength'=>128, 'tl_class'=>'w50'),
-			'save_callback' => array
-			(
-				array('tl_iao_posten_templates', 'generateAlias')
-			)
-		),
-		'author' => array
-		(
-			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_posten_templates']['author'],
-			'default'                 => $this->User->id,
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_posten_templates']['headline_to_pdf'],
 			'exclude'                 => true,
 			'filter'                  => true,
-			'sorting'                 => true,
-			'flag'                    => 1,
-			'inputType'               => 'select',
-			'foreignKey'              => 'tl_user.name',
-			'eval'                    => array('doNotCopy'=>true, 'mandatory'=>true, 'includeBlankOption'=>true, 'tl_class'=>'w50')
-		),				
+			'flag'                    => 2,
+			'inputType'               => 'checkbox',
+			'eval'                    => array('doNotCopy'=>true, 'tl_class'=>'w50')
+		),						
 		'text' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_posten_templates']['text'],
@@ -190,6 +175,16 @@ $GLOBALS['TL_DCA']['tl_iao_posten_templates'] = array
 			'inputType'               => 'text',
 			'eval'                    => array('mandatory'=>true, 'maxlength'=>255, 'tl_class'=>'w50')
 		),
+		'amountStr' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_posten_templates']['amountStr'],
+			'exclude'                 => true,
+			'filter'                  => true,
+			'flag'                    => 1,
+			'inputType'               => 'select',
+			'options'                 => &$GLOBALS['TL_LANG']['tl_iao_posten_templates']['amountStr_options'],
+                        'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>true,'submitOnChange'=>false)
+		),		
 		'vat' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_posten_templates']['vat'],
@@ -197,7 +192,8 @@ $GLOBALS['TL_DCA']['tl_iao_posten_templates'] = array
 			'filter'                  => true,
 			'flag'                    => 1,
 			'inputType'               => 'select',
-			'options'                 => array(19=>'19% MwSt.',7=>'7% MwSt.',0=>'ohne MwSt.')
+			'options'            	  => &$GLOBALS['TL_LANG']['tl_iao_posten_templates']['vat_options'],
+			'eval'                    => array('tl_class'=>'w50')
 		),				
 		'vat_incl' => array
 		(
@@ -206,8 +202,19 @@ $GLOBALS['TL_DCA']['tl_iao_posten_templates'] = array
 			'filter'                  => true,
 			'flag'                    => 1,
 			'inputType'               => 'select',
-			'options'                 => array(1=>'netto',2=>'brutto')
-		),				
+			'options'                 => &$GLOBALS['TL_LANG']['tl_iao_posten_templates']['vat_incl_percents'],			
+			'eval'                    => array('tl_class'=>'w50')		
+		),
+		'operator' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_posten_templates']['operator'],
+			'exclude'                 => true,
+			'filter'                  => true,
+			'flag'                    => 1,
+			'inputType'               => 'select',
+			'options'                 => &$GLOBALS['TL_LANG']['tl_iao_posten_templates']['operators'],
+			'eval'                    => array('tl_class'=>'w50')			
+		),						
 		'published' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_posten_templates']['published'],
@@ -386,45 +393,7 @@ class tl_iao_posten_templates extends Backend
 		}
 	}
 
-
-
-
-
-
-	/**
-	 * Autogenerate an article alias if it has not been set yet
-	 * @param mixed
-	 * @param object
-	 * @return string
-	 */
-	public function generateAlias($varValue, DataContainer $dc)
-	{
-		$autoAlias = false;
-                
-		// Generate alias if there is none
-		if (!strlen($varValue))
-		{
-			$autoAlias = true;
-			$varValue = standardize($dc->activeRecord->title);
-		}
-                
-        
-		$objAlias = $this->Database->prepare("SELECT id FROM `tl_iao_posten_templates` WHERE id=? OR alias=?")
-								   ->execute($dc->id, $varValue);
-
-		// Check whether the page alias exists
-		if ($objAlias->numRows > 1)
-		{
-			if (!$autoAlias)
-			{
-				throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'], $varValue));
-			}
-
-			$varValue .= '-' . $dc->id;
-		}
-
-		return $varValue;
-	}
+	
         /**
         * fill date-Field if this empty
         * @param mixed
@@ -435,92 +404,7 @@ class tl_iao_posten_templates extends Backend
 	    
 	    return ($varValue==0) ? date('Y-m-d') : $varValue;
 	    
-        }
-        
-        /**
-        * fill date-Field if this empty
-        * @param mixed
-        * @param object
-        * @return date
-        */
-        public function  generateExpiryDate($varValue, DataContainer $dc)
-        {
-	    
-	    if($varValue==0)
-	    {
-		 $format = ($GLOBALS['TL_CONFIG']['iao_credit_expiry_date']) ? $GLOBALS['TL_CONFIG']['iao_credit_expiry_date'] : 'd:m+3:Y';
-		 $parts = explode(':',$format);
-		
-		 $part['day'] =  substr($parts[0],1);
-		 $part['month'] =  substr($parts[1],1);
-		 $part['year'] =  substr($parts[2],1);
-
-		 $varValue = date('Y-m-d',mktime(0, 0, 0, date('n')+$part['month'],date('d')+$part['day'], date('Y')+$part['year']));
-	    }
-	    return  $varValue;
-        }
-        /**
-        * fill date-Field if this empty
-        * @param mixed
-        * @param object
-        * @return date
-        */
-        public function  generateCreditTstamp($varValue, DataContainer $dc){
-	    
-	    $credit_date = $dc->activeRecord->credit_date;
-	    if($credit_date == 0  && $varValue !=0) return time();
-	    
- 	    $idArr =  explode('-',$credit_date);	    
-	    return mktime(0, 0, 0, $idArr[1], $idArr[2], $idArr[0]); 
-        }  
-	/**
-	 * fill Adress-Text
-	 * @param object
-	 * @throws Exception
-	 */
-	public function fillAdressText($varValue, DataContainer $dc)
-	{
-                 if(strip_tags($dc->activeRecord->address_text)=='')
-                 {
-		    
-		    if(strlen($varValue)<=0) return $varValue;
-		     
-		    $objMember = $this->Database->prepare('SELECT * FROM `tl_member` WHERE `id`=?')
-						->limit(1)
-						->execute($varValue);
-						
-		    $text = '<p>'.$objMember->company.'<br />'.($objMember->gender!='' ? $GLOBALS['TL_LANG']['tl_iao_posten_templates']['gender'][$objMember->gender].' ':'').($objMember->title ? $objMember->title.' ':'').$objMember->firstname.' '.$objMember->lastname.'<br />'.$objMember->street.'</p>';
-		    $text .='<p>'.$objMember->postal.' '.$objMember->city.'</p>';			    		    
-		    
-		    $this->Database->prepare('UPDATE `tl_iao_posten_templates` SET `address_text`=? WHERE `id`=?')
-				   ->limit(1)
-				   ->execute($text,$dc->id);			
-                 }
-		return $varValue;
-	}	
-	/**
-	 * get all members to valid groups
-	 * @param object
-	 * @throws Exception
-	 */
-	public function getMembers(DataContainer $dc)
-	{
-            $varValue= array();
-            
-            if(!$GLOBALS['TL_CONFIG']['iao_costumer_group'])  return $varValue;
-            
-            $groups = deserialize($GLOBALS['TL_CONFIG']['iao_costumer_group']);
-            $all = $this->Database->execute('SELECT `id`,`groups`,`firstname`,`lastname`,`company` FROM `tl_member`');
-            while($all->next())
-            {
-               $actgroups=deserialize($all->groups);
-               
-               foreach($actgroups as $k => $actgroup) if(!in_array($actgroup,$groups)) continue;
-               $varValue[$all->id] = $all->firstname.' '.$all->lastname.' ('.$all->company.')';
-            }
-            
-	    return $varValue;
-	}
+        }	
 
 	/**
 	 * Return the edit header button
@@ -540,127 +424,6 @@ class tl_iao_posten_templates extends Backend
 
 
 	
-	/**
-	 * Generate a "PDF" button and return it as string
-	 * @param array
-	 * @param string
-	 * @param string
-	 * @param string
-	 * @param string
-	 * @return string
-	 */
-	public function showPDF($row, $href, $label, $title, $icon)
-	{
-		if (!$this->User->isAdmin)
-		{
-			return '';
-		}
-                
-		if ($this->Input->get('key') == 'pdf' && $this->Input->get('id') == $row['id'])
-		{
-		    if( !file_exists(TL_ROOT . '/' . $GLOBALS['TL_CONFIG']['iao_credit_pdf']) ) return;  // template file not found
-		
-		    $pdfname = 'Gutschrift-'.$row['credit_id_str'];
-		    
-		    //-- Calculating dimensions
-		    $margins = unserialize($GLOBALS['TL_CONFIG']['iao_pdf_margins']);         // Margins as an array
-		    switch( $margins['unit'] ) {
-		      case 'cm':      $factor = 10.0;   break;
-		      default:        $factor = 1.0;
-		    }
-                    require_once(TL_ROOT . '/system/modules/invoice_and_offer/iaoPDF.php');
-		    
-		    $dim['top']    = !is_numeric($margins['top'])   ? PDF_MARGIN_TOP    : $margins['top'] * $factor;
-		    $dim['right']  = !is_numeric($margins['right']) ? PDF_MARGIN_RIGHT  : $margins['right'] * $factor;
-		    $dim['bottom'] = !is_numeric($margins['top'])   ? PDF_MARGIN_BOTTOM : $margins['bottom'] * $factor;
-		    $dim['left']   = !is_numeric($margins['left'])  ? PDF_MARGIN_LEFT   : $margins['left'] * $factor;		
-		    
-		    // TCPDF configuration
-		    $l['a_meta_dir'] = 'ltr';
-		    $l['a_meta_charset'] = $GLOBALS['TL_CONFIG']['characterSet'];
-		    $l['a_meta_language'] = $GLOBALS['TL_LANGUAGE'];
-		    $l['w_page'] = 'page';
-		  		   
-		   // Create new PDF document with FPDI extension
-		    
-		    $pdf = new iaoPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true);
-		    $pdf->setSourceFile( TL_ROOT . '/' . $GLOBALS['TL_CONFIG']['iao_credit_pdf']);          // Set PDF template
-		   
-		    // Set document information
-		    $pdf->SetCreator(PDF_CREATOR);
-		    $pdf->SetAuthor(PDF_AUTHOR);
-		    $pdf->SetTitle($pdfname);
-		    $pdf->SetSubject($pdfname);
-		    $pdf->SetKeywords($pdfname);
-		
-		    $pdf->SetDisplayMode('fullwidth', 'OneColumn', 'UseNone');
-		    $pdf->SetHeaderData( );
- 
-		    // Remove default header/footer
-		    $pdf->setPrintHeader(false);
-		    $pdf->setPrintFooter(false);
-		    
-		    // Set margins
-		    $pdf->SetMargins($dim['left'], $dim['top'], $dim['right']);
-		
-		    // Set auto page breaks
-		    $pdf->SetAutoPageBreak(true, $dim['bottom']);
-		    
-		    // Set image scale factor
-		    $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
-		    
-		    // Set some language-dependent strings
-		    $pdf->setLanguageArray($l);
-		    
-		    // Initialize document and add a page
-		    $pdf->AliasNbPages();
-		    $pdf->AddPage();		    
-
-		    // Include CSS (TCPDF 5.1.000 an newer)
-		    if(file_exists(TL_ROOT . '/' . $GLOBALS['TL_CONFIG']['iao_pdf_css']) ) {
-		      $styles = "<style>\n" . file_get_contents(TL_ROOT . '/' . $GLOBALS['TL_CONFIG']['iao_pdf_css']) . "\n</style>\n";  
-    
-		    }		    			    		    		    
-		    		   		    
-		    // write the address-data
-                    $pdf->drawAddress($styles.$this->changeTags($row['address_text']));
-		    		    
-		    //Rechnungsnummer
-                    $pdf->drawDocumentNumber($row['credit_id_str']);
-		    
-		    //Datum
-                    $pdf->drawDate(date('d.m.Y',$row['tstamp']));
-		    
-		    //Text vor der Posten-Tabelle
-		    if(strip_tags($row['before_text']))
-		    {
-		        $row['before_text']  = $this->changeTags($row['before_text']);
-		        $pdf->drawTextBefore($row['before_text']);
-		    }
-		    
-		    //Posten-Tabelle
-		    $header = array('Menge','Beschreibung','Einzelpreis','Gesamt');
-		    $fields = $this->getPosten($this->Input->get('id'));
-		    $pdf->drawPostenTable($header,$fields);
-		    
-		    //Text vor der Posten-Tabelle
-		    if(strip_tags($row['after_text']))
-		    {
-			$row['after_text']  = $this->changeTags($row['after_text']);
-			$pdf->drawTextAfter($row['after_text']);
-		    }
-		    
-		    // Close and output PDF document
-		    $pdf->lastPage();		    
-		    $pdf->Output($pdfname. '.pdf', 'D');		     
-		   		    
-		    // Stop script execution
-		    exit();
-		    
-		
-		}
-		return '<a href="'.$this->addToUrl($href.'&amp;id='.$row['id']).'" title="'.specialchars($title).'">'.$this->generateImage($icon, $label).'</a> ';
-	}
 	
 	public function changeTags($text)
 	{
@@ -737,50 +500,6 @@ class tl_iao_posten_templates extends Backend
 	   return $varValue;
 	}
 	
-	/**
-	 * Autogenerate an article alias if it has not been set yet
-	 * @param mixed
-	 * @param object
-	 * @return string
-	 */
-	public function generateCreditNumber($varValue, DataContainer $dc)
-	{
-	    $autoNr = false;
-	    $varValue = (int) $varValue;
-	    
-	    // Generate credit_id if there is none
-	    if($varValue == 0)
-	    {
-		$autoNr = true;
-		$objNr = $this->Database->prepare("SELECT `credit_id` FROM `tl_iao_posten_templates` ORDER BY `credit_id` DESC")
-					->limit(1)
-					->execute();
-		
-					
-	        if($objNr->numRows < 1 || $objNr->credit_id == 0)  $varValue = $GLOBALS['TL_CONFIG']['iao_credit_startnumber'];
-	        else  $varValue =  $objNr->credit_id +1;
-	        
-	    }
-	    else
-	    {			        
-		$objNr = $this->Database->prepare("SELECT `credit_id` FROM `tl_iao_posten_templates` WHERE `id`=? OR `credit_id`=?")
-					    ->limit(1)
-					    ->execute($dc->id,$varValue);
-		    
-		// Check whether the CreditNumber exists
-		if ($objNr->numRows > 1 )
-		{
-			if (!$autoNr)
-			{
-				throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'], $varValue));
-			}
-    
-			$varValue .= '-' . $dc->id;
-		}
-	    }
-	    return $varValue;
-	    
-      }
       
     /**
      * List a particular record

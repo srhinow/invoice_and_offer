@@ -15,29 +15,35 @@
  * permanent text corrections which are update-safe. 
  */
 
- $GLOBALS['TL_LANG']['tl_iao_invoice']['title'] = array('Bezeichnung','Bezeichnung des Elementes');
-  $GLOBALS['TL_LANG']['tl_iao_invoice']['alias'] = array('Alias','');
-  $GLOBALS['TL_LANG']['tl_iao_invoice']['member'] = array('Kunde','Adresse aus gespeicherten Kunden in nachstehendes Feld befüllen');
-  $GLOBALS['TL_LANG']['tl_iao_invoice']['address_text'] = array('Rechnungs-Adresse','Adresse die in der Rechnungs-PDF-Datei geschrieben wird.');
-  $GLOBALS['TL_LANG']['tl_iao_invoice']['before_text'] = array('Text vor den Posten','');
-  $GLOBALS['TL_LANG']['tl_iao_invoice']['after_text'] = array('Text nach den Posten','');
-  $GLOBALS['TL_LANG']['tl_iao_invoice']['published'] = array('veröffnentlich/versendet.','');
-  $GLOBALS['TL_LANG']['tl_iao_invoice']['status'] = array('Status dieser Rechnung','');
-    
   $GLOBALS['TL_LANG']['tl_iao_invoice']['new'] = array('Neue Rechnung','Eine neue Rechnung anlegen');   
   $GLOBALS['TL_LANG']['tl_iao_invoice']['edit'] = array('Rechnung bearbeiten','Rechnung ID %s bearbeiten');
   $GLOBALS['TL_LANG']['tl_iao_invoice']['copy'] = array('Rechnung duplizieren','Rechnung ID %s duplizieren');
   $GLOBALS['TL_LANG']['tl_iao_invoice']['delete'] = array('Rechnung löschen','Rechnung ID %s löschen');
   $GLOBALS['TL_LANG']['tl_iao_invoice']['deleteConfirm'] = 'Soll die Rechnung ID %s wirklich gelöscht werden?!';
   $GLOBALS['TL_LANG']['tl_iao_invoice']['show'] = array('Details anzeigen','Details der Rechnung ID %s anzeigen');
-  $GLOBALS['TL_LANG']['tl_iao_invoice']['pdf'] = array('PDF generieren','eine PDF zu dieser Rechnung generieren');
+
   $GLOBALS['TL_LANG']['tl_iao_invoice']['importInvoices'] = array('Import','Rechnungen aus CSV-Dateien importieren');
   $GLOBALS['TL_LANG']['tl_iao_invoice']['exportInvoices'] = array('Export','Rechnungen und deren Posten in CSV-Dateien exportieren.');
    
+  $GLOBALS['TL_LANG']['tl_iao_invoice']['title'] = array('Bezeichnung','Bezeichnung des Elementes');
+  $GLOBALS['TL_LANG']['tl_iao_invoice']['alias'] = array('Alias','');
+  $GLOBALS['TL_LANG']['tl_iao_invoice']['member'] = array('Kunde','Adresse aus gespeicherten Kunden in nachstehendes Feld befüllen');
+  $GLOBALS['TL_LANG']['tl_iao_invoice']['address_text'] = array('Rechnungs-Adresse','Adresse die in der Rechnungs-PDF-Datei geschrieben wird.');
+  $GLOBALS['TL_LANG']['tl_iao_invoice']['before_text'] = array('Text vor den Posten','');
+  $GLOBALS['TL_LANG']['tl_iao_invoice']['before_template'] = array('Text-Template vor den Posten','');    
+  $GLOBALS['TL_LANG']['tl_iao_invoice']['after_text'] = array('Text nach den Posten','');
+  $GLOBALS['TL_LANG']['tl_iao_invoice']['after_template'] = array('Text-Template nach den Posten','');   
+  $GLOBALS['TL_LANG']['tl_iao_invoice']['published'] = array('veröffnentlich/versendet.','');
+  $GLOBALS['TL_LANG']['tl_iao_invoice']['status'] = array('Status dieser Rechnung','');   
   $GLOBALS['TL_LANG']['tl_iao_invoice']['price_netto'] = array('Rechnung-Höhe (Netto)','');
   $GLOBALS['TL_LANG']['tl_iao_invoice']['price_brutto'] = array('Rechnung-Höhe (Brutto)','');
   $GLOBALS['TL_LANG']['tl_iao_invoice']['member'] = array('Kunde','');
-  $GLOBALS['TL_LANG']['tl_iao_invoice']['notice'] = array('Notiz','');  
+  $GLOBALS['TL_LANG']['tl_iao_invoice']['noVat'] = array('keine MwSt. ausweisen','z.B. Rechnung in nicht Bundesrepublik Deutschland');  
+  $GLOBALS['TL_LANG']['tl_iao_invoice']['notice'] = array('Notiz',''); 
+  $GLOBALS['TL_LANG']['tl_iao_invoice']['discount'] = array('Rabatt/Skonto',' Rabatt/Skonto auf die Gesamtsumme');  
+  $GLOBALS['TL_LANG']['tl_iao_invoice']['discount_title'] = array('Rabatt-Beschreibung','Text vor dem Rabattwert');  
+  $GLOBALS['TL_LANG']['tl_iao_invoice']['discount_value'] = array('Rabatt-Wert','Wert als Zahl eingeben');  
+  $GLOBALS['TL_LANG']['tl_iao_invoice']['discount_operator'] = array('Rabatt-Operator','Art der Rabattierung');  
   $GLOBALS['TL_LANG']['tl_iao_invoice']['invoice_date'] = array('Rechnungsdatum','wenn es leer bleibt dann wird das aktuelle Datum eingetragen. Unter normalen Umständen sollte dieses Feld leer bleiben. Es ist hauptsächlich für Importe gedacht.');
   $GLOBALS['TL_LANG']['tl_iao_invoice']['invoice_tstamp'] = array('Rechnungsdatum als Timestamp','Wenn es leer bleibt dann wird der Timestamp vom Rechungsdatum eingetragen. Unter normalen Umständen sollte dieses Feld leer bleiben. Es ist hauptsächlich für Importe gedacht.');
   $GLOBALS['TL_LANG']['tl_iao_invoice']['invoice_id'] = array('Rechnungs-ID','Dieses Feld wird hauptsächlich zum hochzählen der nächsten Rechung benötigt.');
@@ -46,7 +52,7 @@
   $GLOBALS['TL_LANG']['tl_iao_invoice']['expiry_date'] = array('Begleichen bis','Das Datum nachdem die Mahnungsstufen anfangen.');  
   $GLOBALS['TL_LANG']['tl_iao_invoice']['invoice_pdf_file'] = array('Rechnungsdatei','Wenn hier eine Datei angegeben wurde wird diese statt einer generierten ausgegeben. Unter normalen Umständen sollte dieses Feld leer bleiben. Es ist hauptsächlich für Importe gedacht.');
   $GLOBALS['TL_LANG']['tl_iao_invoice']['paid_on_date'] = array('Bezahlt am','Das Datum an dem die Zahlung auf dem Konto eingegangen ist.'); 
-    
+ 
   
   $GLOBALS['TL_LANG']['tl_iao_invoice']['csv_source'] = array('CSV der Rechnungen','z.B. tl_iao_invoice_YYYY-MM-DD.csv');
   $GLOBALS['TL_LANG']['tl_iao_invoice']['csv_posten_source'] = array('CSV der Rechnungsposten','z.B. tl_iao_invoice_items_YYYY-MM-DD.csv');
@@ -83,4 +89,10 @@
    */
    $GLOBALS['TL_LANG']['tl_iao_invoice']['Invoice_imported'] = 'Es wurden die Datensätze aus %s erfogreich importiert';
    $GLOBALS['TL_LANG']['tl_iao_invoice']['Invoice_exported'] = 'Es wurden die Datensätze erfogreich exportiert';   
+  
+   /**
+   * Select-fiels options
+   */   
+   $GLOBALS['TL_LANG']['tl_iao_invoice']['status_options'] = array('1'=>'nicht bezahlt','2'=>'bezahlt','3'=>'ruht (keine Mahnungen)'); 
+   $GLOBALS['TL_LANG']['tl_iao_invoice']['discount_operators'] = array('%'=>'% (Prozentwert Rabatt von der Summe)','-'=>'- (verminderter Wert von die Summe)','+'=>'+ (erhöhender Wert auf die Summe)');  
 ?>

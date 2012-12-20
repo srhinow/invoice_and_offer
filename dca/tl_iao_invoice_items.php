@@ -146,10 +146,11 @@ $GLOBALS['TL_DCA']['tl_iao_invoice_items'] = array
 	// Palettes
 	'palettes' => array
 	(
-		'__selector__'                => array(),
-		'default'                     => '{templates_legend:hide},posten_template;{title_legend},headline,alias,author;{item_legend},text,price,count,vat,vat_incl;{publish_legend},published;pagebreak_after'
+		'__selector__'                => array('type'),
+		'default'                     => '{type_legend},type',
+		'item'                        => '{type_legend},type;{templates_legend:hide},posten_template;{title_legend},headline,headline_to_pdf;{item_legend},text,price,vat,count,amountStr,operator,vat_incl;{publish_legend},published;{pagebreake_legend:hidden},pagebreak_after',
+		'devider'                     => '{type_legend},type;{publish_legend},published'
 	),
-
 	// Subpalettes
 	'subpalettes' => array
 	(
@@ -159,6 +160,16 @@ $GLOBALS['TL_DCA']['tl_iao_invoice_items'] = array
 	// Fields
 	'fields' => array
 	(
+		'type' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_invoice_items']['type'],
+			'default'                 => 'item',
+			'exclude'                 => true,
+			'filter'                  => true,
+			'inputType'               => 'select',
+			'options' 		  => array('item'=>'Eintrag','devider'=>'PDF-Trenner'),
+			'eval'                    => array( 'submitOnChange'=>true)
+		),		
 		'posten_template' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_invoice_items']['posten_template'],
@@ -168,7 +179,7 @@ $GLOBALS['TL_DCA']['tl_iao_invoice_items'] = array
 			'flag'                    => 11,
 			'inputType'               => 'select',
 			'options_callback'        => array('tl_iao_invoice_items', 'getPostenTemplate'),
-			'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>true,'submitOnChange'=>true),
+			'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>true,'submitOnChange'=>true, 'chosen'=>true),
 			'save_callback' => array
 			(
 				array('tl_iao_invoice_items', 'fillPostenFields')
@@ -182,32 +193,17 @@ $GLOBALS['TL_DCA']['tl_iao_invoice_items'] = array
 			'sorting'                 => true,
 			'flag'                    => 1,
 			'inputType'               => 'text',
-			'eval'                    => array('mandatory'=>true, 'maxlength'=>255)
+			'eval'                    => array('mandatory'=>true, 'maxlength'=>255, 'tl_class'=>'w50')
 		),
-		'alias' => array
+		'headline_to_pdf' => array
 		(
-			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_invoice_items']['alias'],
-			'exclude'                 => true,
-			'search'                  => true,
-			'inputType'               => 'text',
-			'eval'                    => array('rgxp'=>'alnum', 'unique'=>true, 'spaceToUnderscore'=>true, 'maxlength'=>128, 'tl_class'=>'w50'),
-			'save_callback' => array
-			(
-				array('tl_iao_invoice_items', 'generateAlias')
-			)
-		),
-		'author' => array
-		(
-			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_invoice_items']['author'],
-			'default'                 => $this->User->id,
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_invoice_items']['headline_to_pdf'],
 			'exclude'                 => true,
 			'filter'                  => true,
-			'sorting'                 => true,
-			'flag'                    => 1,
-			'inputType'               => 'select',
-			'foreignKey'              => 'tl_user.name',
-			'eval'                    => array('doNotCopy'=>true, 'mandatory'=>true, 'includeBlankOption'=>true, 'tl_class'=>'w50')
-		),
+			'flag'                    => 2,
+			'inputType'               => 'checkbox',
+			'eval'                    => array('doNotCopy'=>true, 'tl_class'=>'w50')
+		),		
 		'text' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_invoice_items']['text'],
@@ -234,6 +230,16 @@ $GLOBALS['TL_DCA']['tl_iao_invoice_items'] = array
 			'inputType'               => 'text',
 			'eval'                    => array('mandatory'=>true, 'maxlength'=>255, 'tl_class'=>'w50')
 		),
+		'amountStr' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_invoice_items']['amountStr'],
+			'exclude'                 => true,
+			'filter'                  => true,
+			'flag'                    => 1,
+			'inputType'               => 'select',
+			'options'                 => &$GLOBALS['TL_LANG']['tl_iao_invoice_items']['amountStr_options'],
+                        'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>true,'submitOnChange'=>false)
+		),		
 		'vat' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_invoice_items']['vat'],
@@ -241,7 +247,8 @@ $GLOBALS['TL_DCA']['tl_iao_invoice_items'] = array
 			'filter'                  => true,
 			'flag'                    => 1,
 			'inputType'               => 'select',
-			'options'                 => array(19=>'19% MwSt.',7=>'7% MwSt.',0=>'ohne MwSt.')
+			'options'            	  => &$GLOBALS['TL_LANG']['tl_iao_invoice_items']['vat_options'],
+			'eval'                    => array('tl_class'=>'w50')
 		),				
 		'vat_incl' => array
 		(
@@ -250,8 +257,19 @@ $GLOBALS['TL_DCA']['tl_iao_invoice_items'] = array
 			'filter'                  => true,
 			'flag'                    => 1,
 			'inputType'               => 'select',
-			'options'                 => array(1=>'netto',2=>'brutto')
-		),				
+			'options'                 => &$GLOBALS['TL_LANG']['tl_iao_invoice_items']['vat_incl_percents'],			
+			'eval'                    => array('tl_class'=>'w50')			
+		),
+		'operator' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_invoice_items']['operator'],
+			'exclude'                 => true,
+			'filter'                  => true,
+			'flag'                    => 1,
+			'inputType'               => 'select',
+			'options'                 => &$GLOBALS['TL_LANG']['tl_iao_invoice_items']['operators'],
+			'eval'                    => array('tl_class'=>'w50')			
+		),						
 		'published' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_invoice_items']['published'],
@@ -414,44 +432,6 @@ class tl_iao_invoice_items extends Backend
 		}
 	}
 
-
-	/**
-	 * Autogenerate a event alias if it has not been set yet
-	 * @param mixed
-	 * @param object
-	 * @return string
-	 */
-	public function generateAlias($varValue, DataContainer $dc)
-	{
-		$autoAlias = false;
-
-		// Generate alias if there is none
-		if (!strlen($varValue))
-		{
-			$autoAlias = true;
-			$varValue = standardize($dc->activeRecord->headline);
-		}
-
-		$objAlias = $this->Database->prepare("SELECT id FROM tl_iao_invoice_items WHERE alias=?")
-								   ->execute($varValue);
-
-		// Check whether the alias exists
-		if ($objAlias->numRows > 1 && !$autoAlias)
-		{
-			throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'], $varValue));
-		}
-
-		// Add ID to alias
-		if ($objAlias->numRows && $autoAlias)
-		{
-			$varValue .= '-' . $dc->id;
-		}
-
-		return $varValue;
-	}
-
-
-
 	/**
 	 * Add the type of input field
 	 * @param array
@@ -459,17 +439,25 @@ class tl_iao_invoice_items extends Backend
 	 */
 	public function listItems($arrRow)
 	{
+		
+	    if($arrRow['type']=='devider')
+	    {
+	        return '<div class="pdf-devider"><span>PDF-Trenner</span></div>';
+	    }
+	    else
+	    {		    
 		$time = time();
 		$key = ($arrRow['published']) ? ' published' : ' unpublished';
                 $vat = ($arrRow['vat_incl']==1) ? 'netto' : 'brutto';
                 $pagebreak = ($arrRow['pagebreak_after']==1) ? ' pagebreak' : '';
-                
+                                
 		return '<div class="cte_type' . $key . $pagebreak . '">
 		<strong>' . $arrRow['headline'] . '</strong>
 		 <br />Netto: '.number_format($arrRow['price_netto'],2,',','.') .$GLOBALS['TL_CONFIG']['iao_currency_symbol'].' 
 		 <br />Brutto: ' . number_format($arrRow['price_brutto'],2,',','.') .$GLOBALS['TL_CONFIG']['iao_currency_symbol']. ' (inkl. '.$arrRow['vat'].'% MwSt.)
 		 <br />'.$arrRow['text'].'
 		 </div>' . "\n";
+	    }
 	}
 
 	/**
@@ -486,7 +474,7 @@ class tl_iao_invoice_items extends Backend
 		    return;
 	    }
 	    
-            $itemObj = $this->Database->prepare('SELECT `price`,`count`,`vat`,`vat_incl` FROM `tl_iao_invoice_items` WHERE `pid`=? AND published =?')
+            $itemObj = $this->Database->prepare('SELECT `price`,`count`,`vat`,`vat_incl`,`operator` FROM `tl_iao_invoice_items` WHERE `pid`=? AND published =?')
 				      ->execute($dc->activeRecord->pid,1);
             
             
@@ -500,15 +488,28 @@ class tl_iao_invoice_items extends Backend
 		    $englprice = str_replace(',','.',$itemObj->price);
 		    $priceSum = $englprice * $itemObj->count;
 		    
+		    //if MwSt inclusive
 		    if($itemObj->vat_incl == 1)
 		    {
-		       $allNetto += $priceSum;
-		       $allBrutto += $this->getBruttoPrice($priceSum,$itemObj->vat);
+		       $Netto = $priceSum;
+		       $Brutto = $this->getBruttoPrice($priceSum,$itemObj->vat);
 		    }
 		    else
 		    {
-		       $allNetto += $this->getNettoPrice($priceSum,$itemObj->vat);
-		       $allBrutto += $priceSum;
+		       $Netto = $this->getNettoPrice($priceSum,$itemObj->vat);
+		       $Brutto = $priceSum;
+		    }
+		    
+		    //which operator is set?
+		    if($itemObj->operator == '-')
+		    {
+			$allNetto -= $Netto;
+			$allBrutto -= $Brutto;
+		    }
+		    else
+		    {
+			$allNetto += $Netto;
+			$allBrutto += $Brutto;		    
 		    }
 		    
 		    $this->Database->prepare('UPDATE `tl_iao_invoice` SET `price_netto`=?, `price_brutto`=? WHERE `id`=?')
@@ -582,51 +583,6 @@ class tl_iao_invoice_items extends Backend
 	 {
 	     return ($netto / 100) * ($vat + 100);
 	 }	 
-	/**
-	 * Get all articles and return them as array
-	 * @param object
-	 * @return array
-	 */
-	public function getArticleAlias(DataContainer $dc)
-	{
-		$arrPids = array();
-		$arrAlias = array();
-
-		if (!$this->User->isAdmin)
-		{
-			foreach ($this->User->pagemounts as $id)
-			{
-				$arrPids[] = $id;
-				$arrPids = array_merge($arrPids, $this->getChildRecords($id, 'tl_page', true));
-			}
-
-			if (empty($arrPids))
-			{
-				return $arrAlias;
-			}
-
-			$objAlias = $this->Database->prepare("SELECT a.id, a.title, a.inColumn, p.title AS parent FROM tl_article a LEFT JOIN tl_page p ON p.id=a.pid WHERE a.pid IN(". implode(',', array_map('intval', array_unique($arrPids))) .") ORDER BY parent, a.sorting")
-									   ->execute($dc->id);
-		}
-		else
-		{
-			$objAlias = $this->Database->prepare("SELECT a.id, a.title, a.inColumn, p.title AS parent FROM tl_article a LEFT JOIN tl_page p ON p.id=a.pid ORDER BY parent, a.sorting")
-									   ->execute($dc->id);
-		}
-
-		if ($objAlias->numRows)
-		{
-			$this->loadLanguageFile('tl_article');
-
-			while ($objAlias->next())
-			{
-				$arrAlias[$objAlias->parent][$objAlias->id] = $objAlias->title . ' (' . (strlen($GLOBALS['TL_LANG']['tl_article'][$objAlias->inColumn]) ? $GLOBALS['TL_LANG']['tl_article'][$objAlias->inColumn] : $objAlias->inColumn) . ', ID ' . $objAlias->id . ')';
-			}
-		}
-
-		return $arrAlias;
-	}
-
 
 
 	/**
@@ -746,14 +702,15 @@ class tl_iao_invoice_items extends Backend
 		    $postenset = array(
 		    'tstamp' => time(),
 		    'headline' => $result->headline,
-		    'alias' => $result->alias,
+		    'headline_to_pdf' => $result->headline_to_pdf,
 		    'sorting' => $result->sorting,
-		    'author' => $result->author,
 		    'date' => $result->date,
 		    'time' => $result->time,
 		    'text' => $result->text,
 		    'count' => $result->count,
 		    'price' => $result->price,
+		    'amountStr' => $result->amountStr,
+		    'operator' => $result->operator,
 		    'price_netto' => $result->price_netto,
 		    'price_brutto' => $result->price_brutto,
 		    'published' => $result->published,
@@ -802,7 +759,7 @@ class tl_iao_invoice_items extends Backend
 	{
 		    
 		if(strlen($varValue)<=0) return $varValue;
-		 
+ 
 		$result = $this->Database->prepare('SELECT * FROM `tl_iao_posten_templates` WHERE `id`=?')
 					    ->limit(1)
 					    ->execute($varValue);

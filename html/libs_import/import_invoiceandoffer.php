@@ -171,25 +171,25 @@ class import_invoiceandoffer extends Backend
 		$this->import('Database');
 		$this->import('String');
 						      			
-		$seperators = array('comma'=>',','semicolon'=>';','tabulator'=>'\t','linebreak'=>'\n');
+		$separators = array('comma'=>',','semicolon'=>';','tabulator'=>'\t','linebreak'=>'\n');
 		
 		// Lock the tables
 		$arrLocks = array('tl_iao_offer' => 'WRITE','tl_iao_offer_items' => 'WRITE');
 		$this->Database->lockTables($arrLocks);
 		
 		//get DB-Fields as arrays		
-		$invoice_fields = $this->Database->listFields('tl_iao_offer');
-		$invoice_items_fields = $this->Database->listFields('tl_iao_offer_items');		
+		$offer_fields = $this->Database->listFields('tl_iao_offer');
+		$offer_items_fields = $this->Database->listFields('tl_iao_offer_items');		
 		
 		/**
-		*import Invoice-File
+		*import Offer-File
 		*/
 		$handle = $this->Files->fopen($Files['offer'],'r');
 		$counter = 0;
 		$csvhead = array();
 		$OfferSet = '';
 		
-		while (($data = fgetcsv ($handle, 1000, $seperators[$this->Input->post('separator')])) !== FALSE ) 
+		while (($data = fgetcsv ($handle, 1000, $separators[$this->Input->post('separator')])) !== FALSE ) 
 		{	
 	              $counter ++;
 		      if($counter == 1 && $this->Input->post('drop_first_row')==1)
@@ -200,7 +200,7 @@ class import_invoiceandoffer extends Backend
 		      foreach($csvhead AS $headk => $headv) $headfields[$headv]=$headk;
 		      
 		      $lineA  = array();
-		      foreach($invoice_fields as  $i_field)
+		      foreach($offer_fields as  $i_field)
 		      {
 		          
 		          //exclude index Fields
@@ -230,19 +230,20 @@ class import_invoiceandoffer extends Backend
 		$counter = 0;
 		$csvhead = array();
 		$OfferItemSet = '';
-		
-		while (($data = fgetcsv ($handle, 1000, $seperators[$this->Input->post('separator')])) !== FALSE ) 
-		{
+				
+		while (($data = fgetcsv ($handle, 1000, $separators[$this->Input->post('separator')])) !== FALSE ) 
+		{	              
 	              $counter ++;
 		      if($counter == 1 && $this->Input->post('drop_first_row')==1)		      
 		      {
 			  $csvhead = $data;
 			  continue; 		      		       
-		      }		      
+		      }
+	      
 		      foreach($csvhead AS $headk => $headv) $headfields[$headv]=$headk; 		      
-		      	      		
+	      		
 		      $lineA  = array();
-		      foreach($invoice_items_fields as  $ii_field)
+		      foreach($offer_items_fields as  $ii_field)
 		      {
 		          
 		          //exclude index Fields
@@ -254,10 +255,10 @@ class import_invoiceandoffer extends Backend
 		      }
 		      $OfferItemSet = $lineA;
 		      
-		      // get compare invoice		
-/*                      $parentObj = $this->Database->prepare('SELECT * FROM `tl_iao_invoice` WHERE `invoice_id`=?')
+		      // get compare offer		
+/*                      $parentObj = $this->Database->prepare('SELECT * FROM `tl_iao_offer` WHERE `offer_id`=?')
 						  ->limit(1)
-						  ->execute($InvoiceSet['invoice_id']);*/
+						  ->execute($offerSet['offer_id']);*/
                     
 		      // Update the datatbase
 		      if($this->Input->post('drop_exist_entries')==1)  $this->Database->prepare('DELETE FROM `tl_iao_offer_items` WHERE `id`=?')->execute($OfferItemSet['id']);
@@ -286,7 +287,7 @@ class import_invoiceandoffer extends Backend
 					    ->limit(1)
 					    ->execute($varValue);
 					    
-		$text = '<p>'.$objMember->company.'<br />'.($objMember->gender!='' ? $GLOBALS['TL_LANG']['tl_iao_invoice']['gender'][$objMember->gender].' ':'').($objMember->title ? $objMember->title.' ':'').$objMember->firstname.' '.$objMember->lastname.'<br />'.$objMember->street.'</p>';
+		$text = '<p>'.$objMember->company.'<br />'.($objMember->gender!='' ? $GLOBALS['TL_LANG']['tl_iao_offer']['gender'][$objMember->gender].' ':'').($objMember->title ? $objMember->title.' ':'').$objMember->firstname.' '.$objMember->lastname.'<br />'.$objMember->street.'</p>';
 		$text .='<p>'.$objMember->postal.' '.$objMember->city.'</p>';			    		    
 		    
 		return $text;

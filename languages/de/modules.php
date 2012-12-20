@@ -19,8 +19,9 @@
  * Back end modules
  */
  $GLOBALS['TL_LANG']['MOD']['iao']  = 'Rechnungen & Angebote';
- $GLOBALS['TL_LANG']['MOD']['iao_invoice']       = array('Rechnungen', 'Verwalten Sie hier Ihre Rechnungen.');
  $GLOBALS['TL_LANG']['MOD']['iao_offer']       = array('Angebote', 'Verwalten Sie hier Ihre Angebote.');
+ $GLOBALS['TL_LANG']['MOD']['iao_invoice']       = array('Rechnungen', 'Verwalten Sie hier Ihre Rechnungen.');
+ $GLOBALS['TL_LANG']['MOD']['iao_reminder']       = array('Rückstände', 'Verwalten Sie hier Ihre Rückstände.');
  $GLOBALS['TL_LANG']['MOD']['iao_credit']       = array('Gutschriften', 'Verwalten Sie hier Ihre Gutschriften.');
  $GLOBALS['TL_LANG']['MOD']['iao_templates']       = array('Vorlagen (Text)', 'Verwalten Sie die Vorlagen für die Standarttexte vor und nach den Posten von Rechnungen, Angebote und Gutschriften.');
  $GLOBALS['TL_LANG']['MOD']['iao_posten_templates']       = array('Vorlagen (Posten)', 'Verwalten Sie die Vorlagen für die Posten von Rechnungen, Angebote und Gutschriften.');

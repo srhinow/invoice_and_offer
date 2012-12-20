@@ -30,10 +30,10 @@
 
 
 /**
- * Class iao
+ * Class iao_invoice
  *
  * Provide methods to handle invoice_and_offer-module.
- * @copyright  Sven Rhinow 2011
+ * @copyright  Sven Rhinow 2012
  * @author     sr-tag Sven Rhinow Webentwicklung <http://www.sr-tag.de>
  * @package    invoice_and_offer
  * @license    LGPL
@@ -169,7 +169,7 @@ class iao_invoice extends Backend
 		    <a href="'.ampersand(str_replace('&key=exportInvoices', '', $this->Environment->request)).'" class="header_back" title="'.specialchars($GLOBALS['TL_LANG']['MSC']['backBT']).'" accesskey="b">'.$GLOBALS['TL_LANG']['MSC']['backBT'].'</a>
 		    </div>
 		    
-		    <h2 class="sub_headline">'.$GLOBALS['TL_LANG']['tl_iao_invoice']['importInvoiceItems'][1].'</h2>'.$this->getMessages().'
+		    <h2 class="sub_headline">'.$GLOBALS['TL_LANG']['tl_iao_invoice']['exportInvoices'][1].'</h2>'.$this->getMessages().'
 		    
 		    <form action="'.ampersand($this->Environment->request, true).'" id="tl_iao_export" class="tl_form" method="post">
 		    <div class="tl_formbody_edit">
@@ -301,7 +301,7 @@ class iao_invoice extends Backend
 		    <a href="'.ampersand(str_replace('&key=importInvoices', '', $this->Environment->request)).'" class="header_back" title="'.specialchars($GLOBALS['TL_LANG']['MSC']['backBT']).'" accesskey="b">'.$GLOBALS['TL_LANG']['MSC']['backBT'].'</a>
 		    </div>
 		    
-		    <h2 class="sub_headline">'.$GLOBALS['TL_LANG']['tl_iao_invoice']['importInvoiceItems'][1].'</h2>'.$this->getMessages().'
+		    <h2 class="sub_headline">'.$GLOBALS['TL_LANG']['tl_iao_invoice']['importInvoices'][1].'</h2>'.$this->getMessages().'
 		    
 		    <form action="'.ampersand($this->Environment->request, true).'" id="tl_iao_import" class="tl_form" method="post">
 		   

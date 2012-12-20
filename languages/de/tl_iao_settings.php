@@ -46,21 +46,24 @@ $GLOBALS['TL_LANG']['tl_iao_settings']['iao_credit_pdf']= array('Gutschrift-PDF-
 $GLOBALS['TL_LANG']['tl_iao_settings']['iao_credit_number_format']= array('Gutschrift-Nummer-Formatierung', 'die Platzhalter  {date} für aktuelles Datum  und {nr} für die Gutschrift-ID können angegeben werden.');
 $GLOBALS['TL_LANG']['tl_iao_settings']['iao_credit_expiry_date']= array('Gutschrift gültig bis', 'die Platzhalter  im Format d+n:m-n:Y+n für ein viertel Jahr z.B. d:m+3:Y.');
 
-$GLOBALS['TL_LANG']['tl_iao_settings']['iao_memory_duration']= array('Erinnerungs-Zeitraum', '');
-$GLOBALS['TL_LANG']['tl_iao_settings']['iao_memory_text']= array('Erinnerungs-Text', 'Platzhalter: Herr/Frau = ##gender## , Nachname = ##lastname## , Rechnungssumme = ##brutto## , Rechnungsdatum = ##invoice-date## , Rechnungsnummer = ##invoice-id-str##, Frist-Datum = ##period-date##');
-$GLOBALS['TL_LANG']['tl_iao_settings']['iao_memory_pdf']= array('Erinnerungs-PDF-Vorlage', '');
+$GLOBALS['TL_LANG']['tl_iao_settings']['iao_reminder_tax']= array('Mahnungs-Zins (%)', '');
+$GLOBALS['TL_LANG']['tl_iao_settings']['iao_reminder_postage']= array('Portokosten (&euro;)', 'mit Punkt getrennt (englisch)');
 
-$GLOBALS['TL_LANG']['tl_iao_settings']['iao_reminder_1_duration']= array('1. Mahnung-Zeitraum', '');
-$GLOBALS['TL_LANG']['tl_iao_settings']['iao_reminder_1_text']= array('1. Mahnung-Text', 'Platzhalter: Herr/Frau = ##gender## , Nachname = ##lastname## , Rechnungssumme = ##brutto## , Rechnungsdatum = ##invoice-date## , Rechnungsnummer = ##invoice-id-str##, Frist-Datum = ##period-date##');
-$GLOBALS['TL_LANG']['tl_iao_settings']['iao_reminder_1_pdf']= array('1. Mahnung-PDF-Vorlage', '');
+$GLOBALS['TL_LANG']['tl_iao_settings']['iao_reminder_1_duration']= array('Erinnerungs-Zeitraum', 'Status 4');
+$GLOBALS['TL_LANG']['tl_iao_settings']['iao_reminder_1_text']= array('Erinnerungs-Text', 'Platzhalter: alle Contao-Inserttags http://de.contaowiki.org/Insert-Tags , Rechnungsdatum = {{invoice::date}} , Rechnungsnummer = {{invoice::invoice_id_str}}, Frist-Datum = {{iao::period-date}}');
+$GLOBALS['TL_LANG']['tl_iao_settings']['iao_reminder_1_pdf']= array('Erinnerungs-PDF-Vorlage', '');
 
-$GLOBALS['TL_LANG']['tl_iao_settings']['iao_reminder_2_duration']= array('2. Mahnung-Zeitraum', '');
-$GLOBALS['TL_LANG']['tl_iao_settings']['iao_reminder_2_text']= array('2. Mahnung-Text', 'Platzhalter: Herr/Frau = ##gender## , Nachname = ##lastname## , Rechnungssumme = ##brutto## , Rechnungsdatum = ##invoice-date## , Rechnungsnummer = ##invoice-id-str##, Frist-Datum = ##period-date##');
-$GLOBALS['TL_LANG']['tl_iao_settings']['iao_reminder_2_pdf']= array('2. Mahnung-PDF-Vorlage', '');
+$GLOBALS['TL_LANG']['tl_iao_settings']['iao_reminder_2_duration']= array('1. Mahnung-Zeitraum', '');
+$GLOBALS['TL_LANG']['tl_iao_settings']['iao_reminder_2_text']= array('1. Mahnung-Text', 'Platzhalter: alle Contao-Inserttags http://de.contaowiki.org/Insert-Tags , Rechnungsdatum = {{invoice::date}} , Rechnungsnummer = {{invoice::invoice_id_str}}, Frist-Datum = {{iao::period-date}}');
+$GLOBALS['TL_LANG']['tl_iao_settings']['iao_reminder_2_pdf']= array('1. Mahnung-PDF-Vorlage', '');
 
-$GLOBALS['TL_LANG']['tl_iao_settings']['iao_reminder_3_duration']= array('3. Mahnung-Zeitraum', '');
-$GLOBALS['TL_LANG']['tl_iao_settings']['iao_reminder_3_text']= array('3. Mahnung-Text', 'Platzhalter: Herr/Frau = ##gender## , Nachname = ##lastname## , Rechnungssumme = ##brutto## , Rechnungsdatum = ##invoice-date## , Rechnungsnummer = ##invoice-id-str##, Frist-Datum = ##period-date##');
-$GLOBALS['TL_LANG']['tl_iao_settings']['iao_reminder_3_pdf']= array('3. Mahnung-PDF-Vorlage', '');
+$GLOBALS['TL_LANG']['tl_iao_settings']['iao_reminder_3_duration']= array('2. Mahnung-Zeitraum', '');
+$GLOBALS['TL_LANG']['tl_iao_settings']['iao_reminder_3_text']= array('2. Mahnung-Text', 'Platzhalter: alle Contao-Inserttags http://de.contaowiki.org/Insert-Tags , Rechnungsdatum = {{invoice::date}} , Rechnungsnummer = {{invoice::invoice_id_str}}, Frist-Datum = {{iao::period-date}}');
+$GLOBALS['TL_LANG']['tl_iao_settings']['iao_reminder_3_pdf']= array('2. Mahnung-PDF-Vorlage', '');
+
+$GLOBALS['TL_LANG']['tl_iao_settings']['iao_reminder_4_duration']= array('3. Mahnung-Zeitraum', '');
+$GLOBALS['TL_LANG']['tl_iao_settings']['iao_reminder_4_text']= array('3. Mahnung-Text', 'Platzhalter: alle Contao-Inserttags http://de.contaowiki.org/Insert-Tags , Rechnungsdatum = {{invoice::date}} , Rechnungsnummer = {{invoice::invoice_id_str}}, Frist-Datum = {{iao::period-date}}');
+$GLOBALS['TL_LANG']['tl_iao_settings']['iao_reminder_4_pdf']= array('3. Mahnung-PDF-Vorlage', '');
 /**
  * Buttons
  */

@@ -17,16 +17,26 @@
  
   $GLOBALS['TL_LANG']['tl_iao_offer_items']['posten_template'] = array('Template','Posten-Template');
   $GLOBALS['TL_LANG']['tl_iao_offer_items']['headline'] = array('Bezeichnung','Posten-Bezeichnung');
+  $GLOBALS['TL_LANG']['tl_iao_offer_items']['type'] = array('Inhaltstyp','neuer Eintrag oder PDF-Seitentrenner');
+  $GLOBALS['TL_LANG']['tl_iao_offer_items']['headline_to_pdf'] = array('Bezeichnung in PDF aufnhemen','wenn die Bezeichnung in der PDF-Datei vor dem Text aufgenommen werden soll.');
   $GLOBALS['TL_LANG']['tl_iao_offer_items']['alias'] = array('Alias','');
   $GLOBALS['TL_LANG']['tl_iao_offer_items']['author'] = array('Posten-Ersteller','');
   $GLOBALS['TL_LANG']['tl_iao_offer_items']['text'] = array('Beschreibung','hier wird die Beschreibung zu dem Posten eingegeben.');
   $GLOBALS['TL_LANG']['tl_iao_offer_items']['price'] = array('Preis','geben Sie hier den Preis an.');
   $GLOBALS['TL_LANG']['tl_iao_offer_items']['vat_incl'] = array('Preis-Angabe mit oder ohne MwSt.','(brutto / netto)');
   $GLOBALS['TL_LANG']['tl_iao_offer_items']['count'] = array('Anzahl','die Anzahl wird mit dem Preis multipliziert');
+  $GLOBALS['TL_LANG']['tl_iao_offer_items']['amountStr'] = array('Art der Anzahl','');
   $GLOBALS['TL_LANG']['tl_iao_offer_items']['vat'] = array('MwSt.','Art der MwSt. zu diesem Posten.');
-  
+  $GLOBALS['TL_LANG']['tl_iao_offer_items']['operator'] = array('Zahlungsart','soll dieser Posten hinzugefügt oder abgezogen werden?');    
+  $GLOBALS['TL_LANG']['tl_iao_offer_items']['pagebreak_after'] = array('Seitenumbruch nach diesem Posten','Seitenumbruch nach diesem Posten erzwingen.');  
+  /**
+  * Global Operation
+  */
   $GLOBALS['TL_LANG']['tl_iao_offer_items']['new'] = array('Neuer Posten','Ein neuen Posten anlegen');
-    
+  $GLOBALS['TL_LANG']['tl_iao_offer_items']['pdf'] = array('PDF generieren','eine PDF zu dieses Angebotes generieren');
+  /**
+  * Operations
+  */  
   $GLOBALS['TL_LANG']['tl_iao_offer_items']['edit'] = array('Posten bearbeiten','Element ID %s bearbeiten');
   $GLOBALS['TL_LANG']['tl_iao_offer_items']['copy'] = array('Posten duplizieren','Element ID %s duplizieren');
   $GLOBALS['TL_LANG']['tl_iao_offer_items']['delete'] = array('Posten löschen','Element ID %s löschen');
@@ -41,6 +51,11 @@
   $GLOBALS['TL_LANG']['tl_iao_offer_items']['title_legend'] = 'Grundeinstellungen';
   $GLOBALS['TL_LANG']['tl_iao_offer_items']['item_legend'] = 'Posten-Daten';
   $GLOBALS['TL_LANG']['tl_iao_offer_items']['publish_legend'] = 'Veröffentlichung';
-
-
+  $GLOBALS['TL_LANG']['tl_iao_offer_items']['type_legend'] = 'Elementtyp-Einstellung';
+  
+  $GLOBALS['TL_LANG']['tl_iao_offer_items']['amountStr_options'] = array('piece'=>'Stück','flaterate'=>'Pauschale', 'days'=>'Tag(e)','hour'=>'Stunde(n)', 'minutes'=>'Minute(n)','year'=>'Jahr(e)');
+  $GLOBALS['TL_LANG']['tl_iao_offer_items']['vat_incl_percents'] = array(1 => 'netto', 2 => 'brutto');
+  $GLOBALS['TL_LANG']['tl_iao_offer_items']['vat_options'] = array(19=>'19% MwSt.',7=>'7% MwSt.',0=>'ohne MwSt.');
+  $GLOBALS['TL_LANG']['tl_iao_offer_items']['operators'] = array('+' => '+ (addieren)', '-' => '- (subtrahieren)'); 
+  $GLOBALS['TL_LANG']['tl_iao_offer_items']['type_options'] = array('item'=>'Eintrag','devider'=>'PDF-Trenner');   
 ?>

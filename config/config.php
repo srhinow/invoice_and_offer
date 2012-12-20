@@ -54,6 +54,14 @@ $GLOBALS['BE_MOD']['iao']['iao_credit'] = array
 	'icon'   => 'system/modules/invoice_and_offer/html/icons/16-tag-pencil.png',
 	'stylesheet' => 'system/modules/invoice_and_offer/html/be.css'	
 );
+$GLOBALS['BE_MOD']['iao']['iao_reminder'] = array
+(
+	'tables' => array('tl_iao_reminder'),
+// 	'callback' => 'ModuleArrears',
+	'icon'   => 'system/modules/invoice_and_offer/html/icons/warning.png',
+	'stylesheet' => 'system/modules/invoice_and_offer/html/be.css',
+	'checkReminder'=> array('iao_reminder', 'checkReminder'),
+);
 $GLOBALS['BE_MOD']['iao']['iao_templates'] = array
 (
 	'tables' => array('tl_iao_templates'),
@@ -81,5 +89,10 @@ $GLOBALS['BE_MOD']['iao']['iao_settings'] = array
  */
  
 $GLOBALS['FE_MOD']['campain_layer'] = array('campain_layer' => 'ModuleCampainLayer');
+
+/**
+ * HOOKS
+ */
+// $GLOBALS['TL_HOOKS']['replaceInsertTags'][] = array('mpMembers', 'changeIAOTags');
 
 ?>

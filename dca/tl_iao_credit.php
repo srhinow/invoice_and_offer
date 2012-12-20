@@ -136,7 +136,7 @@ $GLOBALS['TL_DCA']['tl_iao_credit'] = array
 	'palettes' => array
 	(
 		'__selector__'                => array(),
-		'default'                     => '{title_legend},title;{credit_id_legend:hide},credit_id,credit_id_str,credit_date,credit_tstamp,credit_pdf_file,expiry_date;{address_legend},member,address_text;{text_legend},before_template,before_text,after_template,after_text;{status_legend},published,status;{notice_legend:hide},notice'
+		'default'                     => '{title_legend},title;{credit_id_legend:hide},credit_id,credit_id_str,credit_date,credit_tstamp,credit_pdf_file,expiry_date;{address_legend},member,address_text;{text_legend},before_template,before_text,after_template,after_text;noVat;{status_legend},published,status;{notice_legend:hide},notice'
 	),
 
 	// Subpalettes
@@ -239,7 +239,7 @@ $GLOBALS['TL_DCA']['tl_iao_credit'] = array
 			'flag'                    => 11,
 			'inputType'               => 'select',
 			'options_callback'        => array('tl_iao_credit', 'getMembers'),
-			'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>true,'submitOnChange'=>true),
+			'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>true,'submitOnChange'=>true, 'chosen'=>true),
 			'save_callback' => array
 			(
 				array('tl_iao_credit', 'fillAdressText')
@@ -323,6 +323,15 @@ $GLOBALS['TL_DCA']['tl_iao_credit'] = array
 			'2'=>'angenommen'
 			 ),
 		),
+		'noVat' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_credit']['noVat'],
+			'exclude'                 => true,
+			'filter'                  => true,
+			'flag'                    => 1,
+			'inputType'               => 'checkbox',
+			'eval'                    => array('doNotCopy'=>true,'tl_class'=>'w50')
+		),		
 		'notice' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_invoice']['notice'],
@@ -867,6 +876,8 @@ class tl_iao_credit extends Backend
 		$einzelpreis = ($resultObj->vat_incl == 1) ? iao::getBruttoPrice($resultObj->price,$resultObj->vat) : $resultObj->price;
 		$resultObj->text = iao::changeTags($resultObj->text);
 		
+		$posten['type'][] = $resultObj->type;
+		
 		$posten['fields'][] = array(
 			$resultObj->count,
 			$resultObj->text,
@@ -878,8 +889,9 @@ class tl_iao_credit extends Backend
 		$posten['vat'] = $resultObj->vat;
 	    }
 	    $posten['summe']['mwst'] =  number_format(($posten['summe']['brutto'] - $posten['summe']['netto']),2,',','.');
-	    $posten['summe']['netto'] =  number_format($posten['summe']['netto'],2,',','.');
-	    $posten['summe']['brutto'] =  number_format($posten['summe']['brutto'],2,',','.');	    
+	    
+	    $posten['summe']['netto_format'] =  number_format($posten['summe']['netto'],2,',','.');
+	    $posten['summe']['brutto_format'] =  number_format($posten['summe']['brutto'],2,',','.');	    
 	    return $posten;
 	}
 		

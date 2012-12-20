@@ -68,22 +68,23 @@ class iaoPDF extends TPLPDF
 	$y = $this->getY();
 	$this->writeHTMLCell(185, '', 13, $y+5, $text, 0, 1,false, true, 'L', true);       
    }
-         // Page footer
-	public function Footer() {
-	    // Position at 15 mm from bottom
-	    $this->SetY(-42);
-	    // Set font
-	    $this->SetFont('helvetica', 'I', 8);
-	    // Page number
-	    $this->Cell(0, 10, 'Seite '.$this->getAliasNumPage().'/'.$this->getAliasNbPages(), 0, false, 'C', 0, '', 0, false, 'T', 'M');
-	}  
+   
+   // Page footer
+   public function Footer() {
+	// Position at 15 mm from bottom
+	$this->SetY(-42);
+	// Set font
+	$this->SetFont('helvetica', 'I', 8);
+	// Page number
+	$this->Cell(0, 10, 'Seite '.$this->getAliasNumPage().'/'.$this->getAliasNbPages(), 0, false, 'C', 0, '', 0, false, 'T', 'M');
+    }  
    public function drawPostenTable($header,$data)
    {
         if(count($data['fields'])>0)
         {
 	    $this->SetFont('helvetica', '', 10);
 	    // Header
-	    $w = array(20, 105, 25, 30);
+	    $w = array(25, 100, 25, 30);
 	    $align = array('left','left','right','right');
 	    
 	    $num_headers = count($header);
@@ -99,33 +100,94 @@ class iaoPDF extends TPLPDF
 	    $fill = 0;
 	    $posten_td = '';
 	    $posten_tr = '';
+	    $postenTable = '';
 	    
-	    foreach($data['fields'] as $row) {
-		$posten_td = '<td style="width:'.$w[0].'mm; text-align:'.$align[0].';border:5pt solid white;">'.$row[0].'</td>'.
-			     '<td style="width:'.$w[1].'mm; text-align:'.$align[1].';border:5pt solid white;">'.$row[1].'</td>'.
-			     '<td style="width:'.$w[2].'mm; text-align:'.$align[2].';border:5pt solid white;">'.$row[2].' '.$GLOBALS['TL_CONFIG']['iao_currency'].'</td>'.
-			     '<td style="width:'.$w[3].'mm; text-align:'.$align[3].';border:5pt solid white;">'.$row[3].' '.$GLOBALS['TL_CONFIG']['iao_currency'].'</td>';
-	       $posten_tr .= '<tr>'.$posten_td.'</tr>';
+	    foreach($data['fields'] as $k => $row) {
+		
+		if($data['type'][$k] == 'devider')
+		{
+		    $postenTable = '<table class="posten-table" style="width:210mm; border-bottom:1px solid #000;" cellpadding="3" cellspacing="3">'.$header_tr.$posten_tr.'</table>';
+		    $y = $this->getY();
+		    $this->writeHTMLCell(185, '', 13, $y+8, $postenTable, 0, 1,false, true, 'L', true);  
+		    $posten_td = '';
+		    $posten_tr = '';	        
+		    $pagebreak = true;
+		    $this->AddPage();
+		}
+		else
+		{
+		    $pagebreak = false;
+		    $posten_td = '<td style="width:'.$w[0].'mm; text-align:'.$align[0].';border:5pt solid white;">'.$row[0].'</td>'.
+				 '<td style="width:'.$w[1].'mm; text-align:'.$align[1].';border:5pt solid white;">'.$row[1].'</td>'.
+				 '<td style="width:'.$w[2].'mm; text-align:'.$align[2].';border:5pt solid white;">'.$row[2].' '.$GLOBALS['TL_CONFIG']['iao_currency'].'</td>'.
+				 '<td style="width:'.$w[3].'mm; text-align:'.$align[3].';border:5pt solid white;">'.$row[3].' '.$GLOBALS['TL_CONFIG']['iao_currency'].'</td>';
+		   $posten_tr .= '<tr>'.$posten_td.'</tr>';
+		   
+		   if($data['pagebreak_after'][$k] == 1)
+		   {
+		    $postenTable = '<table class="postentable" style="width:210mm; border-bottom:1px solid #000;" cellpadding="3" cellspacing="3">'.$header_tr.$posten_tr.'</table>';
+		    $y = $this->getY();
+		    $this->writeHTMLCell(185, '', 13, $y+8, $postenTable, 0, 1,false, true, 'L', true);  
+		    $posten_td = '';
+		    $posten_tr = '';	        
+		    $pagebreak = true;
+		    $this->AddPage();
+		    
+		   }
+	       } 
 	    }
-	    $postenTable = '<table style="width:210mm; border-bottom:1px solid black;" cellpadding="3" cellspacing="3">'.$header_tr.$posten_tr.'</table>';
-	    $y = $this->getY();
-	    $this->writeHTMLCell(185, '', 13, $y+8, $postenTable, 0, 1,false, true, 'L', true);  
-	    
+	    if(!$pagebreak)
+	    {
+		$postenTable = '<table class="postentable" style="width:210mm; border-bottom:1px solid #000;" cellpadding="3" cellspacing="3">'.$header_tr.$posten_tr.'</table>';
+		$y = $this->getY();
+		$this->writeHTMLCell(185, '', 13, $y+8, $postenTable, 0, 1,false, true, 'L', true);  
+	    }
 	    //Summe
 	    $summe_tr = '<tr>
 	    <td style="text-align:right; width:'.($w[0]+$w[1]+$w[2]+3).'mm;">
-	    Nettobetrag '.$data['vat'].'%:<br />
-	    MwSt. '.$data['vat'].'%:<br />
-	    <b>Gesamt '.$GLOBALS['TL_CONFIG']['iao_currency_symbol'].':</b><br />
-	    <div style="border-bottom:1px solid black; font-size:1px; line-height:1px;"></div>
-	    </td>
-	    <td style="text-align:right;width:'.$w[4].'mm; ">
-	    '.$data['summe']['netto'].' '.$GLOBALS['TL_CONFIG']['iao_currency'].'<br />
-	    '.$data['summe']['mwst'].' '.$GLOBALS['TL_CONFIG']['iao_currency'].'<br />
-	    <b>'.$data['summe']['brutto'].' '.$GLOBALS['TL_CONFIG']['iao_currency'].'</b><br />
-	    <div style="border-bottom:1px solid black; font-size:1px; line-height:1px;"></div>
-	    </td></tr>';
-	    $summeTable = '<table style="width:210mm; border-bottom:1px solid black;" cellpadding="0" cellspacing="0">'.$summe_tr.'</table>';
+	    Nettobetrag:<br />';
+	    
+	    reset($data['summe']['mwst']);
+	    foreach($data['summe']['mwst'] as $k => $v)
+	    {
+		$summe_tr .= 'MwSt. '.$k.'%:<br />';
+	    }
+	    $summe_tr .= '<b>Gesamt '.$GLOBALS['TL_CONFIG']['iao_currency_symbol'].':</b>';
+	    
+	    if($data['discount'])
+	    {
+		$summe_tr .= '<br>'.$data['discount']['discount_title'].':';
+	    }
+	    
+	    $summe_tr .= '</td><td style="text-align:right;width:'.$w[4].'mm; ">'.number_format($data['summe']['netto'],2,',','.').' '.$GLOBALS['TL_CONFIG']['iao_currency'].'<br />';
+	    reset($data['summe']['mwst']);
+	    foreach($data['summe']['mwst'] as $k => $v)
+	    {	    
+		$summe_tr .= number_format($v,2,',','.').' '.$GLOBALS['TL_CONFIG']['iao_currency'].'<br />';
+	    }
+	    $summe_tr .= '<b>'.number_format($data['summe']['brutto'],2,',','.').' '.$GLOBALS['TL_CONFIG']['iao_currency'].'</b>';
+	    
+	    if($data['discount'])
+	    {
+		switch($data['discount']['discount_operator'])
+		{
+		    case '-':
+			$discount_val = $data['summe']['brutto'] - $data['discount']['discount_value'];
+		    break;
+		    case '+':
+			$discount_val = $data['summe']['brutto'] + $data['discount']['discount_value'];
+		    break;		    
+		    case '%':
+		    default:
+			$discount_val = $data['summe']['brutto'] - (($data['summe']['brutto']  * $data['discount']['discount_value'])/100);			
+		}
+		$summe_tr .= '<br>'.number_format($discount_val,2,',','.').' '.$GLOBALS['TL_CONFIG']['iao_currency'];
+	    }
+	    
+	    $summe_tr .= '</td></tr>';
+	    
+	    $summeTable = '<table style="width:210mm;" cellpadding="0" cellspacing="0">'.$summe_tr.'</table>
+	    <div style="border-bottom:1px solid black; border-top:1px solid black; font-size:1px; line-height:1px;"></div>';
 	    
 	    $y = $this->getY();
 	    $this->writeHTMLCell(184, '', 13, $y+3, $summeTable, 0, 1,false, true, 'L', true); 

@@ -148,14 +148,15 @@ $GLOBALS['TL_DCA']['tl_iao_invoice'] = array
 	// Palettes
 	'palettes' => array
 	(
-		'__selector__'                => array(),
-		'default'                     => '{title_legend},title;{invoice_id_legend:hide},invoice_id,invoice_id_str,invoice_tstamp,invoice_pdf_file,execute_date,expiry_date;{address_legend},member,address_text;{text_legend},before_template,before_text,after_template,after_text;{status_legend},published,status,paid_on_date;{notice_legend:hide},notice'
+		'__selector__'                => array('discount'),
+		'default'                     => '{title_legend},title;{invoice_id_legend:hide},invoice_id,invoice_id_str,invoice_tstamp,invoice_pdf_file,execute_date,expiry_date;{address_legend},member,address_text;{text_legend},before_template,before_text,after_template,after_text;{status_legend},published,status,paid_on_date,noVat;discount;{notice_legend:hide},notice',
+		'iao_arrears'		      => '{title_legend},title;{invoice_id_legend:hide},invoice_id,invoice_id_str,invoice_tstamp,invoice_pdf_file,execute_date,expiry_date;{address_legend},member,address_text;{text_legend},before_template,before_text,after_template,after_text;{status_legend},published,status,paid_on_date,noVat;{notice_legend:hide},notice'
 	),
 
 	// Subpalettes
 	'subpalettes' => array
 	(
-
+             'discount' => ('discount_title,discount_value,discount_operator')
 	),
 
 	// Fields
@@ -245,6 +246,7 @@ $GLOBALS['TL_DCA']['tl_iao_invoice'] = array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_invoice']['invoice_id'],
 			'exclude'                 => true,
+			'search'                  => true,
 			'inputType'               => 'text',
 			'eval'                    => array('doNotCopy'=>true, 'tl_class'=>'w50'),
 			'save_callback' => array
@@ -256,6 +258,7 @@ $GLOBALS['TL_DCA']['tl_iao_invoice'] = array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_invoice']['invoice_id_str'],
 			'exclude'                 => true,
+			'search'                  => true,
 			'inputType'               => 'text',
 			'eval'                    => array('doNotCopy'=>true, 'spaceToUnderscore'=>true, 'maxlength'=>128, 'tl_class'=>'w50'),
 			'save_callback' => array
@@ -267,6 +270,7 @@ $GLOBALS['TL_DCA']['tl_iao_invoice'] = array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_invoice']['invoice_pdf_file'],
 			'exclude'                 => true,
+			'search'                  => true,
 			'inputType'               => 'fileTree',
 			'eval'                    => array('fieldType'=>'radio', 'tl_class'=>'clr','extensions'=>'pdf','files'=>true, 'filesOnly'=>true, 'mandatory'=>false)
 		),
@@ -276,11 +280,12 @@ $GLOBALS['TL_DCA']['tl_iao_invoice'] = array
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_invoice']['member'],
 			'exclude'                 => true,
 			'filter'                  => true,
+			'search'                  => true,
 			'sorting'                 => true,
 			'flag'                    => 11,
 			'inputType'               => 'select',
 			'options_callback'        => array('tl_iao_invoice', 'getMembers'),
-			'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>true,'submitOnChange'=>true),
+			'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>true,'submitOnChange'=>true, 'chosen'=>true),
 			'save_callback' => array
 			(
 				array('tl_iao_invoice', 'fillAdressText')
@@ -299,12 +304,11 @@ $GLOBALS['TL_DCA']['tl_iao_invoice'] = array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_invoice']['before_template'],
 			'exclude'                 => true,
-			'filter'                  => true,
 			'sorting'                 => true,
 			'flag'                    => 11,
 			'inputType'               => 'select',
 			'options_callback'        => array('tl_iao_invoice', 'getBeforeTemplate'),
-			'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>true,'submitOnChange'=>true),
+			'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>true,'submitOnChange'=>true, 'chosen'=>true),
 			'save_callback' => array
 			(
 				array('tl_iao_invoice', 'fillBeforeText')
@@ -321,14 +325,13 @@ $GLOBALS['TL_DCA']['tl_iao_invoice'] = array
 		),
 		'after_template' => array
 		(
-			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_invoice']['before_template'],
-			'exclude'                 => true,
-			'filter'                  => true,
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_invoice']['after_template'],
+			'exclude'                 => true,			
 			'sorting'                 => true,
 			'flag'                    => 11,
 			'inputType'               => 'select',
 			'options_callback'        => array('tl_iao_invoice', 'getAfterTemplate'),
-			'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>true,'submitOnChange'=>true),
+			'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>true,'submitOnChange'=>true, 'chosen'=>true),
 			'save_callback' => array
 			(
 				array('tl_iao_invoice', 'fillAfterText')
@@ -359,9 +362,57 @@ $GLOBALS['TL_DCA']['tl_iao_invoice'] = array
 			'filter'                  => true,
 			'flag'                    => 1,
 			'inputType'               => 'select',
-			'options'                 => array('1'=>'nicht bezahlt','2'=>'bezahlt'),
-                        'eval'			  => array('tl_class'=>'w50')
+			'options'                 => &$GLOBALS['TL_LANG']['tl_iao_invoice']['status_options'],			
+                        'eval'			  => array('tl_class'=>'w50'),
+			'save_callback' => array
+			(
+				array('tl_iao_invoice', 'updateStatus')
+			)                        
 		),
+		'noVat' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_invoice']['noVat'],
+			'exclude'                 => true,
+			'filter'                  => true,
+			'flag'                    => 1,
+			'inputType'               => 'checkbox',
+			'eval'                    => array('doNotCopy'=>true,'tl_class'=>'w50')
+		),
+		'discount' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_invoice']['discount'],
+			'exclude'                 => true,
+			'filter'                  => true,
+			'flag'                    => 1,
+			'inputType'               => 'checkbox',
+			'eval'                    => array('doNotCopy'=>true,'submitOnChange'=>true)
+		),
+		'discount_title' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_invoice']['discount_title'],
+			'exclude'                 => true,
+			'search'                  => true,
+			'inputType'               => 'text',
+			'eval'                    => array('maxlength'=>255,'tl_class'=>'w50')
+		),
+		'discount_value' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_invoice']['discount_value'],
+			'exclude'                 => true,
+			'search'                  => true,
+			'inputType'               => 'text',
+			'eval'                    => array('maxlength'=>255,'tl_class'=>'w50')
+		),
+		'discount_operator' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_invoice']['discount_operator'],
+			'exclude'                 => true,
+			'filter'                  => true,
+			'flag'                    => 1,
+			'inputType'               => 'select',
+			'options'                 => &$GLOBALS['TL_LANG']['tl_iao_invoice']['discount_operators'],			
+                        'eval'			  => array('tl_class'=>'w50')
+		),										
 		'notice' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_invoice']['notice'],
@@ -371,7 +422,7 @@ $GLOBALS['TL_DCA']['tl_iao_invoice'] = array
 			'inputType'               => 'textarea',
 			'eval'                    => array('mandatory'=>false, 'cols'=>'10','rows'=>'10','style'=>'height:100px','rte'=>false)
 			
-		)										
+		),
 	)
 );
 
@@ -649,6 +700,8 @@ class tl_iao_invoice extends Backend
 	public function fillBeforeText($varValue, DataContainer $dc)
 	{
 
+                 $this->import('iao');
+                 
                  if(strip_tags($dc->activeRecord->before_text)=='')
                  {
 		    
@@ -658,6 +711,7 @@ class tl_iao_invoice extends Backend
 						->limit(1)
 						->execute($varValue);
 									    		    
+ 		    $objTemplate->text = $this->iao->changeIAOTags($objTemplate->text,'invoice',$dc->id);
 		    
 		    $this->Database->prepare('UPDATE `tl_iao_invoice` SET `before_text`=? WHERE `id`=?')
 				   ->limit(1)
@@ -674,6 +728,8 @@ class tl_iao_invoice extends Backend
 	public function fillAfterText($varValue, DataContainer $dc)
 	{
 
+                 $this->import('iao');
+                                  
                  if(strip_tags($dc->activeRecord->after_text)=='')
                  {
 		    
@@ -683,6 +739,7 @@ class tl_iao_invoice extends Backend
 						->limit(1)
 						->execute($varValue);
 									    		    
+		    $objTemplate->text = $this->iao->changeIAOTags($objTemplate->text,'invoice',$dc->id);
 		    
 		    $this->Database->prepare('UPDATE `tl_iao_invoice` SET `after_text`=? WHERE `id`=?')
 				   ->limit(1)
@@ -783,6 +840,9 @@ class tl_iao_invoice extends Backend
                 
 		if ($this->Input->get('key') == 'pdf' && $this->Input->get('id') == $row['id'])
 		{
+		    
+		    $this->import('iao');
+		    
 		    if(!empty($row['invoice_pdf_file']) && file_exists(TL_ROOT . '/' . $row['invoice_pdf_file']))
 		    {	
 		
@@ -857,30 +917,33 @@ class tl_iao_invoice extends Backend
 		    // Include CSS (TCPDF 5.1.000 an newer)
 		    if(file_exists(TL_ROOT . '/' . $GLOBALS['TL_CONFIG']['iao_pdf_css']) ) {
 		      $styles = "<style>\n" . file_get_contents(TL_ROOT . '/' . $GLOBALS['TL_CONFIG']['iao_pdf_css']) . "\n</style>\n";  
-    
+                      $pdf->writeHTML($styles, true, false, true, false, '');
 		    }		    			    		    		    
-		    		   		    
+		   		    
 		    // write the address-data
-                    $pdf->drawAddress($styles.iao::changeTags($row['address_text']));
+		    $row['address_text'] = $this->iao->changeIAOTags($row['address_text'],'invoice',$row['id']);
+		    $row['address_text'] = $this->iao->changeTags($row['address_text']);
+                    $pdf->drawAddress($row['address_text']);
 		    		    
 		    //Rechnungsnummer
                     $pdf->drawDocumentNumber($row['invoice_id_str']);		    
                     		    
 		    //Datum
-                    $pdf->drawDate(date('d.m.Y',$row['invoice_tstamp']));
+                    $pdf->drawDate(date($GLOBALS['TL_CONFIG']['dateFormat'],$row['invoice_tstamp']));
 		    
  		    //ausgeführt am 
                     $newdate= $row['execute_date'];
-                    $pdf->drawInvoiceExecuteDate(date('d.m.Y',$newdate));
+                    $pdf->drawInvoiceExecuteDate(date($GLOBALS['TL_CONFIG']['dateFormat'],$newdate));
                     
 		    //ausgeführt am 
                     $newdate= $row['expiry_date'];
-                    $pdf->drawInvoiceDurationDate(date('d.m.Y',$newdate));                    
+                    $pdf->drawInvoiceDurationDate(date($GLOBALS['TL_CONFIG']['dateFormat'],$newdate));                    
                     		    
 		    //Text vor der Posten-Tabelle
 		    if(strip_tags($row['before_text']))
 		    {
-		        $row['before_text']  = iao::changeTags($row['before_text']);
+		        $row['before_text'] = $this->iao->changeIAOTags($row['before_text'],'invoice',$row['id']);
+			$row['before_text'] = $this->iao->changeTags($row['before_text']);		        
 		        $pdf->drawTextBefore($row['before_text']);
 		    }
 		    
@@ -892,7 +955,8 @@ class tl_iao_invoice extends Backend
 		    //Text vor der Posten-Tabelle
 		    if(strip_tags($row['after_text']))
 		    {
-			$row['after_text']  = iao::changeTags($row['after_text']);
+			$row['after_text'] = $this->iao->changeIAOTags($row['after_text'],'invoice',$row['id']);
+			$row['after_text'] = $this->iao->changeTags($row['after_text']);
 			$pdf->drawTextAfter($row['after_text']);
 		    }
 		    
@@ -914,28 +978,65 @@ class tl_iao_invoice extends Backend
 	    
 	    if(!$id) return $posten;
 	    
+	    $this->import('iao');
+	    $this->loadLanguageFile('tl_iao_invoice_items');
+	    
 	    $resultObj = $this->Database->prepare('SELECT * FROM `tl_iao_invoice_items` WHERE `pid`=? AND `published`=1 ORDER BY `sorting`')->execute($id);
 	    
-	    if($resultObj->numRows > 0) while($resultObj->next())
+	    $parentObj = $this->Database->prepare('SELECT * FROM `tl_iao_invoice` WHERE `id`=?')
+					->limit(1)
+					->execute($id);
+					
+	    if($resultObj->numRows <= 0) return $posten;
+	     
+	    while($resultObj->next())
 	    {
 		$resultObj->price = str_replace(',','.',$resultObj->price);
-		$einzelpreis = ($resultObj->vat_incl == 1) ? iao::getBruttoPrice($resultObj->price,$resultObj->vat) : $resultObj->price;
-                $resultObj->text = iao::changeTags($resultObj->text);
+		$einzelpreis = ($resultObj->vat_incl == 1) ? $this->iao->getBruttoPrice($resultObj->price,$resultObj->vat) : $resultObj->price;
+                if($resultObj->headline_to_pdf == 1) $resultObj->text = substr_replace($resultObj->text, '<p><strong>'.$resultObj->headline.'</strong><br>', 0, 3);
+                $resultObj->text = $this->iao->changeTags($resultObj->text);
                 
-		$posten['fields'][] = array(
-		    $resultObj->count,
-		    $resultObj->text,
+		$posten['fields'][] = array
+		(
+		    $resultObj->count.' '.$GLOBALS['TL_LANG']['tl_iao_invoice_items']['amountStr_options'][$resultObj->amountStr],		    
+		    $resultObj->text,		    
 		    number_format($einzelpreis,2,',','.'),
-		    number_format($resultObj->price_brutto,2,',','.'));
+		    number_format($resultObj->price_brutto,2,',','.')
+		);
+		$posten['pagebreak_after'][] = $resultObj->pagebreak_after;
+		$posten['type'][] = $resultObj->type;
 		
-		$posten['summe']['price'] += $resultObj->price;
-		$posten['summe']['netto'] += $resultObj->price_netto;
-		$posten['summe']['brutto'] += $resultObj->price_brutto; 
-		$posten['vat'] = $resultObj->vat;
+		$posten['discount'] = false;
+		
+		if($parentObj->discount)
+		{
+		  $posten['discount'] = array
+		  (
+		      'discount' =>  $parentObj->discount,
+		      'discount_title' => $parentObj->discount_title,
+		      'discount_value' => $parentObj->discount_value,
+		      'discount_operator' => $parentObj->discount_operator
+		  );
+		}
+		
+		if($resultObj->operator == '-')
+		{
+		    $posten['summe']['price'] -= $resultObj->operator = $resultObj->price;
+		    $posten['summe']['netto'] -= $resultObj->price_netto;
+		    $posten['summe']['brutto'] -= $resultObj->price_brutto;                 
+                }
+                else
+                {
+		    $posten['summe']['price'] += $resultObj->operator = $resultObj->price;
+		    $posten['summe']['netto'] += $resultObj->price_netto;
+		    $posten['summe']['brutto'] += $resultObj->price_brutto; 
+                }
+		
+		if($parentObj->noVat != 1) $posten['summe']['mwst'][$resultObj->vat] += $resultObj->price_brutto - $resultObj->price_netto;
 	    }
-	    $posten['summe']['mwst'] =  number_format(($posten['summe']['brutto'] - $posten['summe']['netto']),2,',','.');
-	    $posten['summe']['netto'] =  number_format($posten['summe']['netto'],2,',','.');
-	    $posten['summe']['brutto'] =  number_format($posten['summe']['brutto'],2,',','.');	    
+
+	    $posten['summe']['netto_format'] =  number_format($posten['summe']['netto'],2,',','.');
+	    $posten['summe']['brutto_format'] =  number_format($posten['summe']['brutto'],2,',','.');	    
 	    return $posten;
 	}	
 	
@@ -1090,6 +1191,25 @@ class tl_iao_invoice extends Backend
 					   ->execute($intId);
 
 		$this->createNewVersion('tl_iao_invoice', $intId);
+	}
+	    	
+	public Function updateStatus($varValue, DataContainer $dc)
+	{
+
+	    if($varValue == 2)
+	    {
+		$set = array
+		(
+		    'status' => $varValue,
+		    'paid_on_date' => $dc->activeRecord->paid_on_date
+		);
+		
+		$this->Database->prepare('UPDATE `tl_iao_reminder` %s WHERE `invoice_id`=?')
+			       ->set($set)
+			       ->execute($dc->id);
+	    }
+	    return $varValue;
+	    
 	}    	
 	
 }

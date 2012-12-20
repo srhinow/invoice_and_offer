@@ -15,17 +15,6 @@
  * permanent text corrections which are update-safe. 
  */
 
- $GLOBALS['TL_LANG']['tl_iao_offer']['title'] = array('Bezeichnung','Bezeichnung des Elementes');
-  $GLOBALS['TL_LANG']['tl_iao_offer']['alias'] = array('Alias','');
-  $GLOBALS['TL_LANG']['tl_iao_offer']['offer_id'] = array('Angebots-ID','Dieses Feld wird hauptsächlich zum hochzählen des nächsten Angebots benötigt.');
-  $GLOBALS['TL_LANG']['tl_iao_offer']['offer_id_str'] = array('Rechnungs-ID-Name','Dieses Feld wird für den PDF-Namen und direkt auf dem Angebot ausgegeben.');
-  $GLOBALS['TL_LANG']['tl_iao_offer']['member'] = array('Kunde','Adresse aus gespeicherten Kunden in nachstehendes Feld befüllen');
-  $GLOBALS['TL_LANG']['tl_iao_offer']['address_text'] = array('Angebots-Adresse','Adresse die in der Angebot-PDF-Datei geschrieben wird.');
-  $GLOBALS['TL_LANG']['tl_iao_offer']['before_text'] = array('Text vor den Posten','');
-  $GLOBALS['TL_LANG']['tl_iao_offer']['after_text'] = array('Text nach den Posten','');
-  $GLOBALS['TL_LANG']['tl_iao_offer']['published'] = array('veröffnentlich/versendet.','');
-  $GLOBALS['TL_LANG']['tl_iao_offer']['status'] = array('Status des Angebotes','');
-    
   $GLOBALS['TL_LANG']['tl_iao_offer']['new'] = array('Neues Angebot','Ein neues Angebot anlegen');   
   $GLOBALS['TL_LANG']['tl_iao_offer']['edit'] = array('Angebot bearbeiten','Angebot ID %s bearbeiten');
   $GLOBALS['TL_LANG']['tl_iao_offer']['copy'] = array('Angebot duplizieren','Angebot ID %s duplizieren');
@@ -33,21 +22,36 @@
   $GLOBALS['TL_LANG']['tl_iao_offer']['deleteConfirm'] = 'Soll das Angebot ID %s wirklich gelöscht werden?!';
   $GLOBALS['TL_LANG']['tl_iao_offer']['show'] = array('Details anzeigen','Details des Angebots ID %s anzeigen');
   $GLOBALS['TL_LANG']['tl_iao_offer']['invoice'] = array('dieses Angebot als Rechnung übernehmen','Angebot ID %s als Rechnung anlegen');
-  $GLOBALS['TL_LANG']['tl_iao_offer']['notice'] = array('Notiz','');
+
+  
   $GLOBALS['TL_LANG']['tl_iao_offer']['importOffer'] = array('Import','Angebote aus CSV-Dateien importieren');
   $GLOBALS['TL_LANG']['tl_iao_offer']['exportOffer'] = array('Export','Angebote und deren Posten in CSV-Dateien exportieren.');  
   
   $GLOBALS['TL_LANG']['tl_iao_offer']['pdf'] = array('PDF generieren','eine PDF zu diesem Angebot generieren');
+  
+  $GLOBALS['TL_LANG']['tl_iao_offer']['title'] = array('Bezeichnung','Bezeichnung des Elementes');
+  $GLOBALS['TL_LANG']['tl_iao_offer']['alias'] = array('Alias','');
+  $GLOBALS['TL_LANG']['tl_iao_offer']['offer_id'] = array('Angebots-ID','Dieses Feld wird hauptsächlich zum hochzählen des nächsten Angebots benötigt.');
+  $GLOBALS['TL_LANG']['tl_iao_offer']['offer_id_str'] = array('Rechnungs-ID-Name','Dieses Feld wird für den PDF-Namen und direkt auf dem Angebot ausgegeben.');
+  $GLOBALS['TL_LANG']['tl_iao_offer']['address_text'] = array('Angebots-Adresse','Adresse die in der Angebot-PDF-Datei geschrieben wird.');
+  $GLOBALS['TL_LANG']['tl_iao_offer']['before_text'] = array('Text vor den Posten','');
+  $GLOBALS['TL_LANG']['tl_iao_offer']['after_text'] = array('Text nach den Posten','');
+  $GLOBALS['TL_LANG']['tl_iao_offer']['published'] = array('veröffnentlich/versendet.','');
+  $GLOBALS['TL_LANG']['tl_iao_offer']['status'] = array('Status des Angebotes','');  
   $GLOBALS['TL_LANG']['tl_iao_offer']['price_netto'] = array('Angebot-Höhe (Netto)','');
   $GLOBALS['TL_LANG']['tl_iao_offer']['price_brutto'] = array('Angebot-Höhe (Brutto)','');
   $GLOBALS['TL_LANG']['tl_iao_offer']['member'] = array('Kunde','');  
+  $GLOBALS['TL_LANG']['tl_iao_offer']['noVat'] = array('keine MwSt. ausweisen','z.B. Rechnung in nicht Bundesrepublik Deutschland');    
   $GLOBALS['TL_LANG']['tl_iao_offer']['offer_date'] = array('Angebotsdatum','wenn es leer bleibt dann wird das aktuelle Datum eingetragen. Unter normalen Umständen sollte dieses Feld leer bleiben. Es ist hauptsächlich für Importe gedacht.');
   $GLOBALS['TL_LANG']['tl_iao_offer']['offer_tstamp'] = array('Angebotsdatum als Timestamp','Wenn es leer bleibt dann wird der Timestamp vom Gutschriftdatum eingetragen. Unter normalen Umständen sollte dieses Feld leer bleiben. Es ist hauptsächlich für Importe gedacht.');
   $GLOBALS['TL_LANG']['tl_iao_offer']['offer_id'] = array('Angebots-ID','Dieses Feld wird hauptsächlich zum hochzählen des nächsten Angebots benötigt.');
   $GLOBALS['TL_LANG']['tl_iao_offer']['offer_id_str'] = array('Angebots-ID-Name','Dieses Feld wird für den PDF-Namen und direkt auf dem Angebot ausgegeben.');
   $GLOBALS['TL_LANG']['tl_iao_offer']['expiry_date'] = array('Gültig bis','Dieses Angebot ist bis zu diesem Datum gültig.');
   $GLOBALS['TL_LANG']['tl_iao_offer']['offer_pdf_file'] = array('Angebotdatei','Wenn hier eine Datei angegeben wurde wird diese statt einer generierten ausgegeben. Unter normalen Umständen sollte dieses Feld leer bleiben. Es ist hauptsächlich für Importe gedacht.');
-   
+  $GLOBALS['TL_LANG']['tl_iao_offer']['before_template'] = array('Text-Template vor den Posten','');  
+  $GLOBALS['TL_LANG']['tl_iao_offer']['after_template'] = array('Text-Template nach den Posten','');  
+  $GLOBALS['TL_LANG']['tl_iao_offer']['notice'] = array('Notiz','');
+       
   $GLOBALS['TL_LANG']['tl_iao_offer']['csv_source'] = array('CSV der Angebote','z.B. tl_iao_offer_YYYY-MM-DD.csv');
   $GLOBALS['TL_LANG']['tl_iao_offer']['csv_posten_source'] = array('CSV der Angebot-Posten','z.B. tl_iao_offer_items_YYYY-MM-DD.csv');
   $GLOBALS['TL_LANG']['tl_iao_offer']['pdf_import_dir'] = array('Verzeichnis der Angebote-PDF-Dateien','Geben Sie hier das Verzeichnis an in dem die Angebote liegen die beim Import verknüpft werden sollen.');
@@ -85,4 +89,8 @@
   $GLOBALS['TL_LANG']['tl_iao_offer']['Offer_imported'] = 'Es wurden die Angebot-Datensätze aus %s erfogreich importiert';
   $GLOBALS['TL_LANG']['tl_iao_offer']['Offer_exported'] = 'Es wurden die Angebot-Datensätze erfogreich exportiert';
   
+  /**
+  * Select-fiels options
+  */
+  $GLOBALS['TL_LANG']['tl_iao_offer']['status_options'] = array('1'=>'nicht angenommen','2'=>'angenommen');   
 ?>

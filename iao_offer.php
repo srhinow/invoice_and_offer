@@ -30,10 +30,10 @@
 
 
 /**
- * Class iao
+ * Class iao_offer
  *
  * Provide methods to handle invoice_and_offer-module.
- * @copyright  Sven Rhinow 2011
+ * @copyright  Sven Rhinow 2012
  * @author     sr-tag Sven Rhinow Webentwicklung <http://www.sr-tag.de>
  * @package    invoice_and_offer
  * @license    LGPL
@@ -45,6 +45,7 @@ class iao_offer extends Backend
 	 */
 	public function exportOffer()
 	{		
+		$separators = array('comma'=>',','semicolon'=>';','tabulator'=>'\t','linebreak'=>'\n');
 		
 		if ($this->Input->post('FORM_SUBMIT') == 'tl_iao_export')
 		{
@@ -80,7 +81,6 @@ class iao_offer extends Backend
 		    $offer_export_csv = $this->Input->post('export_offer_filename').'.csv';
 		    $offer_items_export_csv = $this->Input->post('export_offer_item_filename').'.csv';		    		 
 		    
-		    $separator = array('comma'=>',','semicolon'=>';','tabulator'=>'\t','linebreak'=>'\n');
 		    
 		    /**
 		    * work on tl_iao_offer
@@ -95,7 +95,7 @@ class iao_offer extends Backend
 		    while($dbObj->next())
 		    {
 		        $lineA  = array();
-		        
+
 		        foreach($offer_fields as $i_field)
 		        {
 			    //exclude index Fields
@@ -115,7 +115,7 @@ class iao_offer extends Backend
 		   
 		    
 		    foreach ($linesArr as $line) {
-			fputcsv($fp,  $line, $separator[$this->Input->post('separator')]);
+			fputcsv($fp,  $line, $separators[$this->Input->post('separator')]);
 		    }
 		    
 		    $this->Files->fclose($fp);
@@ -133,7 +133,7 @@ class iao_offer extends Backend
 		    while($dbObj->next())
 		    {
 		        $lineA  = array();
-		        
+	        
 		        foreach($offer_items_fields as $i_field)
 		        {
 			    //exclude index Fields
@@ -143,16 +143,19 @@ class iao_offer extends Backend
 			    $lineA[] = $dbObj->$i_field['name'];
 			    
 			}
+	
 			if($isOneLine) $linesArr[] = $oneLine;
 			$linesArr[] = $lineA;
 			$isOneLine = false;
 		    }
 
+		    #if(!$isOneLine) exit();
 		    //set handle from file
 		    $fp = $this->Files->fopen($csv_export_dir.'/'.$offer_items_export_csv,'w');
-		    
+
 		    foreach ($linesArr as $line) {
-			fputcsv($fp,  $line, $separators[$this->Input->post('separator')]);
+
+			fputcsv($fp,$line,$separators[$this->Input->post('separator')]);
 		    }
 		    
 		    $this->Files->fclose($fp);	
@@ -170,7 +173,7 @@ class iao_offer extends Backend
 		    <a href="'.ampersand(str_replace('&key=exportOffer', '', $this->Environment->request)).'" class="header_back" title="'.specialchars($GLOBALS['TL_LANG']['MSC']['backBT']).'" accesskey="b">'.$GLOBALS['TL_LANG']['MSC']['backBT'].'</a>
 		    </div>
 		    
-		    <h2 class="sub_headline">'.$GLOBALS['TL_LANG']['tl_iao_offer']['importOfferItems'][1].'</h2>'.$this->getMessages().'
+		    <h2 class="sub_headline">'.$GLOBALS['TL_LANG']['tl_iao_offer']['exportOffer'][1].'</h2>'.$this->getMessages().'
 		    
 		    <form action="'.ampersand($this->Environment->request, true).'" id="tl_iao_export" class="tl_form" method="post">
 		    <div class="tl_formbody_edit">
@@ -302,7 +305,7 @@ class iao_offer extends Backend
 		    <a href="'.ampersand(str_replace('&key=importOffer', '', $this->Environment->request)).'" class="header_back" title="'.specialchars($GLOBALS['TL_LANG']['MSC']['backBT']).'" accesskey="b">'.$GLOBALS['TL_LANG']['MSC']['backBT'].'</a>
 		    </div>
 		    
-		    <h2 class="sub_headline">'.$GLOBALS['TL_LANG']['tl_iao_offer']['importOfferItems'][1].'</h2>'.$this->getMessages().'
+		    <h2 class="sub_headline">'.$GLOBALS['TL_LANG']['tl_iao_offer']['importOffer'][1].'</h2>'.$this->getMessages().'
 		    
 		    <form action="'.ampersand($this->Environment->request, true).'" id="tl_iao_import" class="tl_form" method="post">
 		   
