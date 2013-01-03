@@ -698,7 +698,6 @@ class tl_iao_reminder extends Backend
 		   
 		    // Set document information
 		    $pdf->SetCreator(PDF_CREATOR);
-		    $pdf->SetAuthor(PDF_AUTHOR);
 		    $pdf->SetTitle($reminder_Str);
 		    $pdf->SetSubject($reminder_Str);
 		    $pdf->SetKeywords($reminder_Str);

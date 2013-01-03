@@ -170,18 +170,6 @@ $GLOBALS['TL_DCA']['tl_iao_invoice'] = array
 			'inputType'               => 'text',
 			'eval'                    => array('mandatory'=>true, 'maxlength'=>255)
 		),
-
-		'alias' => array
-		(
-			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_invoice']['alias'],
-			'exclude'                 => true,
-			'inputType'               => 'text',
-			'eval'                    => array('rgxp'=>'alnum', 'doNotCopy'=>true, 'spaceToUnderscore'=>true, 'maxlength'=>128),
-			'save_callback' => array
-			(
-				array('tl_iao_invoice', 'generateAlias')
-			)
-		),
 		'invoice_tstamp' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_invoice']['invoice_date'],
@@ -577,48 +565,7 @@ class tl_iao_invoice extends Backend
 				break;
 		}
 	}
-
-
-
-
-
-
-	/**
-	 * Autogenerate an article alias if it has not been set yet
-	 * @param mixed
-	 * @param object
-	 * @return string
-	 */
-	public function generateAlias($varValue, DataContainer $dc)
-	{
-		$autoAlias = false;
-                
-		// Generate alias if there is none
-		if (!strlen($varValue))
-		{
-			$autoAlias = true;
-			$varValue = standardize($dc->activeRecord->title);
-		}
-                
-        
-		$objAlias = $this->Database->prepare("SELECT id FROM `tl_iao_invoice` WHERE id=? OR alias=?")
-								   ->execute($dc->id, $varValue);
-
-		// Check whether the page alias exists
-		if ($objAlias->numRows > 1)
-		{
-			if (!$autoAlias)
-			{
-				throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'], $varValue));
-			}
-
-			$varValue .= '-' . $dc->id;
-		}
-
-		return $varValue;
-	}
-
-        
+       
         /**
         * fill date-Field if this empty
         * @param mixed
@@ -887,7 +834,6 @@ class tl_iao_invoice extends Backend
 		   
 		    // Set document information
 		    $pdf->SetCreator(PDF_CREATOR);
-		    $pdf->SetAuthor(PDF_AUTHOR);
 		    $pdf->SetTitle($pdfname);
 		    $pdf->SetSubject($pdfname);
 		    $pdf->SetKeywords($pdfname);

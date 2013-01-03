@@ -769,7 +769,6 @@ class tl_iao_invoice_items extends Backend
 		'tstamp' => time(),
 		'headline' => $result->headline,
 		'sorting' => $result->sorting,
-		'author' => $result->author,
 		'date' => $result->date,
 		'time' => $result->time,
 		'text' => $result->text,

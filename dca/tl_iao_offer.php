@@ -176,18 +176,6 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 			'inputType'               => 'text',
 			'eval'                    => array('mandatory'=>true, 'maxlength'=>255)
 		),
-
-		'alias' => array
-		(
-			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_offer']['alias'],
-			'exclude'                 => true,
-			'inputType'               => 'text',
-			'eval'                    => array('rgxp'=>'alnum', 'doNotCopy'=>true, 'spaceToUnderscore'=>true, 'maxlength'=>128),
-			'save_callback' => array
-			(
-				array('tl_iao_offer', 'generateAlias')
-			)
-		),
 		'offer_date' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_offer']['offer_date'],
@@ -540,42 +528,6 @@ class tl_iao_offer extends Backend
 
 
 
-
-
-	/**
-	 * Autogenerate an article alias if it has not been set yet
-	 * @param mixed
-	 * @param object
-	 * @return string
-	 */
-	public function generateAlias($varValue, DataContainer $dc)
-	{
-		$autoAlias = false;
-                
-		// Generate alias if there is none
-		if (!strlen($varValue))
-		{
-			$autoAlias = true;
-			$varValue = standardize($dc->activeRecord->title);
-		}
-                
-        
-		$objAlias = $this->Database->prepare("SELECT id FROM `tl_iao_offer` WHERE id=? OR alias=?")
-								   ->execute($dc->id, $varValue);
-
-		// Check whether the page alias exists
-		if ($objAlias->numRows > 1)
-		{
-			if (!$autoAlias)
-			{
-				throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'], $varValue));
-			}
-
-			$varValue .= '-' . $dc->id;
-		}
-
-		return $varValue;
-	}
 	
         /**
         * fill date-Field if this empty
@@ -798,7 +750,6 @@ class tl_iao_offer extends Backend
 		    'title' => $row['title'],
 		    'address_text' => $row['address_text'],
 		    'member' => $row['member'],
-		    'alias' => $row['alias'],
 		    'price_netto' => $row['price_netto'],
 		    'price_brutto' => $row['price_brutto'],
 		    );
@@ -821,9 +772,7 @@ class tl_iao_offer extends Backend
 			    'pid' => $newInvoiceID,
 			    'tstamp' => $posten->tstamp,
 			    'headline' => $posten->headline,
-                            'alias' => $posten->alias,
                             'sorting' => $posten->sorting,
-                            'author' => $posten->author,
                             'date' => $posten->date,
                             'time' => $posten->time,
                             'text' => $posten->text,
@@ -915,7 +864,6 @@ class tl_iao_offer extends Backend
 		   
 		    // Set document information
 		    $pdf->SetCreator(PDF_CREATOR);
-		    $pdf->SetAuthor(PDF_AUTHOR);
 		    $pdf->SetTitle($pdfname);
 		    $pdf->SetSubject($pdfname);
 		    $pdf->SetKeywords($pdfname);
