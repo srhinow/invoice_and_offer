@@ -716,7 +716,7 @@ class tl_iao_invoice_items extends Backend
 		    'published' => $result->published,
 		    'vat' => $result->vat,
 		    'vat_incl' => $result->vat_incl,
-		    'position' => 'invoice'
+		    'position' => 'invoice',
 		    );
 				    
 		    $newposten = $this->Database->prepare('INSERT INTO `tl_iao_posten_templates` %s')

@@ -684,7 +684,7 @@ class tl_iao_offer_items extends Backend
 		    'published' => $result->published,
 		    'vat' => $result->vat,
 		    'vat_incl' => $result->vat_incl,
-		    'position' => 'offer'
+		    'position' => 'offer',
 		    );
 				    
 		    $newposten = $this->Database->prepare('INSERT INTO `tl_iao_posten_templates` %s')
@@ -698,6 +698,7 @@ class tl_iao_offer_items extends Backend
 		$href.='&amp;ptid='.$row['id'];
 		return '<a href="'.$this->addToUrl($href).'" title="'.specialchars($title).'"'.$attributes.'>'.$this->generateImage($icon, $label).'</a> ';		       
         }
+        
         /**
 	 * get all offer-posten-templates
 	 * @param object
@@ -749,7 +750,6 @@ class tl_iao_offer_items extends Backend
 		    'published' => $result->published,
 		    'vat' => $result->vat,
 		    'vat_incl' => $result->vat_incl,
-		    'position' => 'offer',
 		);
 				
 		$this->Database->prepare('UPDATE `tl_iao_offer_items` %s WHERE `id`=?')

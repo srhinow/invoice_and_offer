@@ -659,7 +659,7 @@ class tl_iao_credit_items extends Backend
 		    'published' => $result->published,
 		    'vat' => $result->vat,
 		    'vat_incl' => $result->vat_incl,
-		    'position' => 'credit'
+		    'position' => 'credit',
 		    );
 				    
 		    $newposten = $this->Database->prepare('INSERT INTO `tl_iao_posten_templates` %s')
