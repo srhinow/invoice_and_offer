@@ -1,37 +1,26 @@
-<?php if (!defined('TL_ROOT')) die('You cannot access this file directly!');
+<?php
 
 /**
- * Contao Open Source CMS
- * Copyright (C) 2005-2011 Leo Feyer
- *
- * Formerly known as TYPOlight Open Source CMS.
- *
  * This program is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation, either
  * version 3 of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this program. If not, please visit the Free
  * Software Foundation website at <http://www.gnu.org/licenses/>.
  *
- * PHP version 5
- * @copyright  Leo Feyer 2005-2011
- * @author     Leo Feyer <http://www.contao.org>
- * @license    LGPL
- *
- * @copyright  Sven Rhinow 2011
+ * @copyright  Sven Rhinow 2011-2013
  * @author     sr-tag Sven Rhinow Webentwicklung <http://www.sr-tag.de>
  * @package    invoice_and_offer
  * @license    LGPL
  * @filesource
  */
-
 
 /**
  * Table tl_iao_reminder
@@ -45,15 +34,10 @@ $GLOBALS['TL_DCA']['tl_iao_reminder'] = array
 		'dataContainer'               => 'Table',
 		'switchToEdit'                => true,
 		'enableVersioning'            => false,
-// 		'onload_callback' => array
-// 		(
-// 			
-// 		),
-                'ondelete_callback'	=> array
-                (
-		    array('tl_iao_reminder', 'onDeleteReminder')
-                )
-
+		'ondelete_callback'	=> array
+		(
+			array('tl_iao_reminder', 'onDeleteReminder')
+		)
 	),
 
 	// List
@@ -70,17 +54,17 @@ $GLOBALS['TL_DCA']['tl_iao_reminder'] = array
 		(
 			'fields'                  => array('title','invoice_id'),
 			'format'                  => '%s (%s)',
-			'label_callback'          => array('tl_iao_reminder', 'listEntries'),			
+			'label_callback'          => array('tl_iao_reminder', 'listEntries'),
 		),
 		'global_operations' => array
-		(			
+		(
 			'checkReminder' => array
 			(
 				'label'               => &$GLOBALS['TL_LANG']['tl_iao_reminder']['checkReminder'],
 				'href'                => 'key=checkReminder',
 				'class'               => 'check_reminder',
 				'attributes'          => 'onclick="Backend.getScrollOffset();"'
-			),			
+			),
 			'all' => array
 			(
 				'label'               => &$GLOBALS['TL_LANG']['MSC']['all'],
@@ -124,21 +108,21 @@ $GLOBALS['TL_DCA']['tl_iao_reminder'] = array
 				'label'               => &$GLOBALS['TL_LANG']['tl_iao_reminder']['show'],
 				'href'                => 'act=show',
 				'icon'                => 'show.gif'
-			),			
+			),
 			'toggle' => array
 			(
 				'label'               => &$GLOBALS['TL_LANG']['tl_iao_reminder']['toggle'],
 				'icon'                => 'ok.gif',
 				#'attributes'          => 'onclick="Backend.getScrollOffset(); return AjaxRequest.toggleVisibility(this, %s);"',
 				'button_callback'     => array('tl_iao_reminder', 'toggleIcon')
-			),			
+			),
 			'pdf' => array
 			(
 				'label'               => &$GLOBALS['TL_LANG']['tl_iao_reminder']['pdf'],
 				'href'                => 'key=pdf',
 				'icon'                => 'iconPDF.gif',
 				'button_callback'     => array('tl_iao_reminder', 'showPDF')
-			)			
+			)
 		)
 	),
 
@@ -164,8 +148,8 @@ $GLOBALS['TL_DCA']['tl_iao_reminder'] = array
 			'exclude'                 => true,
 			'search'                  => true,
 			'inputType'               => 'text',
-			'eval'                    => array('mandatory'=>false, 'maxlength'=>255),						
-		),			
+			'eval'                    => array('mandatory'=>false, 'maxlength'=>255),
+		),
 		'text' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_reminder']['text'],
@@ -173,7 +157,7 @@ $GLOBALS['TL_DCA']['tl_iao_reminder'] = array
 			'search'                  => true,
 			'inputType'               => 'textarea',
 			'eval'                    => array('rte'=>'tinyMCE', 'helpwizard'=>true,'style'=>'height:60px;', 'tl_class'=>'clr'),
-			'explanation'             => 'insertTags',			
+			'explanation'             => 'insertTags',
 		),
 		'text_finish' => array
 		(
@@ -181,15 +165,15 @@ $GLOBALS['TL_DCA']['tl_iao_reminder'] = array
 			'exclude'                 => true,
 			'eval'			  => array('tl_class'=>'clr'),
 			'input_field_callback'	  => array('tl_iao_reminder','getTextFinish'),
-			
-		),				
+
+		),
 		'paid_on_date' =>  array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_reminder']['paid_on_date'],
 			'exclude'                 => true,
 			'inputType'               => 'text',
 			'eval'                    => array('rgxp'=>'date', 'datepicker'=>$this->getDatePickerString(), 'tl_class'=>'w50 wizard'),
-		),													
+		),
 		'invoice_id' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_reminder']['invoice_id'],
@@ -201,8 +185,8 @@ $GLOBALS['TL_DCA']['tl_iao_reminder'] = array
 			'save_callback' => array
 			(
 				array('tl_iao_reminder', 'fillFields')
-			)                        
-		),														
+			)
+		),
 		'address_text' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_reminder']['address_text'],
@@ -211,7 +195,7 @@ $GLOBALS['TL_DCA']['tl_iao_reminder'] = array
 			'inputType'               => 'textarea',
 			'eval'                    => array('rte'=>'tinyMCE','style'=>'height:60px;', 'tl_class'=>'clr'),
 			'explanation'             => 'insertTags'
-		),				
+		),
 
 		'published' => array
 		(
@@ -257,7 +241,7 @@ $GLOBALS['TL_DCA']['tl_iao_reminder'] = array
 			'flag'                    => 1,
 			'inputType'               => 'text',
 			'eval'                    => array('tl_class'=>'w50','rgxp'=>'digit', 'nospace'=>true)
-		),		
+		),
 		'tax' =>  array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_reminder']['tax'],
@@ -281,38 +265,31 @@ $GLOBALS['TL_DCA']['tl_iao_reminder'] = array
 			'flag'                    => 1,
 			'inputType'               => 'text',
 			'eval'                    => array('tl_class'=>'w50','rgxp'=>'digit', 'nospace'=>true)
-		),		
+		),
 		'postage' =>  array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_reminder']['postage'],
 			'exclude'                 => true,
 			'inputType'               => 'text',
 			'eval'                    => array('maxlength'=>25, 'tl_class'=>'w50')
-		),						
+		),
 		'notice' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_reminder']['notice'],
 			'exclude'                 => true,
-			'search'		  => true,			
+			'search'		  => true,
 			'filter'                  => false,
 			'inputType'               => 'textarea',
 			'eval'                    => array('mandatory'=>false, 'cols'=>'10','rows'=>'10','style'=>'height:100px','rte'=>false)
-			
 		),
 	)
 );
 
-
 /**
  * Class tl_iao_reminder
- *
- * Provide miscellaneous methods that are used by the data configuration array.
- * @copyright  Leo Feyer 2005-2011
- * @author     Leo Feyer <http://www.contao.org>
- * @package    Controller
  */
 class tl_iao_reminder extends Backend
-{     
+{
 
 	/**
 	 * Import the back end user object
@@ -322,7 +299,6 @@ class tl_iao_reminder extends Backend
 		parent::__construct();
 		$this->import('BackendUser', 'User');
 	}
-
 
 	/**
 	 * Check permissions to edit table tl_iao_reminder
@@ -364,7 +340,7 @@ class tl_iao_reminder extends Backend
 			case 'create':
 			case 'select':
 				// Allow
-				break;
+			break;
 
 			case 'edit':
 				// Dynamically add the record to the user profile
@@ -378,8 +354,8 @@ class tl_iao_reminder extends Backend
 						if ($this->User->inherit == 'custom' || !$this->User->groups[0])
 						{
 							$objUser = $this->Database->prepare("SELECT news, newp FROM tl_user WHERE id=?")
-													   ->limit(1)
-													   ->execute($this->User->id);
+														->limit(1)
+														->execute($this->User->id);
 
 							$arrNewp = deserialize($objUser->newp);
 
@@ -389,7 +365,7 @@ class tl_iao_reminder extends Backend
 								$arrNews[] = $this->Input->get('id');
 
 								$this->Database->prepare("UPDATE tl_user SET news=? WHERE id=?")
-											   ->execute(serialize($arrNews), $this->User->id);
+												->execute(serialize($arrNews), $this->User->id);
 							}
 						}
 
@@ -397,8 +373,8 @@ class tl_iao_reminder extends Backend
 						elseif ($this->User->groups[0] > 0)
 						{
 							$objGroup = $this->Database->prepare("SELECT news, newp FROM tl_user_group WHERE id=?")
-													   ->limit(1)
-													   ->execute($this->User->groups[0]);
+														->limit(1)
+														->execute($this->User->groups[0]);
 
 							$arrNewp = deserialize($objGroup->newp);
 
@@ -408,7 +384,7 @@ class tl_iao_reminder extends Backend
 								$arrNews[] = $this->Input->get('id');
 
 								$this->Database->prepare("UPDATE tl_user_group SET news=? WHERE id=?")
-											   ->execute(serialize($arrNews), $this->User->groups[0]);
+												->execute(serialize($arrNews), $this->User->groups[0]);
 							}
 						}
 
@@ -427,7 +403,7 @@ class tl_iao_reminder extends Backend
 					$this->log('Not enough permissions to '.$this->Input->get('act').' news archive ID "'.$this->Input->get('id').'"', 'tl_iao_reminder checkPermission', TL_ERROR);
 					$this->redirect('contao/main.php?act=error');
 				}
-				break;
+			break;
 
 			case 'editAll':
 			case 'deleteAll':
@@ -442,7 +418,7 @@ class tl_iao_reminder extends Backend
 					$session['CURRENT']['IDS'] = array_intersect($session['CURRENT']['IDS'], $root);
 				}
 				$this->Session->setData($session);
-				break;
+			break;
 
 			default:
 				if (strlen($this->Input->get('act')))
@@ -450,146 +426,144 @@ class tl_iao_reminder extends Backend
 					$this->log('Not enough permissions to '.$this->Input->get('act').' news archives', 'tl_iao_reminder checkPermission', TL_ERROR);
 					$this->redirect('contao/main.php?act=error');
 				}
-				break;
+			break;
 		}
 	}
 
+	/**
+	 * fill date-Field if this empty
+	 * @param mixed
+	 * @param object
+	 * @return date
+	 */
+	public function  generateExecuteDate($varValue, DataContainer $dc)
+	{
+		$altdate = ($dc->activeRecord->invoice_tstamp) ? $dc->activeRecord->invoice_tstamp : time();
+		return ($varValue==0) ? $altdate : $varValue;
+	}
 
-        
-        /**
-        * fill date-Field if this empty
-        * @param mixed
-        * @param object
-        * @return date
-        */
-        public function  generateExecuteDate($varValue, DataContainer $dc){
-	    
-	    $altdate = ($dc->activeRecord->invoice_tstamp) ? $dc->activeRecord->invoice_tstamp : time();
-	    return ($varValue==0) ? $altdate : $varValue;
-	    
-        }
-        
-                
-        /**
-        * fill date-Field if this empty
-        * @param mixed
-        * @param object
-        * @return date
-        */
-        public function  generateReminderTstamp($varValue, DataContainer $dc){
-	    
-	    return ($varValue == 0) ? time() : $varValue;
-        }        
+	/**
+	 * fill date-Field if this empty
+	 * @param mixed
+	 * @param object
+	 * @return date
+	 */
+	public function  generateReminderTstamp($varValue, DataContainer $dc)
+	{
+		return ($varValue == 0) ? time() : $varValue;
+	}
+
 	/**
 	 * fill Adress-Text
 	 * @param object
 	 * @throws Exception
 	 */
 	public function fillFields($varValue, DataContainer $dc)
-	{		    	    	    
-	    $dbObj = $this->Database->prepare('SELECT `invoice_id` FROM `tl_iao_reminder` WHERE `id`=?')
-		           ->limit(1)
-		           ->execute($dc->id);
-	    
-	    if($varValue == $dbObj->invoice_id) return $varValue;
+	{
+		$dbObj = $this->Database->prepare('SELECT `invoice_id` FROM `tl_iao_reminder` WHERE `id`=?')
+								->limit(1)
+								->execute($dc->id);
 
-	    $this->import('iao'); 
-	     
-	    if(!$dc->activeRecord->step)
-	    { 
-		$this->iao->fillReminderFields($varValue,$dc->activeRecord);
-	    }	   
+		if($varValue == $dbObj->invoice_id) return $varValue;
+
+		$this->import('iao');
+
+		if(!$dc->activeRecord->step)
+		{
+			$this->iao->fillReminderFields($varValue,$dc->activeRecord);
+		}
 	    return $varValue;
 	}
 
-	
-        /**
+
+    /**
 	 * get all invoices
 	 * @param object
 	 * @throws Exception
 	 */
 	public function getInvoices(DataContainer $dc)
 	{
-            $varValue= array();
-            
-            $all = $this->Database->prepare('SELECT `i`.*, `m`.`company` FROM `tl_iao_invoice` as `i` LEFT JOIN `tl_member` as `m` ON `i`.`member` = `m`.`id` WHERE `status`=? ORDER BY `invoice_id_str` DESC')
-				  ->execute('1');
-            while($all->next())
-            {                                                                       
-		$varValue[$all->id] = $all->invoice_id_str.' :: '.$all->company.' ('.number_format($all->price_brutto,2,',','.').' '.$GLOBALS['TL_CONFIG']['currency_symbol'].')';
-            }
-            
-	    return $varValue;
+		$varValue= array();
+
+		$all = $this->Database->prepare('SELECT `i`.*, `m`.`company` FROM `tl_iao_invoice` as `i` LEFT JOIN `tl_member` as `m` ON `i`.`member` = `m`.`id` WHERE `status`=? ORDER BY `invoice_id_str` DESC')
+								->execute('1');
+
+		while($all->next())
+		{
+			$varValue[$all->id] = $all->invoice_id_str.' :: '.$all->company.' ('.number_format($all->price_brutto,2,',','.').' '.$GLOBALS['TL_CONFIG']['currency_symbol'].')';
+		}
+
+		return $varValue;
 	}
-	
-				
+
 	/**
 	 * fill Text
 	 * @param object
 	 * @throws Exception
 	 */
 	public function fillStepFields($varValue, DataContainer $dc)
-	{                 
-	    if(!$varValue) return $varValue;
-	    $this->import('iao'); 
-	    	    
-	    $dbObj = $this->Database->prepare('SELECT * FROM `tl_iao_reminder` WHERE `id`=?')
-				   ->limit(1)
-				   ->execute($dc->id);
-	    
-	    if($varValue == $dbObj->step) return $varValue;
-    
-	    $text = $GLOBALS['TL_CONFIG']['iao_reminder_'.$varValue.'_text'];	  
-	    $text_finish = $this->iao->changeIAOTags($text,'reminder',$dc->id);						    		    
-	    $text_finish = $this->iao->changeTags($text_finish);
-	    
-	    $tax =  $GLOBALS['TL_CONFIG']['iao_reminder_'.$varValue.'_tax'];
-	    $postage =  $GLOBALS['TL_CONFIG']['iao_reminder_'.$varValue.'_postage'];
-	    $periode_date = $this->iao->getPeriodeDate($dc->activeRecord);
-	    
-	    $set = array
-	    (
-		'tax' => $tax,
-		'postage' => $postage,
-		'text' =>  $text,		
-		'text_finish' => $text_finish,
-		'periode_date' => $periode_date
-	    );
+	{
+		if(!$varValue) return $varValue;
+		$this->import('iao');
+
+		$dbObj = $this->Database->prepare('SELECT * FROM `tl_iao_reminder` WHERE `id`=?')
+								->limit(1)
+								->execute($dc->id);
+
+		if($varValue == $dbObj->step) return $varValue;
+
+		$text = $GLOBALS['TL_CONFIG']['iao_reminder_'.$varValue.'_text'];
+		$text_finish = $this->iao->changeIAOTags($text,'reminder',$dc->id);
+		$text_finish = $this->iao->changeTags($text_finish);
+
+		$tax =  $GLOBALS['TL_CONFIG']['iao_reminder_'.$varValue.'_tax'];
+		$postage =  $GLOBALS['TL_CONFIG']['iao_reminder_'.$varValue.'_postage'];
+		$periode_date = $this->iao->getPeriodeDate($dc->activeRecord);
+
+		$set = array
+		(
+			'tax' => $tax,
+			'postage' => $postage,
+			'text' =>  $text,
+			'text_finish' => $text_finish,
+			'periode_date' => $periode_date
+		);
+
 	    $updateRemind = $this->Database->prepare('UPDATE `tl_iao_reminder` %s WHERE `id`=?')
-			   ->set($set)
-			   ->execute($dc->id);			
-     
-	    //update invoice-data with current reminder-step
-	    $this->Database->prepare('UPDATE `tl_iao_invoice` SET `reminder_id` = ?  WHERE `id`=?')
-		   ->execute($dc->id, $dc->activeRecord->invoice_id);	
-			   
-	    return $varValue;
+										->set($set)
+										->execute($dc->id);
+
+		//update invoice-data with current reminder-step
+		$this->Database->prepare('UPDATE `tl_iao_invoice` SET `reminder_id` = ?  WHERE `id`=?')
+						->execute($dc->id, $dc->activeRecord->invoice_id);
+
+		return $varValue;
 	}
-	
-	
+
 	public function getTextFinish(DataContainer $dc)
 	{
- 	     $this->import('Database');
- 	     $this->import('iao'); 
- 	     
- 	     $obj = $this->Database->prepare('SELECT * FROM `tl_iao_reminder` WHERE `id`=?')
-				   ->limit(1)
-				   ->execute($dc->id);
-				   
-             $text_finish = $this->iao->changeIAOTags($obj->text,'reminder',$dc->id);						    		    
-	     $text_finish = $this->iao->changeTags($text_finish);
-	    
-	     $set = array
-	     (
-		'text_finish' => $text_finish
-	     );
-	     $this->Database->prepare('UPDATE `tl_iao_reminder` %s WHERE `id`=?')
-			    ->set($set)
-			    ->execute($dc->id);
-			    
-	     return '<h3><label for="ctrl_text_finish">'.$GLOBALS['TL_LANG']['tl_iao_reminder']['text_finish'][0].'</label></h3><div id="ctrl_text_finish" class="preview" style="border:1px solid #ddd; padding:5px;">'.$text_finish.'</div>';
+		$this->import('Database');
+		$this->import('iao');
+
+		$obj = $this->Database->prepare('SELECT * FROM `tl_iao_reminder` WHERE `id`=?')
+								->limit(1)
+								->execute($dc->id);
+
+		$text_finish = $this->iao->changeIAOTags($obj->text,'reminder',$dc->id);
+		$text_finish = $this->iao->changeTags($text_finish);
+
+		$set = array
+		(
+			'text_finish' => $text_finish
+		);
+
+		$this->Database->prepare('UPDATE `tl_iao_reminder` %s WHERE `id`=?')
+						->set($set)
+						->execute($dc->id);
+
+		return '<h3><label for="ctrl_text_finish">'.$GLOBALS['TL_LANG']['tl_iao_reminder']['text_finish'][0].'</label></h3><div id="ctrl_text_finish" class="preview" style="border:1px solid #ddd; padding:5px;">'.$text_finish.'</div>';
 	}
-			
+
 	/**
 	 * get all members to valid groups
 	 * @param object
@@ -597,20 +571,21 @@ class tl_iao_reminder extends Backend
 	 */
 	public function getMembers(DataContainer $dc)
 	{
-            $varValue= array();
-            
-            if(!$GLOBALS['TL_CONFIG']['iao_costumer_group'])  return $varValue;
-            
-            $member = $this->Database->prepare('SELECT `id`,`groups`,`firstname`,`lastname`,`company` FROM `tl_member` WHERE `iao_group`')
-            			     ->execute($GLOBALS['TL_CONFIG']['iao_costumer_group']);
-            while($member->next())
-            { 
-               $varValue[$member->id] =  $member->firstname.' '.$member->lastname.' ('.$member->company.')';
-            }
-            
-	    return $varValue;
+		$varValue= array();
+
+		if(!$GLOBALS['TL_CONFIG']['iao_costumer_group'])  return $varValue;
+
+		$member = $this->Database->prepare('SELECT `id`,`groups`,`firstname`,`lastname`,`company` FROM `tl_member` WHERE `iao_group`')
+								->execute($GLOBALS['TL_CONFIG']['iao_costumer_group']);
+
+		while($member->next())
+		{
+			$varValue[$member->id] =  $member->firstname.' '.$member->lastname.' ('.$member->company.')';
+		}
+
+		return $varValue;
 	}
-	
+
 	/**
 	 * Return the edit header button
 	 * @param array
@@ -628,7 +603,7 @@ class tl_iao_reminder extends Backend
 
 
 
-	
+
 	/**
 	 * Generate a "PDF" button and return it as string
 	 * @param array
@@ -640,132 +615,123 @@ class tl_iao_reminder extends Backend
 	 */
 	public function showPDF($row, $href, $label, $title, $icon)
 	{
-
 		if (!$this->User->isAdmin)
 		{
 			return '';
 		}
-                
+
 		if ($this->Input->get('key') == 'pdf' && $this->Input->get('id') == $row['id'])
 		{
-		    $step = $row['step'];
-		    $pdfFile = TL_ROOT . '/' . $GLOBALS['TL_CONFIG']['iao_reminder_'.$step.'_pdf'];
-		    
-		    if(!empty($GLOBALS['TL_CONFIG']['iao_reminder_'.$step.'_pdf']) && file_exists($pdfFile))
-		    {	
+			$step = $row['step'];
+			$pdfFile = TL_ROOT . '/' . $GLOBALS['TL_CONFIG']['iao_reminder_'.$step.'_pdf'];
 
-                        header("Content-type: application/pdf"); 
+		if(!empty($GLOBALS['TL_CONFIG']['iao_reminder_'.$step.'_pdf']) && file_exists($pdfFile))
+		{
+
+			header("Content-type: application/pdf");
 			header('Expires: Sat, 26 Jul 1997 05:00:00 GMT'); // Date in the past
 			header('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT');
-// 			header('Content-Length: '.strlen($row['invoice_pdf_file']));
+ 			header('Content-Length: '.strlen($row['invoice_pdf_file']));
 			header('Content-Disposition: inline; filename="'.basename($pdfFile).'";');
-			
-/*			// The PDF source is in original.pdf
-			readfile($pdfFile);
-		        exit();	*/		
-		    }
 
-		    if( !file_exists($pdfFile) ) return;  // template file not found
-		    
-		    $this->import('Database');
-		    $invoiceObj = $this->Database->prepare('SELECT * FROM `tl_iao_invoice` WHERE `id`=?')->limit(1)->execute($row['invoice_id']);
-		    
-		    $reminder_Str = $GLOBALS['TL_LANG']['tl_iao_reminder']['steps'][$row['step']].'-'.$invoiceObj->invoice_id_str.'-'.$row['id'];
-		    
-		    //-- Calculating dimensions
-		    $margins = unserialize($GLOBALS['TL_CONFIG']['iao_pdf_margins']);         // Margins as an array
-		    switch( $margins['unit'] ) {
-		      case 'cm':      $factor = 10.0;   break;
-		      default:        $factor = 1.0;
-		    }
-                    require_once(TL_ROOT . '/system/modules/invoice_and_offer/iaoPDF.php');
-		    
-		    $dim['top']    = !is_numeric($margins['top'])   ? PDF_MARGIN_TOP    : $margins['top'] * $factor;
-		    $dim['right']  = !is_numeric($margins['right']) ? PDF_MARGIN_RIGHT  : $margins['right'] * $factor;
-		    $dim['bottom'] = !is_numeric($margins['top'])   ? PDF_MARGIN_BOTTOM : $margins['bottom'] * $factor;
-		    $dim['left']   = !is_numeric($margins['left'])  ? PDF_MARGIN_LEFT   : $margins['left'] * $factor;		
-		    
-		    // TCPDF configuration
-		    $l['a_meta_dir'] = 'ltr';
-		    $l['a_meta_charset'] = $GLOBALS['TL_CONFIG']['characterSet'];
-		    $l['a_meta_language'] = $GLOBALS['TL_LANGUAGE'];
-		    $l['w_page'] = 'page';
-		  		   
-		   // Create new PDF document with FPDI extension
-		    
-		    $pdf = new iaoPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true);
-		    $pdf->setSourceFile($pdfFile);          // Set PDF template
-		   
-		    // Set document information
-		    $pdf->SetCreator(PDF_CREATOR);
-		    $pdf->SetTitle($reminder_Str);
-		    $pdf->SetSubject($reminder_Str);
-		    $pdf->SetKeywords($reminder_Str);
-		
-		    $pdf->SetDisplayMode('fullwidth', 'OneColumn', 'UseNone');
-		    $pdf->SetHeaderData( );
- 
-		    // Remove default header/footer
-		    $pdf->setPrintHeader(false);
-		    
-		    // Set margins
-		    $pdf->SetMargins($dim['left'], $dim['top'], $dim['right']);
-		
-		    // Set auto page breaks
-		    $pdf->SetAutoPageBreak(true, $dim['bottom']);
-		    
-		    // Set image scale factor
-		    $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
-		    
-		    // Set some language-dependent strings
-		    $pdf->setLanguageArray($l);
-		    
-		    // Initialize document and add a page
-		    $pdf->AliasNbPages();
-		    $pdf->AddPage();		    
+		}
 
-		    // Include CSS (TCPDF 5.1.000 an newer)
-		    if(file_exists(TL_ROOT . '/' . $GLOBALS['TL_CONFIG']['iao_pdf_css']) ) {
-		      $styles = "<style>\n" . file_get_contents(TL_ROOT . '/' . $GLOBALS['TL_CONFIG']['iao_pdf_css']) . "\n</style>\n";  
-    
-		    }		    			    		    		    
-		    		   		    
-		    // write the address-data
-                    $pdf->drawAddress($styles.iao::changeTags($row['address_text']));
-		    		    
-		    //Mahnungsnummer
-                    $pdf->drawDocumentNumber($reminder_Str);		    
-                    		    
-		    //Datum
-                    $pdf->drawDate(date($GLOBALS['TL_CONFIG']['dateFormat'],$row['tstamp']));
-		    
-                    
-		    //ausgeführt am 
-                    $newdate= $row['periode_date'];
-                    $pdf->drawInvoiceDurationDate(date($GLOBALS['TL_CONFIG']['dateFormat'],$newdate));                    
-                    		    
-		    
-		    //Text
-		    if(strip_tags($row['text_finish']))
-		    {
+		if( !file_exists($pdfFile) ) return;  // template file not found
+
+		$this->import('Database');
+		$invoiceObj = $this->Database->prepare('SELECT * FROM `tl_iao_invoice` WHERE `id`=?')->limit(1)->execute($row['invoice_id']);
+
+		$reminder_Str = $GLOBALS['TL_LANG']['tl_iao_reminder']['steps'][$row['step']].'-'.$invoiceObj->invoice_id_str.'-'.$row['id'];
+
+		//-- Calculating dimensions
+		$margins = unserialize($GLOBALS['TL_CONFIG']['iao_pdf_margins']);         // Margins as an array
+		switch( $margins['unit'] )
+		{
+			case 'cm':      $factor = 10.0;   break;
+			default:        $factor = 1.0;
+		}
+
+		require_once(TL_ROOT . '/system/modules/invoice_and_offer/iaoPDF.php');
+
+		$dim['top']    = !is_numeric($margins['top'])   ? PDF_MARGIN_TOP    : $margins['top'] * $factor;
+		$dim['right']  = !is_numeric($margins['right']) ? PDF_MARGIN_RIGHT  : $margins['right'] * $factor;
+		$dim['bottom'] = !is_numeric($margins['top'])   ? PDF_MARGIN_BOTTOM : $margins['bottom'] * $factor;
+		$dim['left']   = !is_numeric($margins['left'])  ? PDF_MARGIN_LEFT   : $margins['left'] * $factor;
+
+		// TCPDF configuration
+		$l['a_meta_dir'] = 'ltr';
+		$l['a_meta_charset'] = $GLOBALS['TL_CONFIG']['characterSet'];
+		$l['a_meta_language'] = $GLOBALS['TL_LANGUAGE'];
+		$l['w_page'] = 'page';
+
+		// Create new PDF document with FPDI extension
+		$pdf = new iaoPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true);
+		$pdf->setSourceFile($pdfFile);          // Set PDF template
+
+		// Set document information
+		$pdf->SetCreator(PDF_CREATOR);
+		$pdf->SetTitle($reminder_Str);
+		$pdf->SetSubject($reminder_Str);
+		$pdf->SetKeywords($reminder_Str);
+
+		$pdf->SetDisplayMode('fullwidth', 'OneColumn', 'UseNone');
+		$pdf->SetHeaderData( );
+
+		// Remove default header/footer
+		$pdf->setPrintHeader(false);
+
+		// Set margins
+		$pdf->SetMargins($dim['left'], $dim['top'], $dim['right']);
+
+		// Set auto page breaks
+		$pdf->SetAutoPageBreak(true, $dim['bottom']);
+
+		// Set image scale factor
+		$pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+
+		// Set some language-dependent strings
+		$pdf->setLanguageArray($l);
+
+		// Initialize document and add a page
+		$pdf->AddPage();
+
+		// Include CSS (TCPDF 5.1.000 an newer)
+		if(file_exists(TL_ROOT . '/' . $GLOBALS['TL_CONFIG']['iao_pdf_css']) )
+		{
+			$styles = "<style>\n" . file_get_contents(TL_ROOT . '/' . $GLOBALS['TL_CONFIG']['iao_pdf_css']) . "\n</style>\n";
+		}
+
+		// write the address-data
+		$pdf->drawAddress($styles.iao::changeTags($row['address_text']));
+
+		//Mahnungsnummer
+		$pdf->drawDocumentNumber($reminder_Str);
+
+		//Datum
+		$pdf->drawDate(date($GLOBALS['TL_CONFIG']['dateFormat'],$row['tstamp']));
+
+		//ausgeführt am
+		$newdate= $row['periode_date'];
+		$pdf->drawInvoiceDurationDate(date($GLOBALS['TL_CONFIG']['dateFormat'],$newdate));
+
+
+		//Text
+		if(strip_tags($row['text_finish']))
+		{
 			$pdf->drawTextBefore($row['text_finish']);
-		    }
-		    
-		    // Close and output PDF document
-		    $pdf->lastPage();		    		    
-		    $pdf->Output($reminder_Str. '.pdf', 'D');		     
-		   		    
-		    // Stop script execution
-		    exit();
-		    
-		
+		}
+
+		// Close and output PDF document
+		$pdf->lastPage();
+		$pdf->Output($reminder_Str. '.pdf', 'D');
+
+		// Stop script execution
+		exit();
 		}
 		return '<a href="'.$this->addToUrl($href.'&amp;id='.$row['id']).'" title="'.specialchars($title).'">'.$this->generateImage($icon, $label).'</a> ';
-	}	
-			
-	
-	
-	
+
+	}
+
 	/**
 	 * Autogenerate an article alias if it has not been set yet
 	 * @param mixed
@@ -774,43 +740,42 @@ class tl_iao_reminder extends Backend
 	 */
 	public function generateReminderNumber($varValue, DataContainer $dc)
 	{
-	    $autoNr = false;
-	    $varValue = (int) $varValue;
-	    
-	    // Generate invoice_id if there is none
-	    if($varValue == 0)
-	    {
-		$autoNr = true;
-		$objNr = $this->Database->prepare("SELECT `invoice_id` FROM `tl_iao_reminder` ORDER BY `invoice_id` DESC")
-					->limit(1)
-					->execute();
-		
-					
-	        if($objNr->numRows < 1 || $objNr->invoice_id == 0)  $varValue = $GLOBALS['TL_CONFIG']['iao_invoice_startnumber'];
-	        else  $varValue =  $objNr->invoice_id +1;
-	        
-	    }
-	    else
-	    {			        
-		$objNr = $this->Database->prepare("SELECT `invoice_id` FROM `tl_iao_reminder` WHERE `id`=? OR `invoice_id`=?")
-					    ->limit(1)
-					    ->execute($dc->id,$varValue);
-		    
-		// Check whether the InvoiceNumber exists
-		if ($objNr->numRows > 1 )
+		$autoNr = false;
+		$varValue = (int) $varValue;
+
+		// Generate invoice_id if there is none
+		if($varValue == 0)
 		{
-			if (!$autoNr)
-			{
-				throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'], $varValue));
-			}
-    
-			$varValue .= '-' . $dc->id;
+			$autoNr = true;
+			$objNr = $this->Database->prepare("SELECT `invoice_id` FROM `tl_iao_reminder` ORDER BY `invoice_id` DESC")
+									->limit(1)
+									->execute();
+
+
+			if($objNr->numRows < 1 || $objNr->invoice_id == 0)  $varValue = $GLOBALS['TL_CONFIG']['iao_invoice_startnumber'];
+			else  $varValue =  $objNr->invoice_id +1;
+
 		}
-	    }
+		else
+		{
+			$objNr = $this->Database->prepare("SELECT `invoice_id` FROM `tl_iao_reminder` WHERE `id`=? OR `invoice_id`=?")
+									->limit(1)
+									->execute($dc->id,$varValue);
+
+			// Check whether the InvoiceNumber exists
+			if ($objNr->numRows > 1 )
+			{
+				if (!$autoNr)
+				{
+					throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'], $varValue));
+				}
+
+				$varValue .= '-' . $dc->id;
+			}
+		}
 	    return $varValue;
-	    
-      }
-      
+	}
+
     /**
      * List a particular record
      * @param array
@@ -818,29 +783,28 @@ class tl_iao_reminder extends Backend
      */
     public function listEntries($arrRow)
     {
-	    
-	    $this->import('Database');
-	    $result = $this->Database->prepare("SELECT `r`.periode_date,`i`.`invoice_id_str`, `i`.`title` `invoicetitle`, `m`.`firstname`, `m`.`lastname`, `m`.`company` 
-	    FROM `tl_iao_reminder` `r` 
-	    LEFT JOIN `tl_member` `m` ON  `r`.`member` = `m`.`id`
-	    LEFT JOIN `tl_iao_invoice` `i` ON  `r`.`invoice_id` = `i`.`id`
-	    WHERE `r`.`id`=?")
-				       ->limit(1)
-				       ->execute($arrRow['id']);
-	    $row = $result->fetchAssoc();
+		$this->import('Database');
+		$result = $this->Database->prepare("SELECT `r`.periode_date,`i`.`invoice_id_str`, `i`.`title` `invoicetitle`, `m`.`firstname`, `m`.`lastname`, `m`.`company`
+		FROM `tl_iao_reminder` `r`
+		LEFT JOIN `tl_member` `m` ON  `r`.`member` = `m`.`id`
+		LEFT JOIN `tl_iao_invoice` `i` ON  `r`.`invoice_id` = `i`.`id`
+		WHERE `r`.`id`=?")
+						->limit(1)
+						->execute($arrRow['id']);
 
-	    return '
+		$row = $result->fetchAssoc();
+
+		return '
 		<div class="comment_wrap">
 		<div class="cte_type status' . $arrRow['status'] . '"><strong>' . $arrRow['title'] . '</strong> '.$row['invoice_id_str'].'</div>
-		<div>Rechnungs-Title: <strong>'.$row['invoicetitle'].'</strong></div>		
-		<div>'.$GLOBALS['TL_LANG']['tl_iao_reminder']['sum'][0].': <strong>'.number_format($arrRow['sum'],2,',','.').' '.$GLOBALS['TL_CONFIG']['currency_symbol'].'</strong></div>		
+		<div>Rechnungs-Title: <strong>'.$row['invoicetitle'].'</strong></div>
+		<div>'.$GLOBALS['TL_LANG']['tl_iao_reminder']['sum'][0].': <strong>'.number_format($arrRow['sum'],2,',','.').' '.$GLOBALS['TL_CONFIG']['currency_symbol'].'</strong></div>
 		<div>'.$GLOBALS['TL_LANG']['tl_iao_reminder']['member'][0].': '.$row['firstname'].' '.$row['lastname'].' ('.$row['company'].')</div>
 		<div>'.$GLOBALS['TL_LANG']['tl_iao_reminder']['periode_date'][0].': '.date($GLOBALS['TL_CONFIG']['dateFormat'],$row['periode_date']).'</div>
 		'.(($arrRow['notice'])?"<div>".$GLOBALS['TL_LANG']['tl_iao_reminder']['notice'][0].":".$arrRow['notice']."</div>": '').'
 		</div>' . "\n    ";
     }
-    	
-	
+
 	/**
 	 * Return the "toggle visibility" button
 	 * @param array
@@ -854,35 +818,34 @@ class tl_iao_reminder extends Backend
 	public function toggleIcon($row, $href, $label, $title, $icon, $attributes)
 	{
 		$this->import('BackendUser', 'User');
-				
+
 		if (strlen($this->Input->get('tid')))
 		{
 			$this->toggleVisibility($this->Input->get('tid'), ($this->Input->get('state')));
 			$this->redirect($this->getReferer());
-			
+
 		}
 
 		$href .= '&amp;tid='.$row['id'].'&amp;state='.($row['status']==1 ? 2 : 1);
 
 		if ($row['status']==2)
 		{
-			$icon = 'logout.gif';
-		}		
+				$icon = 'logout.gif';
+		}
 
 		return '<a href="'.$this->addToUrl($href).'" title="'.$GLOBALS['TL_LANG']['tl_iao_reminder']['toggle'].'"'.$attributes.'>'.$this->generateImage($icon, $label).'</a> ';
 	}
 
 	/**
-	 * paid/not paid 
+	 * paid/not paid
 	 * @param integer
 	 * @param boolean
 	 */
 	public function toggleVisibility($intId, $blnVisible)
-	{       
+	{
 		// Check permissions to edit
 		$this->Input->setGet('id', $intId);
 		$this->Input->setGet('act', 'toggle');
-		#$this->checkPermission();
 
 		// Check permissions to publish
 		if (!$this->User->isAdmin && !$this->User->hasAccess('tl_iao_reminder::status', 'alexf'))
@@ -892,7 +855,7 @@ class tl_iao_reminder extends Backend
 		}
 
 		$this->createInitialVersion('tl_iao_reminder', $intId);
-	
+
 		// Trigger the save_callback
 		if (is_array($GLOBALS['TL_DCA']['tl_iao_reminder']['fields']['status']['save_callback']))
 		{
@@ -902,105 +865,104 @@ class tl_iao_reminder extends Backend
 				$blnVisible = $this->$callback[0]->$callback[1]($blnVisible, $this);
 			}
 		}
-		
-                $visibility = $blnVisible==1 ? '1' : '2';
-                
+
+		$visibility = $blnVisible==1 ? '1' : '2';
+
 		// Update the database
 		$this->Database->prepare("UPDATE tl_iao_reminder SET status=? WHERE id=?")
 					   ->execute($visibility, $intId);
-		//get reminder-Data			   
-                $remindObj = $this->Database->prepare('SELECT * FROM `tl_iao_reminder` WHERE `id`=?')
-					    ->limit(1)
-					    ->execute($intId);
-                
-                if($remindObj->numRows)
-                {
-		    $dbObj = $this->Database->prepare("UPDATE `tl_iao_invoice` SET `status`=?, `notice` = `notice`+?  WHERE id=?")
-				   ->execute($visibility, $remindObj->notice, $remindObj->invoice_id); 
-		}			   
-		
+
+		//get reminder-Data
+		$remindObj = $this->Database->prepare('SELECT * FROM `tl_iao_reminder` WHERE `id`=?')
+									->limit(1)
+									->execute($intId);
+
+		if($remindObj->numRows)
+		{
+			$dbObj = $this->Database->prepare("UPDATE `tl_iao_invoice` SET `status`=?, `notice` = `notice`+?  WHERE id=?")
+									->execute($visibility, $remindObj->notice, $remindObj->invoice_id);
+		}
+
 		$this->createNewVersion('tl_iao_reminder', $intId);
 	}
-	    	
+
 	/**
 	* ondelete_callback
 	* @var object
-	*/    	
-	 public function onDeleteReminder(DataContainer $dc)
-	 {
-	     $invoiceID = $dc->activeRecord->invoice_id;
-	     
-	     if($invoiceID)
-	     {
-		$this->import('Database');
-		
-		$otherReminderObj = $this->Database->prepare('SELECT `id` FROM `tl_iao_reminder` WHERE `invoice_id`=? AND `id`!=? ORDER BY `step` DESC')
- 						   ->limit(1)
-						   ->execute($invoiceID, $dc->id);
-						   
-		$newReminderID = ($otherReminderObj->numRows > 0) ? $otherReminderObj->id : 0;
-		
-		$this->Database->prepare('UPDATE `tl_iao_invoice` SET `reminder_id`=? WHERE `id`=?')
-			       ->execute($newReminderID, $invoiceID);
+	*/
+	public function onDeleteReminder(DataContainer $dc)
+	{
+		$invoiceID = $dc->activeRecord->invoice_id;
+
+		if($invoiceID)
+		{
+			$this->import('Database');
+
+			$otherReminderObj = $this->Database->prepare('SELECT `id` FROM `tl_iao_reminder` WHERE `invoice_id`=? AND `id`!=? ORDER BY `step` DESC')
+												->limit(1)
+												->execute($invoiceID, $dc->id);
+
+			$newReminderID = ($otherReminderObj->numRows > 0) ? $otherReminderObj->id : 0;
+
+			$this->Database->prepare('UPDATE `tl_iao_invoice` SET `reminder_id`=? WHERE `id`=?')
+							->execute($newReminderID, $invoiceID);
 	     }
 	 }
+
 	/**
-	* ondelete_callback
-	* @var object
-	*/    	
-	 public function changeStatusReminder(DataContainer $dc)
-	 {
-	     
-	     $state = $this->Input->get('state');
-	     $reminderID = $this->Input->get('id');
-	     $invoiceID = $dc->activeRecord->invoice_id;
-	     
-	     $this->import('Database');
-	     
-	     // 
-	     if($state == 2)
-	     {	     
-		 if($invoiceID)
-		 {		    
-		    $this->Database->prepare('UPDATE `tl_iao_invoice` SET `reminder_id`=?, `paid_on_date`=?, `status`=? WHERE `id`=?')
-				   ->execute($reminderID, time(), 2, $invoiceID);
-		 }
-	     }
-	     elseif($state == 1)
-	     {
-		 if($invoiceID)
-		 {		    
-		    $this->Database->prepare('UPDATE `tl_iao_invoice` SET `reminder_id`=?, `paid_on_date`=?,`status`=?  WHERE `id`=?')
-				   ->execute('', '', 1, $invoiceID);
-	         }
-	     }
-	 }	 
-	 /**
+	 * ondelete_callback
+	 * @var object
+	 */
+	public function changeStatusReminder(DataContainer $dc)
+	{
+		$state = $this->Input->get('state');
+		$reminderID = $this->Input->get('id');
+		$invoiceID = $dc->activeRecord->invoice_id;
+
+		$this->import('Database');
+
+		if($state == 2)
+		{
+			if($invoiceID)
+			{
+				$this->Database->prepare('UPDATE `tl_iao_invoice` SET `reminder_id`=?, `paid_on_date`=?, `status`=? WHERE `id`=?')
+								->execute($reminderID, time(), 2, $invoiceID);
+			}
+		}
+		elseif($state == 1)
+		{
+			if($invoiceID)
+			{
+				$this->Database->prepare('UPDATE `tl_iao_invoice` SET `reminder_id`=?, `paid_on_date`=?,`status`=?  WHERE `id`=?')
+								->execute('', '', 1, $invoiceID);
+			}
+		}
+	}
+
+	/**
 	 * status save_callback
 	 * @var string
 	 * @var object
 	 */
-	 public function updateStatus($varValue, DataContainer $dc)
-	 {
-	    $varValue = (int) $varValue;
-	    
-	    // UPDATE invoice when reminder is market as paid	    
-	    if($varValue == 2 && $dc->activeRecord->invoice_id > 0)
-	    {
-		$set = array
-		(
-		    'status' => $varValue,
-		    'paid_on_date' => $dc->activeRecord->paid_on_date
-		);
+	public function updateStatus($varValue, DataContainer $dc)
+	{
+		$varValue = (int) $varValue;
 
-		$this->Database->prepare("UPDATE `tl_iao_invoice` %s  WHERE `id`=?")		
-					->set($set)
-					->limit(1)
-					->execute($dc->activeRecord->invoice_id);								        
+		// UPDATE invoice when reminder is market as paid
+		if($varValue == 2 && $dc->activeRecord->invoice_id > 0)
+		{
+			$set = array
+			(
+				'status' => $varValue,
+				'paid_on_date' => $dc->activeRecord->paid_on_date
+			);
+
+			$this->Database->prepare("UPDATE `tl_iao_invoice` %s  WHERE `id`=?")
+							->set($set)
+							->limit(1)
+							->execute($dc->activeRecord->invoice_id);
 	    }
 
-	    return $varValue;	     
+	    return $varValue;
 	 }
 }
-
-?>

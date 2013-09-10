@@ -1,38 +1,26 @@
-<?php if (!defined('TL_ROOT')) die('You cannot access this file directly!');
+<?php
 
 /**
- * Contao Open Source CMS
- * Copyright (C) 2005-2011 Leo Feyer
- *
- * Formerly known as TYPOlight Open Source CMS.
- *
  * This program is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation, either
  * version 3 of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this program. If not, please visit the Free
  * Software Foundation website at <http://www.gnu.org/licenses/>.
  *
- * PHP version 5
- * @copyright  Leo Feyer 2005-2011
- * @author     Leo Feyer <http://www.contao.org>
- * @license    LGPL
- * @filesource
- *
- * @copyright  Sven Rhinow 2011
+ * @copyright  Sven Rhinow 2011-2013
  * @author     sr-tag Sven Rhinow Webentwicklung <http://www.sr-tag.de>
- * @package    offer_and_offer
+ * @package    invoice_and_offer
  * @license    LGPL
  * @filesource
  */
-
 
 /**
  * Load tl_content language file
@@ -52,9 +40,10 @@ $GLOBALS['TL_DCA']['tl_iao_offer_items'] = array
 		'dataContainer'               => 'Table',
 		'ptable'                      => 'tl_iao_offer',
 		'enableVersioning'            => true,
-		'onsubmit_callback'	      => array(
-		    array('tl_iao_offer_items','saveAllPricesToParent'),
-		    array('tl_iao_offer_items','saveNettoAndBrutto')
+		'onsubmit_callback'	      => array
+		(
+			array('tl_iao_offer_items','saveAllPricesToParent'),
+			array('tl_iao_offer_items','saveNettoAndBrutto')
 		)
 	),
 
@@ -65,7 +54,7 @@ $GLOBALS['TL_DCA']['tl_iao_offer_items'] = array
 		(
 			'mode'                    => 4,
 			'fields'                  => array('sorting'),
-			'flag'                    => 1,			
+			'flag'                    => 1,
 			'headerFields'            => array('title', 'tstamp', 'price','member','price_netto','price_brutto'),
 			#'panelLayout'             => 'filter;sort,search,limit',
 			'panelLayout'             => '',
@@ -75,7 +64,7 @@ $GLOBALS['TL_DCA']['tl_iao_offer_items'] = array
 		(
 			'fields'                  => array('headline'),
 			'format'                  => '%s',
-		),		
+		),
 		'global_operations' => array
 		(
 			'all' => array
@@ -91,12 +80,12 @@ $GLOBALS['TL_DCA']['tl_iao_offer_items'] = array
 				'href'                => 'key=pdf&id='.$_GET['id'],
 				'class'               => 'header_generate_pdf',
 				'button_callback'     => array('tl_iao_offer_items', 'showPDF')
-			)			
+			)
 		),
 		'operations' => array
 		(
 			'edit' => array
-			(                                                               
+			(
 				'label'               => &$GLOBALS['TL_LANG']['tl_iao_offer_items']['edit'],
 				'href'                => 'act=edit',
 				'icon'                => 'edit.gif'
@@ -139,7 +128,7 @@ $GLOBALS['TL_DCA']['tl_iao_offer_items'] = array
 				'href'                => 'key=addPostenTemplate',
 				'icon'                => 'system/modules/invoice_and_offer/html/icons/posten_templates_16.png',
 				'button_callback'     => array('tl_iao_offer_items', 'addPostenTemplate')
-			)			
+			)
 		)
 	),
 
@@ -149,8 +138,8 @@ $GLOBALS['TL_DCA']['tl_iao_offer_items'] = array
 		'__selector__'                => array('type'),
 		'default'                     => '{type_legend},type',
 		'item'                        => '{type_legend},type;{templates_legend:hide},posten_template;{title_legend},headline,headline_to_pdf;{item_legend},text,price,vat,count,amountStr,operator,vat_incl;{publish_legend},published;{pagebreake_legend:hidden},pagebreak_after',
-		'devider'                     => '{type_legend},type;{publish_legend},published'		
-	),                                                                                                                                 
+		'devider'                     => '{type_legend},type;{publish_legend},published'
+	),
 
 	// Subpalettes
 	'subpalettes' => array
@@ -170,7 +159,7 @@ $GLOBALS['TL_DCA']['tl_iao_offer_items'] = array
 			'inputType'               => 'select',
 			'options' 		  => &$GLOBALS['TL_LANG']['tl_iao_offer_items']['type_options'],
 			'eval'                    => array( 'submitOnChange'=>true)
-		),		
+		),
 		'posten_template' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_offer_items']['posten_template'],
@@ -184,7 +173,7 @@ $GLOBALS['TL_DCA']['tl_iao_offer_items'] = array
 			'save_callback' => array
 			(
 				array('tl_iao_offer_items', 'fillPostenFields')
-			)			
+			)
 		),
 		'headline' => array
 		(
@@ -204,7 +193,7 @@ $GLOBALS['TL_DCA']['tl_iao_offer_items'] = array
 			'flag'                    => 2,
 			'inputType'               => 'checkbox',
 			'eval'                    => array('doNotCopy'=>true, 'tl_class'=>'w50')
-		),		
+		),
 		'text' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_offer_items']['text'],
@@ -240,7 +229,7 @@ $GLOBALS['TL_DCA']['tl_iao_offer_items'] = array
 			'inputType'               => 'select',
 			'options'                 => &$GLOBALS['TL_LANG']['tl_iao_offer_items']['amountStr_options'],
                         'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>true,'submitOnChange'=>false)
-		),		
+		),
 		'vat' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_offer_items']['vat'],
@@ -249,8 +238,8 @@ $GLOBALS['TL_DCA']['tl_iao_offer_items'] = array
 			'flag'                    => 1,
 			'inputType'               => 'select',
 			'options'            	  => &$GLOBALS['TL_LANG']['tl_iao_offer_items']['vat_options'],
-			'eval'                    => array('tl_class'=>'w50')	
-		),				
+			'eval'                    => array('tl_class'=>'w50')
+		),
 		'vat_incl' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_offer_items']['vat_incl'],
@@ -258,8 +247,8 @@ $GLOBALS['TL_DCA']['tl_iao_offer_items'] = array
 			'filter'                  => true,
 			'flag'                    => 1,
 			'inputType'               => 'select',
-			'options'                 => &$GLOBALS['TL_LANG']['tl_iao_offer_items']['vat_incl_percents'],				
-			'eval'                    => array('tl_class'=>'w50')				
+			'options'                 => &$GLOBALS['TL_LANG']['tl_iao_offer_items']['vat_incl_percents'],
+			'eval'                    => array('tl_class'=>'w50')
 		),
 		'operator' => array
 		(
@@ -269,8 +258,8 @@ $GLOBALS['TL_DCA']['tl_iao_offer_items'] = array
 			'flag'                    => 1,
 			'inputType'               => 'select',
 			'options'                 => &$GLOBALS['TL_LANG']['tl_iao_offer_items']['operators'],
-			'eval'                    => array('tl_class'=>'w50')			
-		),						
+			'eval'                    => array('tl_class'=>'w50')
+		),
 		'published' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_offer_items']['published'],
@@ -288,19 +277,14 @@ $GLOBALS['TL_DCA']['tl_iao_offer_items'] = array
 			'flag'                    => 1,
 			'inputType'               => 'checkbox',
 			'eval'                    => array('doNotCopy'=>true)
-		),		
+		),
 	)
 );
 
 
 /**
- * Class tl_iao_offer_items
- *
- * Provide miscellaneous methods that are used by the data configuration array.
- * @copyright  Leo Feyer 2005-2011
- * @author     Leo Feyer <http://www.contao.org>
- * @package    Controller
- */
+* Class tl_iao_offer_items
+*/
 class tl_iao_offer_items extends Backend
 {
 
@@ -312,11 +296,10 @@ class tl_iao_offer_items extends Backend
 		parent::__construct();
 		$this->import('BackendUser', 'User');
 	}
-	
- 	public function showPDF($href, $label, $title, $class)
+
+	public function showPDF($href, $label, $title, $class)
 	{
-          
-	    return '&nbsp; :: &nbsp;<a href="contao/main.php?do=iao_offer&table=tl_iao_offer&'.$href.'" title="'.specialchars($title).'" class="'.$class.'">'.$label.'</a> ';
+		return '&nbsp; :: &nbsp;<a href="contao/main.php?do=iao_offer&table=tl_iao_offer&'.$href.'" title="'.specialchars($title).'" class="'.$class.'">'.$label.'</a> ';
 	}
 
 	/**
@@ -353,7 +336,7 @@ class tl_iao_offer_items extends Backend
 		{
 			case 'paste':
 				// Allow
-				break;
+			break;
 
 			case 'create':
 				if (!strlen($this->Input->get('pid')) || !in_array($this->Input->get('pid'), $root))
@@ -361,7 +344,7 @@ class tl_iao_offer_items extends Backend
 					$this->log('Not enough permissions to create events in calendar ID "'.$this->Input->get('pid').'"', 'tl_iao_offer_items checkPermission', TL_ERROR);
 					$this->redirect('contao/main.php?act=error');
 				}
-				break;
+			break;
 
 			case 'cut':
 			case 'copy':
@@ -377,8 +360,8 @@ class tl_iao_offer_items extends Backend
 			case 'delete':
 			case 'toggle':
 				$objCalendar = $this->Database->prepare("SELECT pid FROM tl_iao_offer_items WHERE id=?")
-											  ->limit(1)
-											  ->execute($id);
+									->limit(1)
+									->execute($id);
 
 				if ($objCalendar->numRows < 1)
 				{
@@ -391,7 +374,7 @@ class tl_iao_offer_items extends Backend
 					$this->log('Not enough permissions to '.$this->Input->get('act').' event ID "'.$id.'" of calendar ID "'.$objCalendar->pid.'"', 'tl_iao_offer_items checkPermission', TL_ERROR);
 					$this->redirect('contao/main.php?act=error');
 				}
-				break;
+			break;
 
 			case 'select':
 			case 'editAll':
@@ -406,7 +389,7 @@ class tl_iao_offer_items extends Backend
 				}
 
 				$objCalendar = $this->Database->prepare("SELECT id FROM tl_iao_offer_items WHERE pid=?")
-											  ->execute($id);
+									->execute($id);
 
 				if ($objCalendar->numRows < 1)
 				{
@@ -417,7 +400,7 @@ class tl_iao_offer_items extends Backend
 				$session = $this->Session->getData();
 				$session['CURRENT']['IDS'] = array_intersect($session['CURRENT']['IDS'], $objCalendar->fetchEach('id'));
 				$this->Session->setData($session);
-				break;
+			break;
 
 			default:
 				if (strlen($this->Input->get('act')))
@@ -430,10 +413,9 @@ class tl_iao_offer_items extends Backend
 					$this->log('Not enough permissions to access calendar ID "'.$id.'"', 'tl_iao_offer_items checkPermission', TL_ERROR);
 					$this->redirect('contao/main.php?act=error');
 				}
-				break;
+			break;
 		}
 	}
-
 
 	/**
 	 * Add the type of input field
@@ -442,23 +424,24 @@ class tl_iao_offer_items extends Backend
 	 */
 	public function listItems($arrRow)
 	{
-	    if($arrRow['type']=='devider')
-	    {
-	        return '<div class="pdf-devider"><span>PDF-Trenner</span></div>';
-	    }
-	    else
-	    {		$time = time();
-		$key = ($arrRow['published']) ? ' published' : ' unpublished';
-                $vat = ($arrRow['vat_incl']==1) ? 'netto' : 'brutto';
-                $pagebreak = ($arrRow['pagebreak_after']==1) ? ' pagebreak' : '';
-                
-		return '<div class="cte_type' . $key . $pagebreak . '">
-		<strong>' . $arrRow['headline'] . '</strong>
-		 <br />Netto: '.number_format($arrRow['price_netto'],2,',','.') .$GLOBALS['TL_CONFIG']['iao_currency_symbol'].' 
-		 <br />Brutto: ' . number_format($arrRow['price_brutto'],2,',','.') .$GLOBALS['TL_CONFIG']['iao_currency_symbol']. ' (inkl. '.$arrRow['vat'].'% MwSt.)
-		 <br />'.$arrRow['text'].'
-		 </div>' . "\n";
-	    }	     
+		if($arrRow['type']=='devider')
+		{
+			return '<div class="pdf-devider"><span>PDF-Trenner</span></div>';
+		}
+		else
+		{
+			$time = time();
+			$key = ($arrRow['published']) ? ' published' : ' unpublished';
+			$vat = ($arrRow['vat_incl']==1) ? 'netto' : 'brutto';
+			$pagebreak = ($arrRow['pagebreak_after']==1) ? ' pagebreak' : '';
+
+			return '<div class="cte_type' . $key . $pagebreak . '">
+			<strong>' . $arrRow['headline'] . '</strong>
+		 	<br />Netto: '.number_format($arrRow['price_netto'],2,',','.') .$GLOBALS['TL_CONFIG']['iao_currency_symbol'].'
+		 	<br />Brutto: ' . number_format($arrRow['price_brutto'],2,',','.') .$GLOBALS['TL_CONFIG']['iao_currency_symbol']. ' (inkl. '.$arrRow['vat'].'% MwSt.)
+		 	<br />'.$arrRow['text'].'
+		 	</div>' . "\n";
+		}
 	}
 
 	/**
@@ -469,47 +452,43 @@ class tl_iao_offer_items extends Backend
 	 */
 	public function saveAllPricesToParent(DataContainer $dc)
 	{
-	    // Return if there is no active record (override all)
-	    if (!$dc->activeRecord)
-	    {
-		    return;
-	    }
-	    
-            $itemObj = $this->Database->prepare('SELECT `price`,`count`,`vat`,`vat_incl` FROM `tl_iao_offer_items` WHERE `pid`=? AND published =?')
-				      ->execute($dc->activeRecord->pid,1);
-            
-            
-            if($itemObj->numRows > 0)
-            {
-		$allNetto = 0;
-		$allBrutto = 0;
-		
-		while($itemObj->next())
+		// Return if there is no active record (override all)
+		if (!$dc->activeRecord)
 		{
-		    $englprice = str_replace(',','.',$itemObj->price);
-		    $priceSum = $englprice * $itemObj->count;
-		    
-		    if($itemObj->vat_incl == 1)
-		    {
-		       $allNetto += $priceSum;
-		       $allBrutto += $this->getBruttoPrice($priceSum,$itemObj->vat);
-		    }
-		    else
-		    {
-		       $allNetto += $this->getNettoPrice($priceSum,$itemObj->vat);
-		       $allBrutto += $priceSum;
-		    }
-		    
-		    $this->Database->prepare('UPDATE `tl_iao_offer` SET `price_netto`=?, `price_brutto`=? WHERE `id`=?')
-				   ->limit(1)
-				   ->execute($allNetto, $allBrutto, $dc->activeRecord->pid);
-		    
+			return;
 		}
-            }
-            
-	 
+
+		$itemObj = $this->Database->prepare('SELECT `price`,`count`,`vat`,`vat_incl` FROM `tl_iao_offer_items` WHERE `pid`=? AND published =?')
+						->execute($dc->activeRecord->pid,1);
+
+		if($itemObj->numRows > 0)
+		{
+			$allNetto = 0;
+			$allBrutto = 0;
+
+			while($itemObj->next())
+			{
+				$englprice = str_replace(',','.',$itemObj->price);
+				$priceSum = $englprice * $itemObj->count;
+
+				if($itemObj->vat_incl == 1)
+				{
+					$allNetto += $priceSum;
+					$allBrutto += $this->getBruttoPrice($priceSum,$itemObj->vat);
+				}
+				else
+				{
+					$allNetto += $this->getNettoPrice($priceSum,$itemObj->vat);
+					$allBrutto += $priceSum;
+				}
+
+				$this->Database->prepare('UPDATE `tl_iao_offer` SET `price_netto`=?, `price_brutto`=? WHERE `id`=?')
+						->limit(1)
+						->execute($allNetto, $allBrutto, $dc->activeRecord->pid);
+			}
+		}
 	}
-	
+
 	/**
 	 * save the price_netto and price_brutto from actuell item
 	 * @param mixed
@@ -518,55 +497,55 @@ class tl_iao_offer_items extends Backend
 	 */
 	public function saveNettoAndBrutto(DataContainer $dc)
 	{
-	    // Return if there is no active record (override all)
-	    if (!$dc->activeRecord)
-	    {
-		    return;
-	    }	
-	    
-	    $englprice = str_replace(',','.',$dc->activeRecord->price);
-	    $priceSum = $englprice * $dc->activeRecord->count;
-	    
-	    $Netto = 0;
-	    $Brutto = 0;
-	    
-	    if($dc->activeRecord->vat_incl == 1)
-	    {
-	       $Netto = $priceSum;
-	       $Brutto = $this->getBruttoPrice($priceSum,$dc->activeRecord->vat);
-	    }
-	    else
-	    {
-	       $Netto = $this->getNettoPrice($priceSum,$dc->activeRecord->vat);
-	       $Brutto = $priceSum;
-	    }
-	    $this->Database->prepare('UPDATE `tl_iao_offer_items` SET `price_netto`=?, `price_brutto`=? WHERE `id`=?')
-		   ->limit(1)
-		   ->execute($Netto, $Brutto, $dc->id);	    
-	}	
-	
+		// Return if there is no active record (override all)
+		if (!$dc->activeRecord)
+		{
+			return;
+		}
+
+		$englprice = str_replace(',','.',$dc->activeRecord->price);
+		$priceSum = $englprice * $dc->activeRecord->count;
+
+		$Netto = 0;
+		$Brutto = 0;
+
+		if($dc->activeRecord->vat_incl == 1)
+		{
+			$Netto = $priceSum;
+			$Brutto = $this->getBruttoPrice($priceSum,$dc->activeRecord->vat);
+		}
+		else
+		{
+			$Netto = $this->getNettoPrice($priceSum,$dc->activeRecord->vat);
+			$Brutto = $priceSum;
+		}
+
+		$this->Database->prepare('UPDATE `tl_iao_offer_items` SET `price_netto`=?, `price_brutto`=? WHERE `id`=?')
+				->limit(1)
+				->execute($Netto, $Brutto, $dc->id);
+	}
+
 	/**
 	 * Get netto-price from brutto
 	 * @param float
 	 * @param integer
 	 * @return float
-	 */	
-	 public function getNettoPrice($brutto,$vat)
-	 {
-	     return ($brutto * 100) / ($vat + 100);
-	 }
-	 
+	 */
+	public function getNettoPrice($brutto,$vat)
+	{
+		return ($brutto * 100) / ($vat + 100);
+	}
+
 	/**
 	 * Get brutto-price from netto
 	 * @param float
 	 * @param integer
 	 * @return float
-	 */	
-	 public function getBruttoPrice($netto,$vat)
-	 {
-	     return ($netto / 100) * ($vat + 100);
-	 }	 
-
+	 */
+	public function getBruttoPrice($netto,$vat)
+	{
+		return ($netto / 100) * ($vat + 100);
+	}
 
 	/**
 	 * Return the "toggle visibility" button
@@ -597,11 +576,10 @@ class tl_iao_offer_items extends Backend
 		if (!$row['published'])
 		{
 			$icon = 'invisible.gif';
-		}		
+		}
 
 		return '<a href="'.$this->addToUrl($href).'" title="'.specialchars($title).'"'.$attributes.'>'.$this->generateImage($icon, $label).'</a> ';
 	}
-
 
 	/**
 	 * Disable/enable a user group
@@ -623,7 +601,7 @@ class tl_iao_offer_items extends Backend
 		}
 
 		$this->createInitialVersion('tl_iao_offer_items', $intId);
-	
+
 		// Trigger the save_callback
 		if (is_array($GLOBALS['TL_DCA']['tl_iao_offer_items']['fields']['published']['save_callback']))
 		{
@@ -636,7 +614,7 @@ class tl_iao_offer_items extends Backend
 
 		// Update the database
 		$this->Database->prepare("UPDATE tl_iao_offer_items SET tstamp=". time() .", published='" . ($blnVisible ? 1 : '') . "' WHERE id=?")
-					   ->execute($intId);
+				->execute($intId);
 
 		$this->createNewVersion('tl_iao_offer_items', $intId);
 
@@ -644,7 +622,7 @@ class tl_iao_offer_items extends Backend
 		sleep(1);
 
 	}
-	
+
 	/**
 	 * Generate a button to put a posten-template for offer
 	 * @param array
@@ -653,71 +631,72 @@ class tl_iao_offer_items extends Backend
 	 * @param string
 	 * @param string
 	 * @return string
-	 */       
-        public function addPostenTemplate($row, $href, $label, $title, $icon, $attributes)
-        {
-		
+	 */
+	public function addPostenTemplate($row, $href, $label, $title, $icon, $attributes)
+	{
 		if (!$this->User->isAdmin)
 		{
 			return '';
 		}
-		
-				 
+
 		if ($this->Input->get('key') == 'addPostenTemplate' && $this->Input->get('ptid') == $row['id'])
 		{
-		$result = $this->Database->prepare('SELECT * FROM `tl_iao_offer_items` WHERE `id`=?')
-		                         ->limit(1)
-					 ->execute($row['id']);							
+			$result = $this->Database->prepare('SELECT * FROM `tl_iao_offer_items` WHERE `id`=?')
+							->limit(1)
+							->execute($row['id']);
 
-		    //Insert Invoice-Entry
-		    $postenset = array(
-		    'tstamp' => time(),
-		    'headline' => $result->headline,
-		    'sorting' => $result->sorting,
-		    'date' => $result->date,
-		    'time' => $result->time,
-		    'text' => $result->text,
-		    'count' => $result->count,
-		    'price' => $result->price,
-		    'price_netto' => $result->price_netto,
-		    'price_brutto' => $result->price_brutto,
-		    'published' => $result->published,
-		    'vat' => $result->vat,
-		    'vat_incl' => $result->vat_incl,
-		    'position' => 'offer',
-		    );
-				    
-		    $newposten = $this->Database->prepare('INSERT INTO `tl_iao_posten_templates` %s')
-				     ->set($postenset)
-				     ->execute();
-				     			
-                    $newPostenID = $newposten->insertId;
-					   						
-		    $this->redirect('contao/main.php?do=iao_posten_templates&table=tl_iao_posten_templates&id='.$newPostenID.'&act=edit');
+			//Insert Invoice-Entry
+			$postenset = array
+			(
+				'tstamp' => time(),
+				'headline' => $result->headline,
+				'sorting' => $result->sorting,
+				'date' => $result->date,
+				'time' => $result->time,
+				'text' => $result->text,
+				'count' => $result->count,
+				'price' => $result->price,
+				'price_netto' => $result->price_netto,
+				'price_brutto' => $result->price_brutto,
+				'published' => $result->published,
+				'vat' => $result->vat,
+				'vat_incl' => $result->vat_incl,
+				'position' => 'offer',
+			);
+
+			$newposten = $this->Database->prepare('INSERT INTO `tl_iao_posten_templates` %s')
+							->set($postenset)
+							->execute();
+
+			$newPostenID = $newposten->insertId;
+
+			$this->redirect('contao/main.php?do=iao_posten_templates&table=tl_iao_posten_templates&id='.$newPostenID.'&act=edit');
 		}
+
 		$href.='&amp;ptid='.$row['id'];
-		return '<a href="'.$this->addToUrl($href).'" title="'.specialchars($title).'"'.$attributes.'>'.$this->generateImage($icon, $label).'</a> ';		       
-        }
-        
-        /**
+		return '<a href="'.$this->addToUrl($href).'" title="'.specialchars($title).'"'.$attributes.'>'.$this->generateImage($icon, $label).'</a> ';
+	}
+
+	/**
 	 * get all offer-posten-templates
 	 * @param object
 	 * @throws Exception
 	 */
 	public function getPostenTemplate(DataContainer $dc)
 	{
-            $varValue= array();
-            
-            $all = $this->Database->prepare('SELECT `id`,`headline` FROM `tl_iao_posten_templates` WHERE `position`=?')
-				  ->execute('offer');
-            while($all->next())
-            {     
-		$varValue[$all->id] = $all->headline;
-            }
-            
-	    return $varValue;
+		$varValue= array();
+
+		$all = $this->Database->prepare('SELECT `id`,`headline` FROM `tl_iao_posten_templates` WHERE `position`=?')
+					->execute('offer');
+
+		while($all->next())
+		{
+			$varValue[$all->id] = $all->headline;
+		}
+
+		return $varValue;
 	}
-	
+
 	/**
 	 * fill Text before
 	 * @param object
@@ -725,40 +704,40 @@ class tl_iao_offer_items extends Backend
 	 */
 	public function fillPostenFields($varValue, DataContainer $dc)
 	{
-		    
-		if(strlen($varValue)<=0) return $varValue;
-		 
-		$result = $this->Database->prepare('SELECT * FROM `tl_iao_posten_templates` WHERE `id`=?')
-					    ->limit(1)
-					    ->execute($varValue);
-											
-		//Insert Invoice-Entry
-		$postenset = array(
-		    'tstamp' => time(),
-		    'headline' => $result->headline,
-		    'headline_to_pdf' => $result->headline_to_pdf,
-		    'sorting' => $result->sorting,
-		    'date' => $result->date,
-		    'time' => $result->time,
-		    'text' => $result->text,
-		    'count' => $result->count,
-		    'price' => $result->price,
-		    'amountStr' => $result->amountStr,
-		    'operator' => $result->operator,
-		    'price_netto' => $result->price_netto,
-		    'price_brutto' => $result->price_brutto,
-		    'published' => $result->published,
-		    'vat' => $result->vat,
-		    'vat_incl' => $result->vat_incl,
-		);
-				
-		$this->Database->prepare('UPDATE `tl_iao_offer_items` %s WHERE `id`=?')
-			       ->set($postenset)
-			       ->execute($dc->id);			
-                $this->reload();
-		return $varValue;
-	}        
-        	
-}
 
-?>
+		if(strlen($varValue)<=0) return $varValue;
+
+		$result = $this->Database->prepare('SELECT * FROM `tl_iao_posten_templates` WHERE `id`=?')
+						->limit(1)
+						->execute($varValue);
+
+		//Insert Invoice-Entry
+		$postenset = array
+		(
+			'tstamp' => time(),
+			'headline' => $result->headline,
+			'headline_to_pdf' => $result->headline_to_pdf,
+			'sorting' => $result->sorting,
+			'date' => $result->date,
+			'time' => $result->time,
+			'text' => $result->text,
+			'count' => $result->count,
+			'price' => $result->price,
+			'amountStr' => $result->amountStr,
+			'operator' => $result->operator,
+			'price_netto' => $result->price_netto,
+			'price_brutto' => $result->price_brutto,
+			'published' => $result->published,
+			'vat' => $result->vat,
+			'vat_incl' => $result->vat_incl,
+		);
+
+		$this->Database->prepare('UPDATE `tl_iao_offer_items` %s WHERE `id`=?')
+				->set($postenset)
+				->execute($dc->id);
+
+		$this->reload();
+		return $varValue;
+	}
+
+}
