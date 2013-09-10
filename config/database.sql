@@ -30,7 +30,6 @@ CREATE TABLE `tl_iao_invoice` (
   `invoice_id` int(10) unsigned NOT NULL default '0',
   `invoice_id_str` varchar(255) NOT NULL default '',
   `invoice_pdf_file` varchar(255) NOT NULL default '',
-  `notice` mediumtext NULL,
   `address_text` mediumtext NULL,
   `member` varbinary(128) NOT NULL default '',
   `sorting` int(10) unsigned NOT NULL default '0',

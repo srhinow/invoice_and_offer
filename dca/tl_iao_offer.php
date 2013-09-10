@@ -729,6 +729,8 @@ class tl_iao_offer extends Backend
 				'member' => $row['member'],
 				'price_netto' => $row['price_netto'],
 				'price_brutto' => $row['price_brutto'],
+				'noVat' => $row['noVat'],
+				'notice' => $row['notice'],
 		    );
 
 			$result = $this->Database->prepare('INSERT INTO `tl_iao_invoice` %s')
@@ -751,18 +753,23 @@ class tl_iao_offer extends Backend
 					(
 						'pid' => $newInvoiceID,
 						'tstamp' => $posten->tstamp,
+						'type' => $posten->type,
 						'headline' => $posten->headline,
+						'headline_to_pdf' => $posten->headline_to_pdf,
 						'sorting' => $posten->sorting,
 						'date' => $posten->date,
 						'time' => $posten->time,
 						'text' => $posten->text,
 						'count' => $posten->count,
+						'amountStr' => $posten->amountStr,
+						'operator' => $posten->operator,
 						'price' => $posten->price,
 						'price_netto' => $posten->price_netto,
 						'price_brutto' => $posten->price_brutto,
 						'published' => $posten->published,
 						'vat' => $posten->vat,
-						'vat_incl' => $posten->vat_incl
+						'vat_incl' => $posten->vat_incl,
+						'pagebreak_after' => $posten->pagebreak_after
 					);
 
 					$newposten = $this->Database->prepare('INSERT INTO `tl_iao_invoice_items` %s')
