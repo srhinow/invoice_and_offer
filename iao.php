@@ -197,7 +197,7 @@ class iao extends Backend
 															->limit(1)
 															->execute($id);
 
-							$this->infoObj->periode_date = date($GLOBALS['TL_CONFIG']['dateFormat'],$this->getPeriodeDate($this->infoObj));
+							$this->infoObj->periode_date = date($GLOBALS['TL_CONFIG']['dateFormat'],$this->infoObj->periode_date);
 							$step = !strlen($this->infoObj->step) ? 1 : $this->infoObj->step;
 
 							$this->infoObj->postageStr = (((int)($this->infoObj->postage) <= 0)) ? '' : $this->getPriceStr($this->infoObj->postage);

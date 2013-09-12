@@ -34,6 +34,9 @@ $GLOBALS['TL_DCA']['tl_iao_reminder'] = array
 		'dataContainer'               => 'Table',
 		'switchToEdit'                => true,
 		'enableVersioning'            => false,
+		'onsubmit_callback'	=> array(
+        	array('tl_iao_reminder','setTextFinish')
+		),
 		'ondelete_callback'	=> array
 		(
 			array('tl_iao_reminder', 'onDeleteReminder')
@@ -130,7 +133,7 @@ $GLOBALS['TL_DCA']['tl_iao_reminder'] = array
 	'palettes' => array
 	(
 		'__selector__'                => array(),
-		'default'                     => '{invoice_legend},invoice_id,title,address_text,unpaid;{content_legend},step,tax,postage,sum,text,text_finish;{status_legend},published,status,paid_on_date;{notice_legend:hide},notice'
+		'default'                     => '{invoice_legend},invoice_id,title,address_text,unpaid,periode_date;{content_legend},step,tax,postage,sum,text,text_finish;{status_legend},published,status,paid_on_date;{notice_legend:hide},notice'
 	),
 
 	// Subpalettes
@@ -166,6 +169,13 @@ $GLOBALS['TL_DCA']['tl_iao_reminder'] = array
 			'eval'			  => array('tl_class'=>'clr'),
 			'input_field_callback'	  => array('tl_iao_reminder','getTextFinish'),
 
+		),
+		'periode_date' =>  array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_reminder']['periode_date'],
+			'exclude'                 => true,
+			'inputType'               => 'text',
+			'eval'                    => array('rgxp'=>'date', 'datepicker'=>$this->getDatePickerString(), 'tl_class'=>'w50 wizard'),
 		),
 		'paid_on_date' =>  array
 		(
@@ -543,25 +553,43 @@ class tl_iao_reminder extends Backend
 	public function getTextFinish(DataContainer $dc)
 	{
 		$this->import('Database');
-		$this->import('iao');
 
 		$obj = $this->Database->prepare('SELECT * FROM `tl_iao_reminder` WHERE `id`=?')
 								->limit(1)
 								->execute($dc->id);
 
-		$text_finish = $this->iao->changeIAOTags($obj->text,'reminder',$dc->id);
-		$text_finish = $this->iao->changeTags($text_finish);
+        if(!$obj->text_finish)
+        {
+			$this->import('iao');
 
-		$set = array
-		(
-			'text_finish' => $text_finish
-		);
-
-		$this->Database->prepare('UPDATE `tl_iao_reminder` %s WHERE `id`=?')
-						->set($set)
-						->execute($dc->id);
+			$text_finish = $this->iao->changeIAOTags($obj->text,'reminder',$dc->id);
+			$text_finish = $this->iao->changeTags($text_finish);
+        }
+        else $text_finish =  $obj->text_finish;
 
 		return '<h3><label for="ctrl_text_finish">'.$GLOBALS['TL_LANG']['tl_iao_reminder']['text_finish'][0].'</label></h3><div id="ctrl_text_finish" class="preview" style="border:1px solid #ddd; padding:5px;">'.$text_finish.'</div>';
+	}
+
+	public function setTextFinish(DataContainer $dc)
+	{
+			$this->import('Database');
+			$this->import('iao');
+
+			$obj = $this->Database->prepare('SELECT * FROM `tl_iao_reminder` WHERE `id`=?')
+									->limit(1)
+									->execute($dc->id);
+			$text_finish = $this->iao->changeIAOTags($obj->text,'reminder',$dc->id);
+			$text_finish = $this->iao->changeTags($text_finish);
+
+			$set = array
+			(
+				'text_finish' => $text_finish
+			);
+
+			$this->Database->prepare('UPDATE `tl_iao_reminder` %s WHERE `id`=?')
+							->set($set)
+							->execute($dc->id);
+
 	}
 
 	/**
@@ -625,108 +653,98 @@ class tl_iao_reminder extends Backend
 			$step = $row['step'];
 			$pdfFile = TL_ROOT . '/' . $GLOBALS['TL_CONFIG']['iao_reminder_'.$step.'_pdf'];
 
-		if(!empty($GLOBALS['TL_CONFIG']['iao_reminder_'.$step.'_pdf']) && file_exists($pdfFile))
-		{
+			if(!file_exists($pdfFile)) return;  // template file not found
 
-			header("Content-type: application/pdf");
-			header('Expires: Sat, 26 Jul 1997 05:00:00 GMT'); // Date in the past
-			header('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT');
- 			header('Content-Length: '.strlen($row['invoice_pdf_file']));
-			header('Content-Disposition: inline; filename="'.basename($pdfFile).'";');
+			$this->import('Database');
+			$this->import('iao');
+			$invoiceObj = $this->Database->prepare('SELECT * FROM `tl_iao_invoice` WHERE `id`=?')->limit(1)->execute($row['invoice_id']);
 
-		}
+			$reminder_Str = $GLOBALS['TL_LANG']['tl_iao_reminder']['steps'][$row['step']].'-'.$invoiceObj->invoice_id_str.'-'.$row['id'];
 
-		if( !file_exists($pdfFile) ) return;  // template file not found
+			//-- Calculating dimensions
+			$margins = unserialize($GLOBALS['TL_CONFIG']['iao_pdf_margins']);         // Margins as an array
+			switch( $margins['unit'] )
+			{
+				case 'cm':      $factor = 10.0;   break;
+				default:        $factor = 1.0;
+			}
 
-		$this->import('Database');
-		$invoiceObj = $this->Database->prepare('SELECT * FROM `tl_iao_invoice` WHERE `id`=?')->limit(1)->execute($row['invoice_id']);
+			require_once(TL_ROOT . '/system/modules/invoice_and_offer/iaoPDF.php');
 
-		$reminder_Str = $GLOBALS['TL_LANG']['tl_iao_reminder']['steps'][$row['step']].'-'.$invoiceObj->invoice_id_str.'-'.$row['id'];
+			$dim['top']    = !is_numeric($margins['top'])   ? PDF_MARGIN_TOP    : $margins['top'] * $factor;
+			$dim['right']  = !is_numeric($margins['right']) ? PDF_MARGIN_RIGHT  : $margins['right'] * $factor;
+			$dim['bottom'] = !is_numeric($margins['top'])   ? PDF_MARGIN_BOTTOM : $margins['bottom'] * $factor;
+			$dim['left']   = !is_numeric($margins['left'])  ? PDF_MARGIN_LEFT   : $margins['left'] * $factor;
 
-		//-- Calculating dimensions
-		$margins = unserialize($GLOBALS['TL_CONFIG']['iao_pdf_margins']);         // Margins as an array
-		switch( $margins['unit'] )
-		{
-			case 'cm':      $factor = 10.0;   break;
-			default:        $factor = 1.0;
-		}
+			// TCPDF configuration
+			$l['a_meta_dir'] = 'ltr';
+			$l['a_meta_charset'] = $GLOBALS['TL_CONFIG']['characterSet'];
+			$l['a_meta_language'] = $GLOBALS['TL_LANGUAGE'];
+			$l['w_page'] = 'page';
 
-		require_once(TL_ROOT . '/system/modules/invoice_and_offer/iaoPDF.php');
+			// Create new PDF document with FPDI extension
+			$pdf = new iaoPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true);
+			$pdf->setSourceFile($pdfFile);          // Set PDF template
 
-		$dim['top']    = !is_numeric($margins['top'])   ? PDF_MARGIN_TOP    : $margins['top'] * $factor;
-		$dim['right']  = !is_numeric($margins['right']) ? PDF_MARGIN_RIGHT  : $margins['right'] * $factor;
-		$dim['bottom'] = !is_numeric($margins['top'])   ? PDF_MARGIN_BOTTOM : $margins['bottom'] * $factor;
-		$dim['left']   = !is_numeric($margins['left'])  ? PDF_MARGIN_LEFT   : $margins['left'] * $factor;
+			// Set document information
+			$pdf->SetCreator(PDF_CREATOR);
+			$pdf->SetTitle($reminder_Str);
+			$pdf->SetSubject($reminder_Str);
+			$pdf->SetKeywords($reminder_Str);
 
-		// TCPDF configuration
-		$l['a_meta_dir'] = 'ltr';
-		$l['a_meta_charset'] = $GLOBALS['TL_CONFIG']['characterSet'];
-		$l['a_meta_language'] = $GLOBALS['TL_LANGUAGE'];
-		$l['w_page'] = 'page';
+			$pdf->SetDisplayMode('fullwidth', 'OneColumn', 'UseNone');
+			$pdf->SetHeaderData();
 
-		// Create new PDF document with FPDI extension
-		$pdf = new iaoPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true);
-		$pdf->setSourceFile($pdfFile);          // Set PDF template
+			// Remove default header/footer
+			$pdf->setPrintHeader(false);
 
-		// Set document information
-		$pdf->SetCreator(PDF_CREATOR);
-		$pdf->SetTitle($reminder_Str);
-		$pdf->SetSubject($reminder_Str);
-		$pdf->SetKeywords($reminder_Str);
+			// Set margins
+			$pdf->SetMargins($dim['left'], $dim['top'], $dim['right']);
 
-		$pdf->SetDisplayMode('fullwidth', 'OneColumn', 'UseNone');
-		$pdf->SetHeaderData( );
+			// Set auto page breaks
+			$pdf->SetAutoPageBreak(true, $dim['bottom']);
 
-		// Remove default header/footer
-		$pdf->setPrintHeader(false);
+			// Set image scale factor
+			$pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
 
-		// Set margins
-		$pdf->SetMargins($dim['left'], $dim['top'], $dim['right']);
+			// Set some language-dependent strings
+			$pdf->setLanguageArray($l);
 
-		// Set auto page breaks
-		$pdf->SetAutoPageBreak(true, $dim['bottom']);
+			// Initialize document and add a page
+			$pdf->AddPage();
 
-		// Set image scale factor
-		$pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+			// Include CSS (TCPDF 5.1.000 an newer)
+			if(file_exists(TL_ROOT . '/' . $GLOBALS['TL_CONFIG']['iao_pdf_css']) )
+			{
+				$styles = "<style>\n" . file_get_contents(TL_ROOT . '/' . $GLOBALS['TL_CONFIG']['iao_pdf_css']) . "\n</style>\n";
+			}
 
-		// Set some language-dependent strings
-		$pdf->setLanguageArray($l);
+			// write the address-data
+			$pdf->drawAddress($styles.$this->iao->changeTags($row['address_text']));
 
-		// Initialize document and add a page
-		$pdf->AddPage();
+			//Mahnungsnummer
+			$pdf->drawDocumentNumber($reminder_Str);
 
-		// Include CSS (TCPDF 5.1.000 an newer)
-		if(file_exists(TL_ROOT . '/' . $GLOBALS['TL_CONFIG']['iao_pdf_css']) )
-		{
-			$styles = "<style>\n" . file_get_contents(TL_ROOT . '/' . $GLOBALS['TL_CONFIG']['iao_pdf_css']) . "\n</style>\n";
-		}
+			//Datum
+			$pdf->drawDate(date($GLOBALS['TL_CONFIG']['dateFormat'],$row['tstamp']));
 
-		// write the address-data
-		$pdf->drawAddress($styles.iao::changeTags($row['address_text']));
-
-		//Mahnungsnummer
-		$pdf->drawDocumentNumber($reminder_Str);
-
-		//Datum
-		$pdf->drawDate(date($GLOBALS['TL_CONFIG']['dateFormat'],$row['tstamp']));
-
-		//ausgeführt am
-		$newdate= $row['periode_date'];
-		$pdf->drawInvoiceDurationDate(date($GLOBALS['TL_CONFIG']['dateFormat'],$newdate));
+			//ausgeführt am
+			$newdate= $row['periode_date'];
+			$pdf->drawInvoiceDurationDate(date($GLOBALS['TL_CONFIG']['dateFormat'],$newdate));
 
 
-		//Text
-		if(strip_tags($row['text_finish']))
-		{
-			$pdf->drawTextBefore($row['text_finish']);
-		}
+			//Text
+			if(strip_tags($row['text_finish']))
+			{
+				$pdf->drawTextBefore($row['text_finish']);
+			}
 
-		// Close and output PDF document
-		$pdf->lastPage();
-		$pdf->Output($reminder_Str. '.pdf', 'D');
+			// Close and output PDF document
+			$pdf->lastPage();
+			$pdf->Output($reminder_Str. '.pdf', 'D');
 
-		// Stop script execution
-		exit();
+			// Stop script execution
+			exit();
 		}
 		return '<a href="'.$this->addToUrl($href.'&amp;id='.$row['id']).'" title="'.specialchars($title).'">'.$this->generateImage($icon, $label).'</a> ';
 
