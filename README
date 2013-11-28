@@ -1,17 +1,36 @@
 Author: Sven Rhinow
 Web: www.sr-tag.de
 License: LPGL (mit Ausnahmen)
-Version: 1.0
-Ausnahmen: Ich verbiete die Benutzung dieser Software für die Firma rokamedia und deren Personen
+Version: 1.1.3
 
 icons: http://dryicons.com
 icons: cc3 http://www.fatcow.com/free-icons
 -----------------------------
 deutsch
 -----------------------------
-Dieses Contao-Backend-Modul stellt die Möglichkeit bereit Angebote,Rechnungen und Gutschriften zu erstellen.
+Dieses Contao-Backend-Modul stellt die Möglichkeit bereit Angebote,Rechnungen, Gutschriften, Rückstände und Verträge zu verwalten.
 
-Aktuelle Funktionen:
+seit Version 1.1.3:
+- Verträge können jetzt verwaltet werden
+- Einstellungen unter einem Menüpunkt zusammen gefügt
+- die Konfigurationen werden jetzt über die Datenbank und nicht mehr über localconfig.php verwaltet
+- Es können mehrere Konfigurationen angelegt und zu jeder Rechnung,Angebot oder Gutschrift zugewiesen werden
+- Steuersätze werden jetzt auch über die Einstellungen verwaltet
+- Mengenangaben werden jetzt auch über die Einstellungen verwaltet
+- direkte Bearbeitung des jeweiligen Elterneintrages aus der Hauptliste
+- bei den Rechnungen sind jetzt Einträge von Teilzahlungen möglich
+- Anzeige von zuzahlen und übrig im Listen und Bearbeiten-Modus
+- Übersetzungen ergänzt
+
+WICHTIG BEI UPDATE ÄLTERER VERSIONEN
+Da Contao umbenennungen von Tabellen als 'alte löschen neue anlegen' ausführen würde, müssen nachfolgende SQL-Befehle manuell also ohne Contao-Mittel in der Datenbank ausgefphrt werden:
+
+RENAME TABLE `sr-tag_contao`.`tl_iao_posten_templates` TO `sr-tag_contao`.`tl_iao_templates_items`;
+UPDATE `tl_iao_offer` SET `setting_id`=1 WHERE `setting_id`=0;
+UPDATE `tl_iao_invoice` SET `setting_id`=1 WHERE `setting_id`=0;
+UPDATE `tl_iao_credit` SET `setting_id`=1 WHERE `setting_id`=0;
+
+weitere Funktionen:
 - Anlegen von Grundeinstellungen für alle drei Bereiche Rechnungen, Angebote und Gutschriften
 - Vorlagen für Text vor und nach den Posten
 - Vorlagen für die Posten nach Angebote, Rechnungen, und Gutschriften getrennt
