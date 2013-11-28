@@ -18,7 +18,11 @@
 /**
  * Fields
  */
-$GLOBALS['TL_LANG']['tl_iao_settings']['iao_sslorder']= array('SSL bei der Bestellung', 'Soll der Bestellvorgang über SSL abewickelt werden?');
+$GLOBALS['TL_LANG']['tl_iao_settings']['name'][0]                         = 'Name der Konfiguration';
+$GLOBALS['TL_LANG']['tl_iao_settings']['name'][1]                         = 'Geben Sie einen eindeutigen Namen ein.';
+$GLOBALS['TL_LANG']['tl_iao_settings']['fallback'][0]                     = 'Standard-Konfiguration';
+$GLOBALS['TL_LANG']['tl_iao_settings']['fallback'][1]                     = 'Verwendet dies als Standardkonfiguration für die Anzeige im Backend.';
+
 $GLOBALS['TL_LANG']['tl_iao_settings']['iao_tax']= array('Standard-Steuersatz', 'Wird für die Berechnung der Standardwerte benötigt. Wirkt sich auch auf Verpackungskosten etc aus.');
 $GLOBALS['TL_LANG']['tl_iao_settings']['iao_costumer_group']= array('Kunden-Gruppe', 'Diese Gruppen werden automatisch bei fehlender Angabe der Firma gesetzt.');
 $GLOBALS['TL_LANG']['tl_iao_settings']['iao_currency']= array('Währungkürzel', 'Bitte das offizielle Währungskennzeichen dieses Shops eingeben.');
@@ -58,7 +62,21 @@ $GLOBALS['TL_LANG']['tl_iao_settings']['iao_reminder_4_pdf']= array('3. Mahnung-
 /**
  * Buttons
  */
-$GLOBALS['TL_LANG']['tl_iao_settings']['edit']   = 'Einstellung für Rechnungen und Angebote bearbeiten';
+$GLOBALS['TL_LANG']['tl_iao_settings']['new'][0]                          = 'Neue Konfiguration';
+$GLOBALS['TL_LANG']['tl_iao_settings']['new'][1]                          = 'Eine neue Konfiguration erstellen.';
+$GLOBALS['TL_LANG']['tl_iao_settings']['edit'][0]                         = 'Konfiguration bearbeiten';
+$GLOBALS['TL_LANG']['tl_iao_settings']['edit'][1]                         = 'Konfiguration ID %s bearbeiten.';
+$GLOBALS['TL_LANG']['tl_iao_settings']['copy'][0]                         = 'Konfiguration duplizieren';
+$GLOBALS['TL_LANG']['tl_iao_settings']['copy'][1]                         = 'Konfiguration ID %s duplizieren.';
+$GLOBALS['TL_LANG']['tl_iao_settings']['delete'][0]                       = 'Konfiguration löschen';
+$GLOBALS['TL_LANG']['tl_iao_settings']['delete'][1]                       = 'Konfiguration ID %s löschen.  Dies löscht nicht die zugeordneten Dateien sondern lediglich die Grundkonfiguration.';
+$GLOBALS['TL_LANG']['tl_iao_settings']['show'][0]                         = 'Konfigurationsdetails anzeigen';
+$GLOBALS['TL_LANG']['tl_iao_settings']['show'][1]                         = 'Details für Konfiguration ID %s anzeigen.';
+
+/**
+ * Legends
+ */
+$GLOBALS['TL_LANG']['tl_iao_settings']['name_legend']                     = 'Name';
 $GLOBALS['TL_LANG']['tl_iao_settings']['currency_legend'] = 'Währungs-Einstellungen';
 $GLOBALS['TL_LANG']['tl_iao_settings']['standards_legend'] = 'Standard-Einstellungen';
 $GLOBALS['TL_LANG']['tl_iao_settings']['customermails_legend'] = 'Kunden-Maileinstellungen';

@@ -54,8 +54,6 @@ $GLOBALS['TL_LANG']['tl_iao_offer_items']['item_legend'] = 'Posten-Daten';
 $GLOBALS['TL_LANG']['tl_iao_offer_items']['publish_legend'] = 'Veröffentlichung';
 $GLOBALS['TL_LANG']['tl_iao_offer_items']['type_legend'] = 'Elementtyp-Einstellung';
 
-$GLOBALS['TL_LANG']['tl_iao_offer_items']['amountStr_options'] = array('piece'=>'Stück','flaterate'=>'Pauschale', 'days'=>'Tag(e)','hour'=>'Stunde(n)', 'minutes'=>'Minute(n)','year'=>'Jahr(e)');
 $GLOBALS['TL_LANG']['tl_iao_offer_items']['vat_incl_percents'] = array(1 => 'netto', 2 => 'brutto');
-$GLOBALS['TL_LANG']['tl_iao_offer_items']['vat_options'] = array(19=>'19% MwSt.',7=>'7% MwSt.',0=>'ohne MwSt.');
 $GLOBALS['TL_LANG']['tl_iao_offer_items']['operators'] = array('+' => '+ (addieren)', '-' => '- (subtrahieren)');
 $GLOBALS['TL_LANG']['tl_iao_offer_items']['type_options'] = array('item'=>'Eintrag','devider'=>'PDF-Trenner');

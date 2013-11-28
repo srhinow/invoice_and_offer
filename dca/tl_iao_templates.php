@@ -57,6 +57,13 @@ $GLOBALS['TL_DCA']['tl_iao_templates'] = array
 		),
 		'global_operations' => array
 		(
+			'back' => array
+			(
+				'label'               => &$GLOBALS['TL_LANG']['MSC']['backBT'],
+				'href'                => 'mod=&table=',
+				'class'               => 'header_back',
+				'attributes'          => 'onclick="Backend.getScrollOffset();"',
+			),
 			'all' => array
 			(
 				'label'               => &$GLOBALS['TL_LANG']['MSC']['all'],

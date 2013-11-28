@@ -37,7 +37,9 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 		'enableVersioning'            => false,
 		'onload_callback' => array
 		(
-			array('tl_iao_offer', 'checkPermission')
+			array('tl_iao_offer','IAOSettings'),
+			array('tl_iao_offer', 'checkPermission'),
+			array('tl_iao_offer', 'updateExpiryToTstmp')
 		),
 	),
 
@@ -47,7 +49,7 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 		'sorting' => array
 		(
 			'mode'                    => 1,
-			'fields'                  => array('tstamp'),
+			'fields'                  => array('offer_tstamp'),
 			'flag'                    => 8,
 			'panelLayout'             => 'filter;search,limit'
 		),
@@ -96,7 +98,7 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 				'href'                => 'act=edit',
 				'icon'                => 'header.gif',
 				'button_callback'     => array('tl_iao_offer', 'editHeader'),
-				'attributes'          => 'class="edit-header"'
+				// 'attributes'          => 'class="edit-header"'
 			),
 			'copy' => array
 			(
@@ -136,7 +138,7 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 				'label'               => &$GLOBALS['TL_LANG']['tl_iao_offer']['pdf'],
 				'href'                => 'key=pdf',
 				'icon'                => 'iconPDF.gif',
-				'button_callback'     => array('tl_iao_offer', 'showPDF')
+				'button_callback'     => array('tl_iao_offer', 'showPDFButton')
 			)
 		)
 	),
@@ -145,7 +147,7 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 	'palettes' => array
 	(
 		'__selector__'                => array(),
-		'default'                     => '{title_legend},title;{offer_id_legend:hide},offer_id,offer_id_str,offer_date,offer_tstamp,offer_pdf_file,expiry_date;{address_legend},member,address_text;{text_legend},before_template,before_text,after_template,after_text;{status_legend},published,status,noVat;{notice_legend:hide},notice'
+		'default'                     => '{settings_legend},setting_id;{title_legend},title;{offer_id_legend:hide},offer_id,offer_id_str,offer_tstamp,offer_pdf_file,expiry_date;{address_legend},member,address_text;{text_legend},before_template,before_text,after_template,after_text;{status_legend},published,status;{extend_legend},noVat;{notice_legend:hide},notice'
 	),
 
 	// Subpalettes
@@ -157,31 +159,31 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 	// Fields
 	'fields' => array
 	(
+		'setting_id' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_offer']['setting_id'],
+			'exclude'                 => true,
+			'filter'                  => true,
+			'sorting'                 => true,
+			'flag'                    => 11,
+			'inputType'               => 'select',
+			'options_callback'        => array('tl_iao_offer', 'getSettings'),
+			'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>false, 'chosen'=>true),
+		),
 		'title' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_offer']['title'],
 			'exclude'                 => true,
 			'search'                  => true,
 			'inputType'               => 'text',
-			'eval'                    => array('mandatory'=>true, 'maxlength'=>255)
-		),
-		'offer_date' => array
-		(
-			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_offer']['offer_date'],
-			'exclude'                 => true,
-			'inputType'               => 'text',
-			'eval'                    => array('doNotCopy'=>true, 'tl_class'=>'w50'),
-			'save_callback' => array
-			(
-				array('tl_iao_offer', 'generateOfferDate')
-			)
+			'eval'                    => array('mandatory'=>true, 'maxlength'=>255,'tl_class'=>'long')
 		),
 		'offer_tstamp' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_offer']['offer_tstamp'],
 			'exclude'                 => true,
 			'inputType'               => 'text',
-			'eval'                    => array('doNotCopy'=>true, 'tl_class'=>'w50'),
+			'eval'                    => array('rgxp'=>'date', 'doNotCopy'=>true, 'datepicker'=>$this->getDatePickerString(), 'tl_class'=>'w50 wizard'),
 			'save_callback' => array
 			(
 				array('tl_iao_offer', 'generateOfferTstamp')
@@ -212,7 +214,7 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_offer']['expiry_date'],
 			'exclude'                 => true,
 			'inputType'               => 'text',
-			'eval'                    => array('doNotCopy'=>true, 'tl_class'=>'w50'),
+			'eval'                    => array('rgxp'=>'date', 'doNotCopy'=>true, 'datepicker'=>$this->getDatePickerString(), 'tl_class'=>'w50 wizard'),
 			'save_callback' => array
 			(
 				array('tl_iao_offer', 'generateExpiryDate')
@@ -300,7 +302,7 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 		),
 		'after_template' => array
 		(
-			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_offer']['before_template'],
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_offer']['after_template'],
 			'exclude'                 => true,
 			'sorting'                 => true,
 			'flag'                    => 11,
@@ -375,6 +377,15 @@ class tl_iao_offer extends Backend
 	{
 		parent::__construct();
 		$this->import('BackendUser', 'User');
+	}
+
+	/**
+	* add all iao-Settings in $GLOBALS['TL_CONFIG'] 
+	*/
+	public function IAOSettings(DataContainer $dc)
+	{
+		$this->import('iao');
+		$this->iao->setIAOSettings($dc->activeRecord->setting_id);
 	}
 
 	/**
@@ -507,16 +518,6 @@ class tl_iao_offer extends Backend
 		}
 	}
 
-	/**
-	 * fill date-Field if this empty
-	 * @param mixed
-	 * @param object
-	 * @return date
-	 */
-	public function  generateOfferDate($varValue, DataContainer $dc)
-	{
-		return ($varValue==0) ? date('Y-m-d') : $varValue;
-	}
 
 	/**
 	 * fill date-Field if this empty
@@ -526,18 +527,28 @@ class tl_iao_offer extends Backend
 	 */
 	public function  generateExpiryDate($varValue, DataContainer $dc)
 	{
-		if($varValue==0)
+		if($varValue == 0)
 		{
-			$format = ($GLOBALS['TL_CONFIG']['iao_offer_expiry_date']) ? $GLOBALS['TL_CONFIG']['iao_offer_expiry_date'] : 'd:m+3:Y';
-
-			$parts = explode(':',$format);
-			$part['day'] =  substr($parts[0],1);
-			$part['month'] =  substr($parts[1],1);
-			$part['year'] =  substr($parts[2],1);
-
-			$varValue = date('Y-m-d',mktime(0, 0, 0, date('n')+$part['month'],date('d')+$part['day'], date('Y')+$part['year']));
+			$format = ( $GLOBALS['TL_CONFIG']['iao_offer_expiry_date'] ) ? $GLOBALS['TL_CONFIG']['iao_offer_expiry_date'] : '+3 month';
+			$tstamp = ($dc->activeRecord->offer_tstamp) ? $dc->activeRecord->offer_tstamp : time();
+			$varValue = strtotime($format,$tstamp);
 		}
 		return  $varValue;
+	}
+
+	public function updateExpiryToTstmp(DataContainer $dc)
+	{
+		$offerObj = $this->Database->prepare('SELECT * FROM `tl_iao_offer`')
+								   ->execute();
+	   	while($offerObj->next())
+   		{
+   			if(!stripos($offerObj->expiry_date,'-')) continue;
+
+			$set = array('expiry_date' => strtotime($offerObj->expiry_date));
+			$this->Database->prepare('UPDATE `tl_iao_offer` %s WHERE `id`=?')
+						->set($set)
+						->execute($offerObj->id);
+   		}
 	}
 
 	/**
@@ -548,11 +559,7 @@ class tl_iao_offer extends Backend
 	 */
 	public function  generateOfferTstamp($varValue, DataContainer $dc)
 	{
-		$offer_date = $dc->activeRecord->offer_date;
-		if($offer_date == 0  && $varValue !=0) return time();
-
-		$idArr =  explode('-',$offer_date);
-		return mktime(0, 0, 0, $idArr[1], $idArr[2], $idArr[0]);
+		return ($varValue == 0) ? time() : $varValue;
 	}
 
 	/**
@@ -641,6 +648,25 @@ class tl_iao_offer extends Backend
 		while($member->next())
 		{
 			$varValue[$member->id] =  $member->firstname.' '.$member->lastname.' ('.$member->company.')';
+		}
+
+		return $varValue;
+	}
+
+	/**
+	 * get all settings
+	 * @param object
+	 * @throws Exception
+	 */
+	public function getSettings(DataContainer $dc)
+	{
+		$varValue= array();
+
+		$settings = $this->Database->prepare('SELECT `id`,`name` FROM `tl_iao_settings` ORDER BY `fallback` DESC, `name` DESC')
+						 ->execute();
+		while($settings->next())
+		{
+			$varValue[$settings->id] =  $settings->name;
 		}
 
 		return $varValue;
@@ -796,7 +822,7 @@ class tl_iao_offer extends Backend
 	 * @param string
 	 * @return string
 	 */
-	public function showPDF($row, $href, $label, $title, $icon)
+	public function showPDFButton($row, $href, $label, $title, $icon)
 	{
 		if (!$this->User->isAdmin)
 		{
@@ -891,12 +917,10 @@ class tl_iao_offer extends Backend
 			$pdf->drawDocumentNumber($row['offer_id_str']);
 
 			//Datum
-			$pdf->drawDate(date($GLOBALS['TL_CONFIG']['dateFormat'],$row['tstamp']));
+			$pdf->drawDate(date($GLOBALS['TL_CONFIG']['dateFormat'],$row['offer_tstamp']));
 
 			//gültig bis
-			$parts = explode('-',$row['expiry_date']);
-			$newdate= mktime(0,0,0,$parts[1],$parts[2],$parts[0]);
-			$pdf->drawExpiryDate(date($GLOBALS['TL_CONFIG']['dateFormat'],$newdate));
+			$pdf->drawExpiryDate(date($GLOBALS['TL_CONFIG']['dateFormat'],$row['expiry_date']));
 
 			//Text vor der Posten-Tabelle
 			if(strip_tags($row['before_text']))
@@ -939,11 +963,11 @@ class tl_iao_offer extends Backend
 
 		$resultObj = $this->Database->prepare('SELECT * FROM `tl_iao_offer_items` WHERE `pid`=? AND `published`=1 ORDER BY `sorting`')->execute($id);
 
+		if($resultObj->numRows <= 0) return $posten;
+
 		$parentObj = $this->Database->prepare('SELECT * FROM `tl_iao_offer` WHERE `id`=?')
 						->limit(1)
 						->execute($id);
-
-		if($resultObj->numRows <= 0) return $posten;
 
 		while($resultObj->next())
 		{
@@ -977,7 +1001,7 @@ class tl_iao_offer extends Backend
 				$posten['summe']['brutto'] += $resultObj->price_brutto;
 			}
 
-			if($parentObj->noVat != 1) $posten['summe']['mwst'][$resultObj->vat] += $resultObj->price_brutto - $resultObj->price_netto;
+			$posten['summe']['mwst'][$resultObj->vat] += ($parentObj->noVat != 1) ? $resultObj->price_brutto - $resultObj->price_netto : 0;
 		}
 
 		$posten['summe']['netto_format'] =  number_format($posten['summe']['netto'],2,',','.');
@@ -1088,7 +1112,7 @@ class tl_iao_offer extends Backend
 		return '
 		<div class="comment_wrap">
 		<div class="cte_type status' . $arrRow['status'] . '"><strong>' . $arrRow['title'] . '</strong> '.$arrRow['offer_id_str'].'</div>
-		<div>'.$GLOBALS['TL_LANG']['tl_iao_offer']['price_brutto'][0].': <strong>'.number_format($arrRow['price_brutto'],2,',','.').' '.$GLOBALS['TL_CONFIG']['currency_symbol'].'</strong></div>
+		<div>'.$GLOBALS['TL_LANG']['tl_iao_offer']['price_brutto'][0].': <strong>'.number_format($arrRow['price_brutto'],2,',','.').' '.$GLOBALS['TL_CONFIG']['iao_currency_symbol'].'</strong></div>
 		<div>'.$GLOBALS['TL_LANG']['tl_iao_offer']['member'][0].': '.$row['firstname'].' '.$row['lastname'].' ('.$row['company'].')</div>
 		'.(($arrRow['notice'])?"<div>".$GLOBALS['TL_LANG']['tl_iao_offer']['notice'][0].":".$arrRow['notice']."</div>": '').'
 		</div>' . "\n    ";

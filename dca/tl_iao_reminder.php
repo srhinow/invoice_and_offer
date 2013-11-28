@@ -34,6 +34,10 @@ $GLOBALS['TL_DCA']['tl_iao_reminder'] = array
 		'dataContainer'               => 'Table',
 		'switchToEdit'                => true,
 		'enableVersioning'            => false,
+		'onload_callback' => array
+		(
+			array('tl_iao_reminder','IAOSettings')
+		),
 		'onsubmit_callback'	=> array(
         	array('tl_iao_reminder','setTextFinish')
 		),
@@ -133,7 +137,7 @@ $GLOBALS['TL_DCA']['tl_iao_reminder'] = array
 	'palettes' => array
 	(
 		'__selector__'                => array(),
-		'default'                     => '{invoice_legend},invoice_id,title,address_text,unpaid,periode_date;{content_legend},step,tax,postage,sum,text,text_finish;{status_legend},published,status,paid_on_date;{notice_legend:hide},notice'
+		'default'                     => '{invoice_legend},invoice_id,title,address_text,unpaid,periode_date,step,tax,postage,sum,text,text_finish;{status_legend},published,status,paid_on_date;{notice_legend:hide},notice'
 	),
 
 	// Subpalettes
@@ -164,10 +168,10 @@ $GLOBALS['TL_DCA']['tl_iao_reminder'] = array
 		),
 		'text_finish' => array
 		(
-			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_reminder']['text_finish'],
-			'exclude'                 => true,
-			'eval'			  => array('tl_class'=>'clr'),
-			'input_field_callback'	  => array('tl_iao_reminder','getTextFinish'),
+			'label'						=> &$GLOBALS['TL_LANG']['tl_iao_reminder']['text_finish'],
+			'exclude'					=> true,
+			'eval'						=> array('tl_class'=>'clr'),
+			'input_field_callback'		=> array('tl_iao_reminder','getTextFinish'),
 
 		),
 		'periode_date' =>  array
@@ -238,7 +242,7 @@ $GLOBALS['TL_DCA']['tl_iao_reminder'] = array
 			'flag'                    => 1,
 			'inputType'               => 'select',
 			'options'                 => &$GLOBALS['TL_LANG']['tl_iao_reminder']['steps'],
-                        'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>true,'submitOnChange'=>true),
+			'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>true,'submitOnChange'=>true),
 			'save_callback' => array
 			(
 				array('tl_iao_reminder', 'fillStepFields')
@@ -308,6 +312,15 @@ class tl_iao_reminder extends Backend
 	{
 		parent::__construct();
 		$this->import('BackendUser', 'User');
+	}
+
+	/**
+	* add all iao-Settings in $GLOBALS['TL_CONFIG'] 
+	*/
+	public function IAOSettings(DataContainer $dc)
+	{
+		$this->import('iao');
+		$this->iao->setIAOSettings($dc->activeRecord->setting_id);
 	}
 
 	/**
@@ -494,13 +507,13 @@ class tl_iao_reminder extends Backend
 	public function getInvoices(DataContainer $dc)
 	{
 		$varValue= array();
-
+		$this->import('String');
 		$all = $this->Database->prepare('SELECT `i`.*, `m`.`company` FROM `tl_iao_invoice` as `i` LEFT JOIN `tl_member` as `m` ON `i`.`member` = `m`.`id` WHERE `status`=? ORDER BY `invoice_id_str` DESC')
 								->execute('1');
 
 		while($all->next())
 		{
-			$varValue[$all->id] = $all->invoice_id_str.' :: '.$all->company.' ('.number_format($all->price_brutto,2,',','.').' '.$GLOBALS['TL_CONFIG']['currency_symbol'].')';
+			$varValue[$all->id] = $all->invoice_id_str.' :: '.$this->String->substr($all->title,20).' ('.number_format($all->price_brutto,2,',','.').' '.$GLOBALS['TL_CONFIG']['currency_symbol'].')';
 		}
 
 		return $varValue;

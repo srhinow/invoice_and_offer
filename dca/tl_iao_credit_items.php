@@ -41,6 +41,9 @@ $GLOBALS['TL_DCA']['tl_iao_credit_items'] = array
 		'dataContainer'		=> 'Table',
 		'ptable'			=> 'tl_iao_credit',
 		'enableVersioning'	=> true,
+		'onload_callback'		=> array(
+			array('tl_iao_credit_items','IAOSettings')
+		),
 		'onsubmit_callback'	=> array(
 			array('tl_iao_credit_items','saveAllPricesToParent'),
 			array('tl_iao_credit_items','saveNettoAndBrutto')
@@ -78,7 +81,7 @@ $GLOBALS['TL_DCA']['tl_iao_credit_items'] = array
 				'label'               => &$GLOBALS['TL_LANG']['tl_iao_credit_items']['pdf'],
 				'href'                => 'key=pdf&id='.$_GET['id'],
 				'class'               => 'header_generate_pdf',
-				'button_callback'     => array('tl_iao_credit_items', 'showPDF')
+				'button_callback'     => array('tl_iao_credit_items', 'showPDFButton')
 			)
 		),
 		'operations' => array
@@ -217,8 +220,8 @@ $GLOBALS['TL_DCA']['tl_iao_credit_items'] = array
 			'filter'                  => true,
 			'flag'                    => 1,
 			'inputType'               => 'select',
-			'options'                 => &$GLOBALS['TL_LANG']['tl_iao_credit_items']['amountStr_options'],
-                        'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>true,'submitOnChange'=>false)
+			'options_callback'        => array('tl_iao_credit_items', 'getItemUnitsOptions'),
+            'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>true,'submitOnChange'=>false)
 		),
 		'vat' => array
 		(
@@ -227,7 +230,7 @@ $GLOBALS['TL_DCA']['tl_iao_credit_items'] = array
 			'filter'                  => true,
 			'flag'                    => 1,
 			'inputType'               => 'select',
-			'options'            	 => &$GLOBALS['TL_LANG']['tl_iao_credit_items']['vat_options'],
+			'options_callback'        => array('tl_iao_credit_items', 'getTaxRatesOptions'),
 			'eval'                    => array('tl_class'=>'w50')
 		),
 		'vat_incl' => array
@@ -266,7 +269,25 @@ class tl_iao_credit_items extends Backend
 		$this->import('BackendUser', 'User');
 	}
 
- 	public function showPDF($href, $label, $title, $class)
+	/**
+	* add all iao-Settings in $GLOBALS['TL_CONFIG'] 
+	*/
+	public function IAOSettings(DataContainer $dc)
+	{
+		if($dc->id)
+		{
+			$dbObj = $this->Database->prepare('SELECT `p`.* FROM `tl_iao_invoice` `p` LEFT JOIN `tl_iao_invoice_items` `i` ON `p`.`id`= `i`.`pid` WHERE `i`.`id`=?')
+							->limit(1)
+							->execute($dc->id);
+
+			$setting_id = ($dbObj->numRows > 0) ? $dbObj->setting_id : '';
+
+			$this->import('iao');
+			$this->iao->setIAOSettings($setting_id);
+		}
+	}
+
+ 	public function showPDFButton($href, $label, $title, $class)
 	{
 		return '&nbsp; :: &nbsp;<a href="contao/main.php?do=iao_credit&table=tl_iao_credit&'.$href.'" title="'.specialchars($title).'" class="'.$class.'">'.$label.'</a> ';
 	}
@@ -639,13 +660,13 @@ class tl_iao_credit_items extends Backend
 				'position' => 'credit',
 			);
 
-			$newposten = $this->Database->prepare('INSERT INTO `tl_iao_posten_templates` %s')
+			$newposten = $this->Database->prepare('INSERT INTO `tl_iao_templates_items` %s')
 							->set($postenset)
 							->execute();
 
 			$newPostenID = $newposten->insertId;
 
-			$this->redirect('contao/main.php?do=iao_posten_templates&table=tl_iao_posten_templates&id='.$newPostenID.'&act=edit');
+			$this->redirect('contao/main.php?do=iao_posten_templates&table=tl_iao_templates_items&id='.$newPostenID.'&act=edit');
 		}
 
 		$href.='&amp;ptid='.$row['id'];
@@ -661,7 +682,7 @@ class tl_iao_credit_items extends Backend
 	{
 		$varValue= array();
 
-		$all = $this->Database->prepare('SELECT `id`,`headline` FROM `tl_iao_posten_templates` WHERE `position`=?')
+		$all = $this->Database->prepare('SELECT `id`,`headline` FROM `tl_iao_templates_items` WHERE `position`=?')
 				->execute('credit');
 
 		while($all->next())
@@ -682,7 +703,7 @@ class tl_iao_credit_items extends Backend
 
 		if(strlen($varValue)<=0) return $varValue;
 
-		$result = $this->Database->prepare('SELECT * FROM `tl_iao_posten_templates` WHERE `id`=?')
+		$result = $this->Database->prepare('SELECT * FROM `tl_iao_templates_items` WHERE `id`=?')
 					->limit(1)
 					->execute($varValue);
 
@@ -710,6 +731,44 @@ class tl_iao_credit_items extends Backend
 
 		$this->reload();
 
+		return $varValue;
+	}
+
+	/**
+	 * get options for tax rates
+	 * @param object
+	 * @throws Exception
+	 */
+	public function getTaxRatesOptions(DataContainer $dc)
+	{
+		$varValue= array();
+
+		$all = $this->Database->prepare('SELECT `value`,`name` FROM `tl_iao_tax_rates`  ORDER BY `sorting` ASC')
+				->execute();
+
+		while($all->next())
+		{
+			$varValue[$all->value] = $all->name;
+		}
+		return $varValue;
+	}
+
+	/**
+	 * get options for item units
+	 * @param object
+	 * @throws Exception
+	 */
+	public function getItemUnitsOptions(DataContainer $dc)
+	{
+		$varValue= array();
+
+		$all = $this->Database->prepare('SELECT `value`,`name` FROM `tl_iao_item_units`  ORDER BY `sorting` ASC')
+				->execute();
+
+		while($all->next())
+		{
+			$varValue[$all->value] = $all->name;
+		}
 		return $varValue;
 	}
 }

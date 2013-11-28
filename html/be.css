@@ -10,6 +10,22 @@ font-size:10px;
 color:#FFB900;
 font-size:10px;
 }
+.cte_type.status4 {
+  color: #FFA100;
+  font-size:10px;
+}
+.cte_type.status5 {
+  color: #0038D3;
+  font-size:10px;
+}
+.cte_type.agreement_status1{
+  color: #077F00;
+  font-size:10px;
+}
+.cte_type.agreement_status2{
+  color: #CC5555;
+  font-size:10px;
+}
 .header_generate_pdf{
   background:url("icons/iconPDF.gif") no-repeat left center;
   padding-left: 20px;
@@ -31,12 +47,12 @@ font-size:10px;
 }
 .pdf-devider{
 /*     height: 3px;  */
-    background-color: #e5e5e5; 
-    width: 500px; 
+    background-color: #e5e5e5;
+    width: 500px;
     text-align:center;
 }
 .pdf-devider span{
-    background-color:#fff; 
+    background-color:#fff;
     color:#000;
     padding: 0 10px;
 }

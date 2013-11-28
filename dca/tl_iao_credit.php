@@ -38,7 +38,9 @@ $GLOBALS['TL_DCA']['tl_iao_credit'] = array
 		'enableVersioning'            => false,
 		'onload_callback' => array
 		(
-			array('tl_iao_credit', 'checkPermission')
+			array('tl_iao_credit','IAOSettings'),
+			array('tl_iao_credit', 'checkPermission'),
+			// array('tl_iao_credit', 'updateExpiryToTstmp')
 		),
 	),
 
@@ -48,7 +50,7 @@ $GLOBALS['TL_DCA']['tl_iao_credit'] = array
 		'sorting' => array
 		(
 			'mode'                    => 1,
-			'fields'                  => array('tstamp'),
+			'fields'                  => array('credit_tstamp'),
 			'flag'                    => 8,
 			'panelLayout'             => 'filter;search,limit'
 		),
@@ -83,7 +85,7 @@ $GLOBALS['TL_DCA']['tl_iao_credit'] = array
 				'href'                => 'act=edit',
 				'icon'                => 'header.gif',
 				'button_callback'     => array('tl_iao_credit', 'editHeader'),
-				'attributes'          => 'class="edit-header"'
+				// 'attributes'          => 'class="edit-header"'
 			),
 			'copy' => array
 			(
@@ -109,7 +111,6 @@ $GLOBALS['TL_DCA']['tl_iao_credit'] = array
 			(
 				'label'               => &$GLOBALS['TL_LANG']['tl_iao_credit']['toggle'],
 				'icon'                => 'ok.gif',
-				#'attributes'          => 'onclick="Backend.getScrollOffset(); return AjaxRequest.toggleVisibility(this, %s);"',
 				'button_callback'     => array('tl_iao_credit', 'toggleIcon')
 			),
 			'pdf' => array
@@ -117,7 +118,7 @@ $GLOBALS['TL_DCA']['tl_iao_credit'] = array
 				'label'               => &$GLOBALS['TL_LANG']['tl_iao_credit']['pdf'],
 				'href'                => 'key=pdf',
 				'icon'                => 'iconPDF.gif',
-				'button_callback'     => array('tl_iao_credit', 'showPDF')
+				'button_callback'     => array('tl_iao_credit', 'showPDFButton')
 			)
 		)
 	),
@@ -126,7 +127,7 @@ $GLOBALS['TL_DCA']['tl_iao_credit'] = array
 	'palettes' => array
 	(
 		'__selector__'                => array(),
-		'default'                     => '{title_legend},title;{credit_id_legend:hide},credit_id,credit_id_str,credit_date,credit_tstamp,credit_pdf_file,expiry_date;{address_legend},member,address_text;{text_legend},before_template,before_text,after_template,after_text;noVat;{status_legend},published,status;{notice_legend:hide},notice'
+		'default'                     => '{settings_legend},setting_id;title;{credit_id_legend:hide},credit_id,credit_id_str,credit_date,credit_tstamp,credit_pdf_file,expiry_date;{address_legend},member,address_text;{text_legend},before_template,before_text,after_template,after_text;{extend_legend},noVat;{status_legend},published,status;{notice_legend:hide},notice'
 	),
 
 	// Subpalettes
@@ -138,6 +139,17 @@ $GLOBALS['TL_DCA']['tl_iao_credit'] = array
 	// Fields
 	'fields' => array
 	(
+		'setting_id' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_credit']['setting_id'],
+			'exclude'                 => true,
+			'filter'                  => true,
+			'sorting'                 => true,
+			'flag'                    => 11,
+			'inputType'               => 'select',
+			'options_callback'        => array('tl_iao_credit', 'getSettings'),
+			'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>false, 'chosen'=>true),
+		),
 		'title' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_credit']['title'],
@@ -158,23 +170,12 @@ $GLOBALS['TL_DCA']['tl_iao_credit'] = array
 				array('tl_iao_credit', 'generateAlias')
 			)
 		),
-		'credit_date' => array
-		(
-			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_credit']['credit_date'],
-			'exclude'                 => true,
-			'inputType'               => 'text',
-			'eval'                    => array('doNotCopy'=>true, 'tl_class'=>'w50'),
-			'save_callback' => array
-			(
-				array('tl_iao_credit', 'generateCreditDate')
-			)
-		),
 		'credit_tstamp' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_credit']['credit_tstamp'],
 			'exclude'                 => true,
 			'inputType'               => 'text',
-			'eval'                    => array('doNotCopy'=>true, 'tl_class'=>'w50'),
+			'eval'                    => array('rgxp'=>'date', 'doNotCopy'=>true, 'datepicker'=>$this->getDatePickerString(), 'tl_class'=>'w50 wizard'),
 			'save_callback' => array
 			(
 				array('tl_iao_credit', 'generateCreditTstamp')
@@ -185,7 +186,7 @@ $GLOBALS['TL_DCA']['tl_iao_credit'] = array
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_credit']['expiry_date'],
 			'exclude'                 => true,
 			'inputType'               => 'text',
-			'eval'                    => array('doNotCopy'=>true, 'tl_class'=>'w50'),
+			'eval'                    => array('rgxp'=>'date', 'doNotCopy'=>true, 'datepicker'=>$this->getDatePickerString(), 'tl_class'=>'w50 wizard'),
 			'save_callback' => array
 			(
 				array('tl_iao_credit', 'generateExpiryDate')
@@ -324,7 +325,7 @@ $GLOBALS['TL_DCA']['tl_iao_credit'] = array
 		),
 		'notice' => array
 		(
-			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_invoice']['notice'],
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_credit']['notice'],
 			'exclude'                 => true,
 			'search'		  => true,
 			'filter'                  => false,
@@ -351,6 +352,14 @@ class tl_iao_credit extends Backend
 		$this->import('BackendUser', 'User');
 	}
 
+	/**
+	* add all iao-Settings in $GLOBALS['TL_CONFIG'] 
+	*/
+	public function IAOSettings(DataContainer $dc)
+	{
+		$this->import('iao');
+		$this->iao->setIAOSettings($dc->activeRecord->setting_id);
+	}
 
 	/**
 	 * Check permissions to edit table tl_iao_credit
@@ -537,16 +546,26 @@ class tl_iao_credit extends Backend
 	{
 		if($varValue==0)
 	    {
-			$format = ($GLOBALS['TL_CONFIG']['iao_credit_expiry_date']) ? $GLOBALS['TL_CONFIG']['iao_credit_expiry_date'] : 'd:m+3:Y';
-			$parts = explode(':',$format);
-
-			$part['day'] =  substr($parts[0],1);
-			$part['month'] =  substr($parts[1],1);
-			$part['year'] =  substr($parts[2],1);
-
-			$varValue = date('Y-m-d',mktime(0, 0, 0, date('n')+$part['month'],date('d')+$part['day'], date('Y')+$part['year']));
+			$format = ( $GLOBALS['TL_CONFIG']['iao_credit_expiry_date'] ) ? $GLOBALS['TL_CONFIG']['iao_credit_expiry_date'] : '+3 month';
+			$tstamp = ($dc->activeRecord->credit_tstamp) ? $dc->activeRecord->credit_tstamp : time();
+			$varValue = strtotime($format,$tstamp);
 	    }
 	    return  $varValue;
+	}
+
+	public function updateExpiryToTstmp(DataContainer $dc)
+	{
+		$creditObj = $this->Database->prepare('SELECT * FROM `tl_iao_credit`')
+								   ->execute();
+	   	while($creditObj->next())
+   		{
+   			if(!stripos($creditObj->expiry_date,'-')) continue;
+
+			$set = array('expiry_date' => strtotime($creditObj->expiry_date));
+			$this->Database->prepare('UPDATE `tl_iao_credit` %s WHERE `id`=?')
+						->set($set)
+						->execute($creditObj->id);
+   		}
 	}
 
 	/**
@@ -557,11 +576,7 @@ class tl_iao_credit extends Backend
 	 */
 	public function  generateCreditTstamp($varValue, DataContainer $dc)
 	{
-		$credit_date = $dc->activeRecord->credit_date;
-		if($credit_date == 0  && $varValue !=0) return time();
-
-		$idArr =  explode('-',$credit_date);
-		return mktime(0, 0, 0, $idArr[1], $idArr[2], $idArr[0]);
+		return ($varValue == 0) ? time() : $varValue;
 	}
 
 	/**
@@ -657,6 +672,25 @@ class tl_iao_credit extends Backend
 	}
 
 	/**
+	 * get all settings to valid groups
+	 * @param object
+	 * @throws Exception
+	 */
+	public function getSettings(DataContainer $dc)
+	{
+		$varValue= array();
+
+		$settings = $this->Database->prepare('SELECT `id`,`name` FROM `tl_iao_settings` ORDER BY `fallback` DESC, `name` DESC')
+						 ->execute();
+		while($settings->next())
+		{
+			$varValue[$settings->id] =  $settings->name;
+		}
+
+		return $varValue;
+	}
+
+	/**
 	 * get all invoice before template
 	 * @param object
 	 * @throws Exception
@@ -720,7 +754,7 @@ class tl_iao_credit extends Backend
 	 * @param string
 	 * @return string
 	 */
-	public function showPDF($row, $href, $label, $title, $icon)
+	public function showPDFButton($row, $href, $label, $title, $icon)
 	{
 		if (!$this->User->isAdmin)
 		{
@@ -729,7 +763,10 @@ class tl_iao_credit extends Backend
 
 		if ($this->Input->get('key') == 'pdf' && $this->Input->get('id') == $row['id'])
 		{
+
 			if( !file_exists(TL_ROOT . '/' . $GLOBALS['TL_CONFIG']['iao_credit_pdf']) ) return;  // template file not found
+
+			$this->import('iao');
 
 			$pdfname = 'Gutschrift-'.$row['credit_id_str'];
 
@@ -794,23 +831,21 @@ class tl_iao_credit extends Backend
 			}
 
 			// write the address-data
-			$pdf->drawAddress($styles.iao::changeTags($row['address_text']));
+			$pdf->drawAddress($styles.$this->iao->changeTags($row['address_text']));
 
 			//Rechnungsnummer
 			$pdf->drawDocumentNumber($row['credit_id_str']);
 
 			//Datum
-			$pdf->drawDate(date('d.m.Y',$row['tstamp']));
+			$pdf->drawDate(date($GLOBALS['TL_CONFIG']['dateFormat'],$row['credit_tstamp']));
 
 			//gültig bis
-			$parts = explode('-',$row['expiry_date']);
-			$newdate= mktime(0,0,0,$parts[1],$parts[2],$parts[0]);
-			$pdf->drawExpiryDate(date('d.m.Y',$newdate));
+			$pdf->drawExpiryDate(date($GLOBALS['TL_CONFIG']['dateFormat'],$row['expiry_date']));
 
 			//Text vor der Posten-Tabelle
 		    if(strip_tags($row['before_text']))
 		    {
-				$row['before_text']  = iao::changeTags($row['before_text']);
+				$row['before_text']  = $this->iao->changeTags($row['before_text']);
 				$pdf->drawTextBefore($row['before_text']);
 			}
 
@@ -822,7 +857,7 @@ class tl_iao_credit extends Backend
 			//Text vor der Posten-Tabelle
 			if(strip_tags($row['after_text']))
 			{
-				$row['after_text']  = iao::changeTags($row['after_text']);
+				$row['after_text']  = $this->iao->changeTags($row['after_text']);
 				$pdf->drawTextAfter($row['after_text']);
 			}
 
@@ -845,26 +880,47 @@ class tl_iao_credit extends Backend
 
 	    $resultObj = $this->Database->prepare('SELECT * FROM `tl_iao_credit_items` WHERE `pid`=? AND `published`=1 ORDER BY `sorting`')->execute($id);
 
-	    if($resultObj->numRows > 0) while($resultObj->next())
+		if($resultObj->numRows <= 0) return $posten;
+
+		$parentObj = $this->Database->prepare('SELECT * FROM `tl_iao_offer` WHERE `id`=?')
+						->limit(1)
+						->execute($id);
+
+		while($resultObj->next())
 	    {
 			$resultObj->price = str_replace(',','.',$resultObj->price);
-			$einzelpreis = ($resultObj->vat_incl == 1) ? iao::getBruttoPrice($resultObj->price,$resultObj->vat) : $resultObj->price;
-			$resultObj->text = iao::changeTags($resultObj->text);
+			$einzelpreis = ($resultObj->vat_incl == 1) ? $this->iao->getBruttoPrice($resultObj->price,$resultObj->vat) : $resultObj->price;
 
-			$posten['type'][] = $resultObj->type;
+			if($resultObj->headline_to_pdf == 1) $resultObj->text = substr_replace($resultObj->text, '<p><strong>'.$resultObj->headline.'</strong><br>', 0, 3);
+			$resultObj->text = $this->iao->changeTags($resultObj->text);
 
-			$posten['fields'][] = array(
-				$resultObj->count,
+			$posten['fields'][] = array
+			(
+				$resultObj->count.' '.$GLOBALS['TL_LANG']['tl_iao_offer_items']['amountStr_options'][$resultObj->amountStr],
 				$resultObj->text,
 				number_format($einzelpreis,2,',','.'),
-				number_format(($resultObj->price_brutto),2,',','.'));
+				number_format($resultObj->price_brutto,2,',','.')
+			);
 
-			$posten['summe']['netto'] += $resultObj->price_netto;
-			$posten['summe']['brutto'] += $resultObj->price_brutto;
-			$posten['vat'] = $resultObj->vat;
-	    }
+			$posten['pagebreak_after'][] = $resultObj->pagebreak_after;
+			$posten['type'][] = $resultObj->type;
 
-		$posten['summe']['mwst'] =  number_format(($posten['summe']['brutto'] - $posten['summe']['netto']),2,',','.');
+			if($resultObj->operator == '-')
+			{
+				$posten['summe']['price'] -= $resultObj->operator = $resultObj->price;
+				$posten['summe']['netto'] -= $resultObj->price_netto;
+				$posten['summe']['brutto'] -= $resultObj->price_brutto;
+			}
+			else
+			{
+				$posten['summe']['price'] += $resultObj->operator = $resultObj->price;
+				$posten['summe']['netto'] += $resultObj->price_netto;
+				$posten['summe']['brutto'] += $resultObj->price_brutto;
+			}
+
+			if($parentObj->noVat != 1) $posten['summe']['mwst'][$resultObj->vat] += $resultObj->price_brutto - $resultObj->price_netto;
+		}
+
 		$posten['summe']['netto_format'] =  number_format($posten['summe']['netto'],2,',','.');
 		$posten['summe']['brutto_format'] =  number_format($posten['summe']['brutto'],2,',','.');
 

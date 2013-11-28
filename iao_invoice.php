@@ -217,7 +217,7 @@ class iao_invoice extends Backend
 				$this->reload();
 			}
 
- 			// Check the posten file names
+			// Check the posten file names
 			if (!$csv_posten_source)
 			{
 				$_SESSION['TL_ERROR'][] = $GLOBALS['TL_LANG']['ERR']['all_fields'];
@@ -247,7 +247,7 @@ class iao_invoice extends Backend
 				$this->reload();
 			}
 
- 			$objPostenFile = new File($csv_posten_source);
+			$objPostenFile = new File($csv_posten_source);
 
 			// Skip anything but .cto files
 			if ($objInvoiceFile->extension != 'csv')
@@ -283,27 +283,27 @@ class iao_invoice extends Backend
 
 		$objTree4PDF = new FileTree($this->prepareForWidget($GLOBALS['TL_DCA']['tl_iao_invoice']['fields']['pdf_import_dir'], 'pdf_import_dir', null, 'pdf_import_dir', 'tl_iao_invoice'));
 		$objTree4Source = new FileTree($this->prepareForWidget($GLOBALS['TL_DCA']['tl_iao_invoice']['fields']['csv_source'], 'csv_source', null, 'csv_source', 'tl_iao_invoice'));
-        $objTree4Posten = new FileTree($this->prepareForWidget($GLOBALS['TL_DCA']['tl_iao_invoice']['fields']['csv_posten_source'], 'csv_posten_source', null, 'csv_posten_source', 'tl_iao_invoice'));
+		$objTree4Posten = new FileTree($this->prepareForWidget($GLOBALS['TL_DCA']['tl_iao_invoice']['fields']['csv_posten_source'], 'csv_posten_source', null, 'csv_posten_source', 'tl_iao_invoice'));
 
 		// Return the form
 		return '
-		    <div id="tl_buttons">
-		    <a href="'.ampersand(str_replace('&key=importInvoices', '', $this->Environment->request)).'" class="header_back" title="'.specialchars($GLOBALS['TL_LANG']['MSC']['backBT']).'" accesskey="b">'.$GLOBALS['TL_LANG']['MSC']['backBT'].'</a>
-		    </div>
+			<div id="tl_buttons">
+			<a href="'.ampersand(str_replace('&key=importInvoices', '', $this->Environment->request)).'" class="header_back" title="'.specialchars($GLOBALS['TL_LANG']['MSC']['backBT']).'" accesskey="b">'.$GLOBALS['TL_LANG']['MSC']['backBT'].'</a>
+			</div>
 
-		    <h2 class="sub_headline">'.$GLOBALS['TL_LANG']['tl_iao_invoice']['importInvoices'][1].'</h2>'.$this->getMessages().'
+			<h2 class="sub_headline">'.$GLOBALS['TL_LANG']['tl_iao_invoice']['importInvoices'][1].'</h2>'.$this->getMessages().'
 
-		    <form action="'.ampersand($this->Environment->request, true).'" id="tl_iao_import" class="tl_form" method="post">
+			<form action="'.ampersand($this->Environment->request, true).'" id="tl_iao_import" class="tl_form" method="post">
 
-		    <div class="tl_formbody_edit">
+			<div class="tl_formbody_edit">
 			<input type="hidden" name="FORM_SUBMIT" value="tl_iao_import" />
 			<input type="hidden" name="REQUEST_TOKEN" value="'.REQUEST_TOKEN.'">
 			 <fieldset class="tl_tbox block nolegend">
 			<div class="w50">
 			<h3><label for="import_lib">'.$GLOBALS['TL_LANG']['tl_iao_invoice']['importlib'][0].'</label></h3>
 			<select name="import_lib" id="import_lib" class="tl_select" onfocus="Backend.getScrollOffset();">
-			    <option value="invoiceandoffer">'.$GLOBALS['TL_LANG']['tl_iao_invoice']['importlib_invoiceandoffer'].'</option>
-			    <option value="phprechnung">'.$GLOBALS['TL_LANG']['tl_iao_invoice']['importlib_phprechnung'].'</option>
+				<option value="invoiceandoffer">'.$GLOBALS['TL_LANG']['tl_iao_invoice']['importlib_invoiceandoffer'].'</option>
+				<option value="phprechnung">'.$GLOBALS['TL_LANG']['tl_iao_invoice']['importlib_phprechnung'].'</option>
 			</select>'.(($GLOBALS['TL_LANG']['MSC']['separator'][1] != '') ? '
 			<p class="tl_help tl_tip">'.$GLOBALS['TL_LANG']['tl_iao_invoice']['importlib'][1].'</p>' : '').'
 			</div>
@@ -313,16 +313,16 @@ class iao_invoice extends Backend
 			<div class="w50">
 			<h3><label for="separator">'.$GLOBALS['TL_LANG']['MSC']['separator'][0].'</label></h3>
 			<select name="separator" id="separator" class="tl_select" onfocus="Backend.getScrollOffset();">
-			    <option value="comma">'.$GLOBALS['TL_LANG']['MSC']['comma'].'</option>
-			    <option value="semicolon">'.$GLOBALS['TL_LANG']['MSC']['semicolon'].'</option>
-			    <option value="tabulator">'.$GLOBALS['TL_LANG']['MSC']['tabulator'].'</option>
-			    <option value="linebreak">'.$GLOBALS['TL_LANG']['MSC']['linebreak'].'</option>
+				<option value="comma">'.$GLOBALS['TL_LANG']['MSC']['comma'].'</option>
+				<option value="semicolon">'.$GLOBALS['TL_LANG']['MSC']['semicolon'].'</option>
+				<option value="tabulator">'.$GLOBALS['TL_LANG']['MSC']['tabulator'].'</option>
+				<option value="linebreak">'.$GLOBALS['TL_LANG']['MSC']['linebreak'].'</option>
 			</select>'.(($GLOBALS['TL_LANG']['MSC']['separator'][1] != '') ? '
 			<p class="tl_help tl_tip">'.$GLOBALS['TL_LANG']['MSC']['separator'][1].'</p>' : '').'
 			</div>
 			<div class="w50">
-			     <h3><label for="drop_first_row">'.$GLOBALS['TL_LANG']['tl_iao_invoice']['drop_first_row'][0].'</label></h3>
-			     <input type="checkbox" name="drop_first_row" value="1" id="drop_first_row" checked />'.(($GLOBALS['TL_LANG']['tl_iao_invoice']['drop_first_row'][1] != '') ? '
+				 <h3><label for="drop_first_row">'.$GLOBALS['TL_LANG']['tl_iao_invoice']['drop_first_row'][0].'</label></h3>
+				 <input type="checkbox" name="drop_first_row" value="1" id="drop_first_row" checked />'.(($GLOBALS['TL_LANG']['tl_iao_invoice']['drop_first_row'][1] != '') ? '
 			<p class="tl_help tl_tip">'.$GLOBALS['TL_LANG']['tl_iao_invoice']['drop_first_row'][1].'</p>' : '').'
 			</div>
 			</fieldset>
@@ -340,25 +340,25 @@ class iao_invoice extends Backend
 			  <h3><label for="pdf_import_dir">'.$GLOBALS['TL_LANG']['tl_iao_invoice']['pdf_import_dir'][0].'</label> <a href="contao/files.php" title="' . specialchars($GLOBALS['TL_LANG']['MSC']['fileManager']) . '" onclick="Backend.getScrollOffset(); Backend.openWindow(this, 750, 500); return false;">' . $this->generateImage('filemanager.gif', $GLOBALS['TL_LANG']['MSC']['fileManager'], 'style="vertical-align:text-bottom;"') . '</a></h3>'.$objTree4PDF->generate().(strlen($GLOBALS['TL_LANG']['tl_iao_invoice']['pdf_import_dir'][1]) ? '
 			  <p class="tl_help tl_tip">'.$GLOBALS['TL_LANG']['tl_iao_invoice']['pdf_import_dir'][1].'</p>' : '').'
 			</div>
-		        </fieldset>
+				</fieldset>
 
 			<fieldset class="tl_tbox block nolegend">
 			<div class="clr">
-			     <input type="checkbox" name="drop_exist_entries" value="1" id="drop_exist_entries" checked /> <label for="drop_exist_entries">'.$GLOBALS['TL_LANG']['tl_iao_invoice']['drop_exist_entries'][0].'</label>'.(($GLOBALS['TL_LANG']['tl_iao_invoice']['drop_exist_entries'][1] != '') ? '
+				 <input type="checkbox" name="drop_exist_entries" value="1" id="drop_exist_entries" checked /> <label for="drop_exist_entries">'.$GLOBALS['TL_LANG']['tl_iao_invoice']['drop_exist_entries'][0].'</label>'.(($GLOBALS['TL_LANG']['tl_iao_invoice']['drop_exist_entries'][1] != '') ? '
 			<p class="tl_help tl_tip">'.$GLOBALS['TL_LANG']['tl_iao_invoice']['drop_exist_entries'][1].'</p>' : '').'
 			</div>
 			</fieldset>
 
-		    </div>
+			</div>
 
-		    <div class="tl_formbody_submit">
+			<div class="tl_formbody_submit">
 
-		    <div class="tl_submit_container">
-		      <input type="submit" name="save" id="save" class="tl_submit" accesskey="s" value="'.specialchars($GLOBALS['TL_LANG']['tl_iao_invoice']['importCSV'][0]).'" />
-		    </div>
+			<div class="tl_submit_container">
+			  <input type="submit" name="save" id="save" class="tl_submit" accesskey="s" value="'.specialchars($GLOBALS['TL_LANG']['tl_iao_invoice']['importCSV'][0]).'" />
+			</div>
 
-		    </div>
-		    </form>';
+			</div>
+			</form>';
 	}
 
 }

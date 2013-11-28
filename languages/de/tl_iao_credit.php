@@ -15,6 +15,7 @@
  * permanent text corrections which are update-safe.
  */
 
+$GLOBALS['TL_LANG']['tl_iao_credit']['setting_id']	=	array('Konfiguration','');
 $GLOBALS['TL_LANG']['tl_iao_credit']['title']	=	array('Bezeichnung','Bezeichnung des Elementes');
 $GLOBALS['TL_LANG']['tl_iao_credit']['alias']	=	array('Alias','');
 
@@ -24,22 +25,13 @@ $GLOBALS['TL_LANG']['tl_iao_credit']['before_text']	=	array('Text vor den Posten
 $GLOBALS['TL_LANG']['tl_iao_credit']['before_template']	=	array('Text-Template vor den Posten','');
 $GLOBALS['TL_LANG']['tl_iao_credit']['after_text']	=	array('Text nach den Posten','');
 $GLOBALS['TL_LANG']['tl_iao_credit']['after_template']	=	array('Text-Template nach den Posten','');
-$GLOBALS['TL_LANG']['tl_iao_credit']['published']	=	array('veröffnentlich/versendet.','');
+$GLOBALS['TL_LANG']['tl_iao_credit']['published']	=	array('veröffnentlicht/ versendet.','');
 $GLOBALS['TL_LANG']['tl_iao_credit']['status']	=	array('Status dieser Gutschrift','');
-$GLOBALS['TL_LANG']['tl_iao_credit']['noVat']	=	array('keine MwSt. ausweisen','z.B. Rechnung in nicht Bundesrepublik Deutschland');
+$GLOBALS['TL_LANG']['tl_iao_credit']['noVat']	=	array('keine MwSt. ausweisen','z.B. Gutschrift in nicht Bundesrepublik Deutschland');
 $GLOBALS['TL_LANG']['tl_iao_credit']['price_netto']	=	array('Gutschrift-Höhe (Netto)','');
 $GLOBALS['TL_LANG']['tl_iao_credit']['price_brutto']	=	array('Gutschrift-Höhe (Brutto)','');
 $GLOBALS['TL_LANG']['tl_iao_credit']['member']	=	array('Kunde','');
-$GLOBALS['TL_LANG']['tl_iao_credit']['notice']	=	array('Notiz','');
-
-$GLOBALS['TL_LANG']['tl_iao_credit']['new']	=	array('Neue Gutschrift','Eine neue Gutschrift anlegen');
-$GLOBALS['TL_LANG']['tl_iao_credit']['edit']	=	array('Gutschrift bearbeiten','Gutschrift ID %s bearbeiten');
-$GLOBALS['TL_LANG']['tl_iao_credit']['copy']	=	array('Gutschrift duplizieren','Gutschrift ID %s duplizieren');
-$GLOBALS['TL_LANG']['tl_iao_credit']['delete']	=	array('Gutschrift löschen','Gutschrift ID %s löschen');
-$GLOBALS['TL_LANG']['tl_iao_credit']['deleteConfirm']	=	'Soll die Gutschrift ID %s wirklich gelöscht werden?!';
-$GLOBALS['TL_LANG']['tl_iao_credit']['show']	=	array('Details anzeigen','Details der Gutschrift ID %s anzeigen');
-$GLOBALS['TL_LANG']['tl_iao_credit']['pdf']	=	array('PDF generieren','eine PDF zu dieser Gutschrift generieren');
-
+$GLOBALS['TL_LANG']['tl_iao_credit']['notice']	=	array('Notiz','Diese Notizen werden ausschließlich im Backend verwendet.');
 
 $GLOBALS['TL_LANG']['tl_iao_credit']['credit_date']	=	array('Gutschriftdatum','wenn es leer bleibt dann wird das aktuelle Datum eingetragen. Unter normalen Umständen sollte dieses Feld leer bleiben. Es ist hauptsächlich für Importe gedacht.');
 $GLOBALS['TL_LANG']['tl_iao_credit']['credit_tstamp']	=	array('Gutschriftdatum als Timestamp','Wenn es leer bleibt dann wird der Timestamp vom Gutschriftdatum eingetragen. Unter normalen Umständen sollte dieses Feld leer bleiben. Es ist hauptsächlich für Importe gedacht.');
@@ -52,9 +44,24 @@ $GLOBALS['TL_LANG']['tl_iao_credit']['toggle']	=	'Gutschrift als akzeptiert/ nic
 $GLOBALS['TL_LANG']['tl_iao_credit']['gender']['male']	=	'Herr';
 $GLOBALS['TL_LANG']['tl_iao_credit']['gender']['female']	=	'Frau';
 
-$GLOBALS['TL_LANG']['tl_iao_credit']['credit_id_legend']	=	'erweiterte Gutschrift-Einstellungen';
+/**
+ * Buttons
+ */
+$GLOBALS['TL_LANG']['tl_iao_credit']['new']	=	array('Neue Gutschrift','Eine neue Gutschrift anlegen');
+$GLOBALS['TL_LANG']['tl_iao_credit']['edit']	=	array('Gutschrift bearbeiten','Gutschrift ID %s bearbeiten');
+$GLOBALS['TL_LANG']['tl_iao_credit']['copy']	=	array('Gutschrift duplizieren','Gutschrift ID %s duplizieren');
+$GLOBALS['TL_LANG']['tl_iao_credit']['delete']	=	array('Gutschrift löschen','Gutschrift ID %s löschen');
+$GLOBALS['TL_LANG']['tl_iao_credit']['deleteConfirm']	=	'Soll die Gutschrift ID %s wirklich gelöscht werden?!';
+$GLOBALS['TL_LANG']['tl_iao_credit']['show']	=	array('Details anzeigen','Details der Gutschrift ID %s anzeigen');
+$GLOBALS['TL_LANG']['tl_iao_credit']['pdf']	=	array('PDF generieren','eine PDF zu dieser Gutschrift generieren');
+
+/**
+ * Legends
+ */
+$GLOBALS['TL_LANG']['tl_iao_credit']['settings_legend']	=	'Konfiguration-Zuweisung';
+$GLOBALS['TL_LANG']['tl_iao_credit']['credit_id_legend']	=	'Gutschrift-Einstellungen';
 $GLOBALS['TL_LANG']['tl_iao_credit']['address_legend']	=	'Adress-Angaben';
 $GLOBALS['TL_LANG']['tl_iao_credit']['text_legend']	=	'Gutschrift-Texte';
+$GLOBALS['TL_LANG']['tl_iao_credit']['extend_legend']	=	'weitere Einstellungen';
 $GLOBALS['TL_LANG']['tl_iao_credit']['status_legend']	=	'Status-Einstellungen';
 $GLOBALS['TL_LANG']['tl_iao_credit']['notice_legend']	=	'Notiz anlegen';
-?>

@@ -42,6 +42,9 @@ class ModuleCustomerMember extends BackendModule
 	{
 		$this->import('BackendUser', 'User');
 
+		$this->import('iao');
+		$this->iao->setIAOSettings();
+
 		$GLOBALS['TL_DCA'][$this->table]['config']['onsubmit_callback'][] = array('tl_iao_member', 'setCustomerGroup');
 		$GLOBALS['TL_DCA'][$this->table]['palettes'] = array
 		(

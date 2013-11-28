@@ -21,7 +21,7 @@ $GLOBALS['TL_LANG']['tl_iao_reminder']['member'] = array('Kunde','Adresse aus ge
 $GLOBALS['TL_LANG']['tl_iao_reminder']['address_text'] = array('Mahnungs-Adresse','Adresse die in der Mahnungs-PDF-Datei geschrieben wird.');
 $GLOBALS['TL_LANG']['tl_iao_reminder']['text'] = array('Mahnungs-Text','');
 $GLOBALS['TL_LANG']['tl_iao_reminder']['text_finish'] = array('Mahnungs-Text (Vorschau)','');
-$GLOBALS['TL_LANG']['tl_iao_reminder']['published'] = array('veröffnentlich/versendet.','');
+$GLOBALS['TL_LANG']['tl_iao_reminder']['published'] = array('veröffnentlicht/ versendet.','');
 $GLOBALS['TL_LANG']['tl_iao_reminder']['status'] = array('Status dieser Mahnung','');
 $GLOBALS['TL_LANG']['tl_iao_reminder']['new'] = array('Neue Erinnerung','Eine neue Erinnerung anlegen');
 $GLOBALS['TL_LANG']['tl_iao_reminder']['checkReminder'] = array('Erinnnerungen aktualisieren','Nach neuen Erinnerungen durchsuchen und anlegen.');
@@ -46,16 +46,6 @@ $GLOBALS['TL_LANG']['tl_iao_reminder']['invoice_pdf_file'] = array('Mahnungsdate
 $GLOBALS['TL_LANG']['tl_iao_reminder']['paid_on_date'] = array('Bezahlt am','Das Datum an dem die Zahlung auf dem Konto eingegangen ist.');
 $GLOBALS['TL_LANG']['tl_iao_reminder']['before_template'] = array('Text-Template vor den Posten','');
 $GLOBALS['TL_LANG']['tl_iao_reminder']['after_template'] = array('Text-Template nach den Posten','');
-$GLOBALS['TL_LANG']['tl_iao_reminder']['csv_source'] = array('CSV der Mahnungen','z.B. tl_iao_reminder_YYYY-MM-DD.csv');
-$GLOBALS['TL_LANG']['tl_iao_reminder']['csv_posten_source'] = array('CSV der Mahnungsposten','z.B. tl_iao_reminder_items_YYYY-MM-DD.csv');
-$GLOBALS['TL_LANG']['tl_iao_reminder']['pdf_import_dir'] = array('Verzeichnis der Mahnungs-PDF-Dateien','Geben Sie hier das Verzeichnis an in dem die Mahnungen liegen die beim Import verknüpft werden sollen.');
-$GLOBALS['TL_LANG']['tl_iao_reminder']['drop_first_row'] = array('erste Zeile überspringen', 'Wenn z.B. die Spaltennamen in der ersten Spalte steht müssen diese beim Import übersprungen werden.');
-$GLOBALS['TL_LANG']['tl_iao_reminder']['drop_exist_entries'] = array('existierende Einträge in der Datenbank-Tabelle löschen', 'Alle bereits existierenden Einträge werden vor dem Import entfernt.');
-$GLOBALS['TL_LANG']['tl_iao_reminder']['importCSV'] = array('Import starten','');
-$GLOBALS['TL_LANG']['tl_iao_reminder']['csv_export_dir'] = array('Export-Ziel-Verzeichnis','Wählen Sie das Verzeichnis, in welchem die Dateien exportiert werden sollen. Beachten Sie das es Schreibrechte besitzt.');
-$GLOBALS['TL_LANG']['tl_iao_reminder']['export_invoice_filename'] = array('Dateiname der Mahnungen','OHNE ENDUNG .csv');
-$GLOBALS['TL_LANG']['tl_iao_reminder']['export_invoice_item_filename'] = array('Dateiname der Mahnungsposten','OHNE ENDUNG .csv');
-$GLOBALS['TL_LANG']['tl_iao_reminder']['exportCSV'] = array('Export starten','');
 
 $GLOBALS['TL_LANG']['tl_iao_reminder']['toggle'] = 'Mahnung als bezahlt/ nicht bezahlt markieren';
 $GLOBALS['TL_LANG']['tl_iao_reminder']['gender']['male'] = 'Herr';
@@ -66,7 +56,7 @@ $GLOBALS['TL_LANG']['tl_iao_reminder']['to_much_steps'] = 'Es gibt keine weitere
 /**
  * Legend
  */
-$GLOBALS['TL_LANG']['tl_iao_reminder']['invoice_id_legend'] = 'erweiterte Mahnungs-Einstellungen';
+$GLOBALS['TL_LANG']['tl_iao_reminder']['invoice_legend'] = 'erweiterte Mahnungs-Einstellungen';
 $GLOBALS['TL_LANG']['tl_iao_reminder']['address_legend'] = 'Adress-Angaben';
 $GLOBALS['TL_LANG']['tl_iao_reminder']['text_legend'] = 'Mahnungs-Texte';
 $GLOBALS['TL_LANG']['tl_iao_reminder']['status_legend'] = 'Status-Einstellungen';

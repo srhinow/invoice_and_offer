@@ -4,6 +4,8 @@ License: LPGL (mit Ausnahmen)
 Version: 1.0
 Ausnahmen: Ich verbiete die Benutzung dieser Software für die Firma rokamedia und deren Personen
 
+icons: http://dryicons.com
+icons: cc3 http://www.fatcow.com/free-icons
 -----------------------------
 deutsch
 -----------------------------
@@ -20,9 +22,9 @@ Aktuelle Funktionen:
 - Rückstände können im eigenen Bereich verwaltet werden.  Per Knopfdruck wird die Liste aktualisiert (ab V1.0)
 - die Rabatttexte aus den Einstellungen werden verwendet, können aber für jeden einzelfall angepasst werden. (ab V1.0)
 - Art der Anzahlangabe kann für die PDF-Ausgabe per Selectfeld vergeben werden z.B. Stück,Stunde,Tag etc. (ab V1.0)
-- eigener Kunden - Adressen-Bereich der auf tl_member basiert und eine eigene Palette mit relevanten Angaben bereit stellt 
+- eigener Kunden - Adressen-Bereich der auf tl_member basiert und eine eigene Palette mit relevanten Angaben bereit stellt
 - beim Anlgene in allen drei Bereichen kann per selectfeld der Textbereich mit den Adressdaten aus der Memberverwaltung befüllt und gegebenfalls nachbearbeitet werden.
-- bei den Texten kann sowohl die Vor und Abschlusstexte per Vorlagen-Selectfeld vorausgefüllt werden 
+- bei den Texten kann sowohl die Vor und Abschlusstexte per Vorlagen-Selectfeld vorausgefüllt werden
 - bei den Posten ebenfalls in allen drei Bereichen, können die Felder per VorlagenAuswahl vorausgefüllt werden
 - Kompatibilität für Contao 3 erstellt. Dieses wurde aber nicht komplett getestet. (ab V1.0)
 - durchsuchbare Selectfelder der Kunden und Postenvorlagen wie ab Contao 2.11.x in den Core-Modulen (ab V1.0)
