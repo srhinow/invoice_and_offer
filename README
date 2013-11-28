@@ -23,12 +23,14 @@ seit Version 1.1.3:
 - Übersetzungen ergänzt
 
 WICHTIG BEI UPDATE ÄLTERER VERSIONEN
-Da Contao umbenennungen von Tabellen als 'alte löschen neue anlegen' ausführen würde, müssen nachfolgende SQL-Befehle manuell also ohne Contao-Mittel in der Datenbank ausgefphrt werden:
+Da Contao umbenennungen von Tabellen als 'alte löschen neue anlegen' ausführen würde, müssen nachfolgende SQL-Befehle manuell also ohne Contao-Mittel in der Datenbank ausgeführt werden:
 
-RENAME TABLE `sr-tag_contao`.`tl_iao_posten_templates` TO `sr-tag_contao`.`tl_iao_templates_items`;
+RENAME TABLE `DATENBANKNAME`.`tl_iao_posten_templates` TO `DATENBANKNAME`.`tl_iao_templates_items`;
 UPDATE `tl_iao_offer` SET `setting_id`=1 WHERE `setting_id`=0;
 UPDATE `tl_iao_invoice` SET `setting_id`=1 WHERE `setting_id`=0;
 UPDATE `tl_iao_credit` SET `setting_id`=1 WHERE `setting_id`=0;
+
+DATENBANKNAME muss durch richtigen Datenbanknamen ersetzt werden.
 
 weitere Funktionen:
 - Anlegen von Grundeinstellungen für alle drei Bereiche Rechnungen, Angebote und Gutschriften
