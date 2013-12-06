@@ -576,7 +576,7 @@ class tl_iao_credit extends Backend
 	 */
 	public function  generateCreditTstamp($varValue, DataContainer $dc)
 	{
-		return ($varValue == 0) ? time() : $varValue;
+		return ($varValue == '') ? time() : $varValue;
 	}
 
 	/**

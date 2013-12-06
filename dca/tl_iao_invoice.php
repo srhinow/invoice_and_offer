@@ -176,7 +176,7 @@ $GLOBALS['TL_DCA']['tl_iao_invoice'] = array
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_invoice']['invoice_date'],
 			'exclude'                 => true,
 			'inputType'               => 'text',
-			'eval'                    => array('rgxp'=>'date', 'datepicker'=>$this->getDatePickerString(), 'tl_class'=>'w50 wizard'),
+			'eval'                    => array('doNotCopy'=>true,'rgxp'=>'date', 'datepicker'=>$this->getDatePickerString(), 'tl_class'=>'w50 wizard'),
 			'save_callback' => array
 			(
 				array('tl_iao_invoice', 'generateInvoiceTstamp')
@@ -678,7 +678,7 @@ class tl_iao_invoice extends Backend
 	 */
 	public function  generateInvoiceTstamp($varValue, DataContainer $dc)
 	{
-		return ($varValue == 0) ? time() : $varValue;
+		return ($varValue == '') ? time() : $varValue;
 	}
 
 	/**
@@ -1342,7 +1342,7 @@ class tl_iao_invoice extends Backend
 		}
 
 		$dif = $dc->activeRecord->price_brutto - $already;
-		$status = ($dc->activeRecord->price_brutto == $already) ? 2 : $dc->activeRecord->status;
+		$status = ($dc->activeRecord->price_brutto == $already && $dc->activeRecord->price_brutto > 0) ? 2 : $dc->activeRecord->status;
 		$paid_on_date = ($dc->activeRecord->price_brutto == $already) ? $lastPayDate : $dc->activeRecord->paid_on_date;
 
 		$set = array(

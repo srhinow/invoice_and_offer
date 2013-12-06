@@ -559,7 +559,7 @@ class tl_iao_offer extends Backend
 	 */
 	public function  generateOfferTstamp($varValue, DataContainer $dc)
 	{
-		return ($varValue == 0) ? time() : $varValue;
+		return ($varValue == '') ? time() : $varValue;
 	}
 
 	/**
