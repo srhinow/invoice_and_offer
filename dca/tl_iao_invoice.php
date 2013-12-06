@@ -39,7 +39,7 @@ $GLOBALS['TL_DCA']['tl_iao_invoice'] = array
 		(
 			array('tl_iao_invoice','IAOSettings'),
 			array('tl_iao_invoice', 'checkPermission'),
-			// array('tl_iao_invoice','upgradeInvoices')
+			array('tl_iao_invoice','upgradeInvoices')
 		),
 	),
 
@@ -1046,9 +1046,16 @@ class tl_iao_invoice extends Backend
 			if($resultObj->headline_to_pdf == 1) $resultObj->text = substr_replace($resultObj->text, '<p><strong>'.$resultObj->headline.'</strong><br>', 0, 3);
 			$resultObj->text = $this->iao->changeTags($resultObj->text);
 
+			// get units from DB-Table
+			$unitObj = $this->Database->prepare('SELECT * FROM `tl_iao_item_units` WHERE `value`=?')
+										->limit(1)
+										->execute($resultObj->amountStr);
+
+			$formatCount = stripos($resultObj->count, '.') ? number_format($resultObj->count,1,',','.') : $resultObj->count;
+
 			$posten['fields'][] = array
 			(
-				$resultObj->count.' '.$GLOBALS['TL_LANG']['tl_iao_invoice_items']['amountStr_options'][$resultObj->amountStr],
+				$formatCount.' '.(($resultObj->count <= 1) ? $unitObj->singular : $unitObj->majority),
 				$resultObj->text,
 				number_format($einzelpreis,2,',','.'),
 				number_format($resultObj->price_brutto,2,',','.')
