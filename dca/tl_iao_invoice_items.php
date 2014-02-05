@@ -45,7 +45,8 @@ $GLOBALS['TL_DCA']['tl_iao_invoice_items'] = array
 		),
 		'onsubmit_callback'	    => array(
 		    array('tl_iao_invoice_items','saveAllPricesToParent'),
-		    array('tl_iao_invoice_items','saveNettoAndBrutto')
+		    array('tl_iao_invoice_items','saveNettoAndBrutto'),
+		    array('tl_iao_invoice_items','updateRemaining')
 		)
 	),
 
@@ -293,7 +294,7 @@ class tl_iao_invoice_items extends Backend
 	}
 
 	/**
-	* add all iao-Settings in $GLOBALS['TL_CONFIG'] 
+	* add all iao-Settings in $GLOBALS['TL_CONFIG']
 	*/
 	public function IAOSettings(DataContainer $dc)
 	{
@@ -723,7 +724,7 @@ class tl_iao_invoice_items extends Backend
 
 			$newPostenID = $newposten->insertId;
 
-			$this->redirect('contao/main.php?do=iao_posten_templates&table=tl_iao_templates_items&id='.$newPostenID.'&act=edit');
+			$this->redirect('contao/main.php?do=iao_setup&mod=iao_templates_items&table=tl_iao_templates_items&act=edit&id='.$newPostenID);
 		}
 
 		$href.='&amp;ptid='.$row['id'];
@@ -827,6 +828,51 @@ class tl_iao_invoice_items extends Backend
 			$varValue[$all->value] = $all->name;
 		}
 		return $varValue;
+	}
+
+	/**
+	* calculate and update fields
+	*/
+	public function updateRemaining(DataContainer $dc)
+	{
+
+		$itemObj =	$this->Database->prepare('SELECT SUM(`price_netto`) as `brutto_sum` FROM `tl_iao_invoice_items` WHERE `pid`=? AND `published`=?')
+									->execute($dc->activeRecord->pid, 1);
+
+		$sumObj = $itemObj->fetchRow();
+
+		if($itemObj->numRows > 0)
+		{
+			$parentObj = $this->Database->prepare('SELECT `paid_on_dates` FROM `tl_iao_invoice` WHERE `ìd`=?')
+										->limit(1)
+										->execute($dc->activeRecord->pid);
+
+			$paidsArr = unserialize($parentObj->fetchRow());
+			$already = 0;
+			$lastPayDate = '';
+
+			if(is_array($paidsArr) && ($paidsArr[0]['payamount'] != ''))
+			{
+				foreach($paidsArr as $k => $a)
+				{
+					$already += $a['payamount'];
+					$lastPayDate = $a['paydate'];
+				}
+			}
+
+			$dif = $dc->activeRecord->price_brutto - $already;
+			$status = ($dc->activeRecord->price_brutto == $already && $dc->activeRecord->price_brutto > 0) ? 2 : $dc->activeRecord->status;
+			$paid_on_date = ($dc->activeRecord->price_brutto == $already) ? $lastPayDate : $dc->activeRecord->paid_on_date;
+
+			$set = array(
+				'remaining' => $dif,
+				'status' => $status,
+				'paid_on_date' => $paid_on_date
+			);
+			$this->Database->prepare('UPDATE `tl_iao_invoice` %s WHERE `id`=?')
+						->set($set)
+						->execute($dc->id);
+		}
 	}
 
 }

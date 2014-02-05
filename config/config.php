@@ -87,7 +87,7 @@ $GLOBALS['BE_MOD']['iao'] = array
 $GLOBALS['IAO']['default_agreement_cycle'] = '+1 year';
 
 /**
- * Isotope Modules
+ * Setup Modules
  */
 $GLOBALS['IAO_MOD'] = array
 (
@@ -144,7 +144,14 @@ if ($_GET['do'] == 'iao_setup')
 /**
  * Frontend modules
  */
-// $GLOBALS['FE_MOD']['modulname'] = array('dca_name' => 'ModuleFrontendClass');
+$GLOBALS['FE_MOD']['iao_fe'] = array
+(
+	'fe_iao_invoice' => 'ModuleMemberInvoices',
+	'fe_iao_offer' => 'ModuleMemberOffer',
+	'fe_iao_credit' => 'ModuleMemberCredit',
+	'fe_iao_reminder' => 'ModuleMemberReminder',
+	'fe_iao_agreements' => 'ModuleMemberAgreements'
+);
 
 /**
  * HOOKS

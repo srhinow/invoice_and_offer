@@ -671,11 +671,13 @@ class tl_iao_offer_items extends Backend
 			(
 				'tstamp' => time(),
 				'headline' => $result->headline,
+				'headline_to_pdf' => $result->headline_to_pdf,
 				'sorting' => $result->sorting,
 				'date' => $result->date,
 				'time' => $result->time,
 				'text' => $result->text,
 				'count' => $result->count,
+				'amountStr' => $result->amountStr,
 				'price' => $result->price,
 				'price_netto' => $result->price_netto,
 				'price_brutto' => $result->price_brutto,
@@ -691,7 +693,7 @@ class tl_iao_offer_items extends Backend
 
 			$newPostenID = $newposten->insertId;
 
-			$this->redirect('contao/main.php?do=iao_posten_templates&table=tl_iao_templates_items&id='.$newPostenID.'&act=edit');
+			$this->redirect('contao/main.php?do=iao_setup&mod=iao_templates_items&table=tl_iao_templates_items&act=edit&id='.$newPostenID);
 		}
 
 		$href.='&amp;ptid='.$row['id'];

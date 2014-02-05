@@ -9,7 +9,7 @@
 
 -- update zu aelteren Versionen
 -- 1.1.3
-RENAME TABLE `sr-tag_contao`.`tl_iao_posten_templates` TO `sr-tag_contao`.`tl_iao_templates_items`;
+RENAME TABLE `tl_iao_posten_templates` TO `tl_iao_templates_items`;
 UPDATE `tl_iao_offer` SET `setting_id`=1 WHERE `setting_id`=0;
 UPDATE `tl_iao_invoice` SET `setting_id`=1 WHERE `setting_id`=0;
 UPDATE `tl_iao_credit` SET `setting_id`=1 WHERE `setting_id`=0;
@@ -388,4 +388,14 @@ CREATE TABLE `tl_iao_item_units` (
   `majority` varchar(25) NOT NULL default '',
   `value` varchar(25) NOT NULL default '',
   PRIMARY KEY  (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+--
+-- Table `tl_module`
+--
+
+CREATE TABLE `tl_module` (
+  `fe_iao_template` varchar(32) NOT NULL default '',
+  `fe_iao_numberOfItems` smallint(5) unsigned NOT NULL default '0',
+  `status` char(1) NOT NULL default '',
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;

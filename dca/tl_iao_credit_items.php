@@ -666,7 +666,7 @@ class tl_iao_credit_items extends Backend
 
 			$newPostenID = $newposten->insertId;
 
-			$this->redirect('contao/main.php?do=iao_posten_templates&table=tl_iao_templates_items&id='.$newPostenID.'&act=edit');
+			$this->redirect('contao/main.php?do=iao_setup&mod=iao_templates_items&table=tl_iao_templates_items&act=edit&id='.$newPostenID);
 		}
 
 		$href.='&amp;ptid='.$row['id'];

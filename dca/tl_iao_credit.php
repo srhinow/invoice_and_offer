@@ -176,7 +176,7 @@ $GLOBALS['TL_DCA']['tl_iao_credit'] = array
 			'exclude'                 => true,
 			'inputType'               => 'text',
 			'eval'                    => array('rgxp'=>'date', 'doNotCopy'=>true, 'datepicker'=>$this->getDatePickerString(), 'tl_class'=>'w50 wizard'),
-			'save_callback' => array
+			'load_callback' => array
 			(
 				array('tl_iao_credit', 'generateCreditTstamp')
 			)
@@ -576,7 +576,7 @@ class tl_iao_credit extends Backend
 	 */
 	public function  generateCreditTstamp($varValue, DataContainer $dc)
 	{
-		return ($varValue == '') ? time() : $varValue;
+		return ((int)$varValue == 0) ? time() : $varValue;
 	}
 
 	/**
