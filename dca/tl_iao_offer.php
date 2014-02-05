@@ -932,7 +932,14 @@ class tl_iao_offer extends Backend
 			//Posten-Tabelle
 			$header = array('Menge','Beschreibung','Einzelpreis','Gesamt');
 			$fields = $this->getPosten($this->Input->get('id'));
-			$pdf->drawPostenTable($header,$fields);
+
+			$parentObj = $this->Database->prepare('SELECT `noVat` FROM `tl_iao_offer` WHERE `id`=?')
+						->limit(1)
+						->execute($this->Input->get('id'));
+			
+			$noVat = $parentObj->noVat;
+
+			$pdf->drawPostenTable($header,$fields, $noVat);
 
 			//Text vor der Posten-Tabelle
 			if(strip_tags($row['after_text']))
@@ -961,13 +968,11 @@ class tl_iao_offer extends Backend
 		$this->import('iao');
 		$this->loadLanguageFile('tl_iao_offer_items');
 
-		$resultObj = $this->Database->prepare('SELECT * FROM `tl_iao_offer_items` WHERE `pid`=? AND `published`=1 ORDER BY `sorting`')->execute($id);
+		$resultObj = $this->Database->prepare('SELECT * FROM `tl_iao_offer_items` WHERE `pid`=? AND `published`= ?  ORDER BY `sorting`')
+									->execute($id,1);
 
 		if($resultObj->numRows <= 0) return $posten;
 
-		$parentObj = $this->Database->prepare('SELECT * FROM `tl_iao_offer` WHERE `id`=?')
-						->limit(1)
-						->execute($id);
 
 		while($resultObj->next())
 		{
@@ -1008,7 +1013,15 @@ class tl_iao_offer extends Backend
 				$posten['summe']['brutto'] += $resultObj->price_brutto;
 			}
 
-			$posten['summe']['mwst'][$resultObj->vat] += ($parentObj->noVat != 1) ? $resultObj->price_brutto - $resultObj->price_netto : 0;
+			$parentObj = $this->Database->prepare('SELECT `noVat` FROM `tl_iao_offer` WHERE `id`=?')
+						->limit(1)
+						->execute($id);
+			
+			if($parentObj->noVat != 1)
+			{
+				$posten['summe']['mwst'][$resultObj->vat] +=  $resultObj->price_brutto - $resultObj->price_netto;
+			}
+
 		}
 
 		$posten['summe']['netto_format'] =  number_format($posten['summe']['netto'],2,',','.');

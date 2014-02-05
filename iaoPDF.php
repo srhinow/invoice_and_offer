@@ -135,7 +135,7 @@ class iaoPDF extends FPDI
 		$this->Cell(0, 10, 'Seite '.$this->getAliasNumPage().'/'.$this->getAliasNbPages(), 0, false, 'C', 0, '', 0, false, 'T', 'M');
 	}
 
-	public function drawPostenTable($header,$data)
+	public function drawPostenTable($header, $data, $noVat)
 	{
 		if(count($data['fields'])>0)
 		{
@@ -205,14 +205,19 @@ class iaoPDF extends FPDI
 
 			//Summe
 			$summe_tr = '<tr>
-							<td style="text-align:right; width:'.($w[0]+$w[1]+$w[2]+3).'mm;">Nettobetrag:<br />';
+							<td style="text-align:right; width:'.($w[0]+$w[1]+$w[2]+3).'mm;">
+							Nettobetrag:<br />';
 
-			reset($data['summe']['mwst']);
+			if($noVat != 1)
+			{	
+				reset($data['summe']['mwst']);
 
-			foreach($data['summe']['mwst'] as $k => $v)
-			{
-				$summe_tr .= 'MwSt. '.$k.'%:<br />';
-			}
+				foreach($data['summe']['mwst'] as $k => $v)
+				{
+					 $summe_tr .= 'UmsatzSt. '.$k.'%:<br />';
+				}
+			}else $summe_tr .= 'ohne Umsatzsteuer<br />';
+
 			$summe_tr .= '<b>Gesamt '.$GLOBALS['TL_CONFIG']['iao_currency_symbol'].':</b>';
 
 			if($data['discount'])
@@ -221,12 +226,17 @@ class iaoPDF extends FPDI
 			}
 
 			$summe_tr .= '</td><td style="text-align:right;width:'.$w[4].'mm; ">'.number_format($data['summe']['netto'],2,',','.').' '.$GLOBALS['TL_CONFIG']['iao_currency'].'<br />';
-			reset($data['summe']['mwst']);
+	
+			if($noVat != 1)
+			{	
+				reset($data['summe']['mwst']);
 
-			foreach($data['summe']['mwst'] as $k => $v)
-			{
-				$summe_tr .= number_format($v,2,',','.').' '.$GLOBALS['TL_CONFIG']['iao_currency'].'<br />';
-			}
+				foreach($data['summe']['mwst'] as $k => $v)
+				{
+					if((int) $k != 0) $summe_tr .= number_format($v,2,',','.').' '.$GLOBALS['TL_CONFIG']['iao_currency'].'<br />';
+				}
+			}else $summe_tr .= '&nbsp;<br>';
+	
 			$summe_tr .= '<b>'.number_format($data['summe']['brutto'],2,',','.').' '.$GLOBALS['TL_CONFIG']['iao_currency'].'</b>';
 
 			if($data['discount'])

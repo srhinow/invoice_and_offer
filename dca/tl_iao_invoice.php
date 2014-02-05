@@ -1000,8 +1000,14 @@ class tl_iao_invoice extends Backend
 			//Posten-Tabelle
 			$header = array('Menge','Beschreibung','Einzelpreis','Gesamt');
 			$fields = $this->getPosten($this->Input->get('id'));
+			
+			$parentObj = $this->Database->prepare('SELECT `noVat` FROM `tl_iao_invoice` WHERE `id`=?')
+						->limit(1)
+						->execute($this->Input->get('id'));
+			
+			$noVat = $parentObj->noVat;
 
-			$pdf->drawPostenTable($header,$fields);
+			$pdf->drawPostenTable($header, $fields, $noVat);
 
 			//Text vor der Posten-Tabelle
 			if(strip_tags($row['after_text']))
@@ -1033,9 +1039,6 @@ class tl_iao_invoice extends Backend
 
 		$resultObj = $this->Database->prepare('SELECT * FROM `tl_iao_invoice_items` WHERE `pid`=? AND `published`=1 ORDER BY `sorting`')->execute($id);
 
-		$parentObj = $this->Database->prepare('SELECT * FROM `tl_iao_invoice` WHERE `id`=?')
-					->limit(1)
-					->execute($id);
 
 		if($resultObj->numRows <= 0) return $posten;
 
@@ -1089,7 +1092,14 @@ class tl_iao_invoice extends Backend
 				$posten['summe']['brutto'] += $resultObj->price_brutto;
 			}
 
-			$posten['summe']['mwst'][$resultObj->vat] += ($parentObj->noVat != 1) ? $resultObj->price_brutto - $resultObj->price_netto : 0;
+			$parentObj = $this->Database->prepare('SELECT * FROM `tl_iao_invoice` WHERE `id`=?')
+					->limit(1)
+					->execute($id);
+			
+			if($parentObj->noVat != 1)
+			{
+				$posten['summe']['mwst'][$resultObj->vat] +=  $resultObj->price_brutto - $resultObj->price_netto;
+			}
 		}
 
 	    $posten['summe']['netto_format'] =  number_format($posten['summe']['netto'],2,',','.');

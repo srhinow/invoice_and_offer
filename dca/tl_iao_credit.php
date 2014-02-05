@@ -852,7 +852,14 @@ class tl_iao_credit extends Backend
 			//Posten-Tabelle
 			$header = array('Menge','Beschreibung','Einzelpreis','Gesamt');
 			$fields = $this->getPosten($this->Input->get('id'));
-			$pdf->drawPostenTable($header,$fields);
+
+			$parentObj = $this->Database->prepare('SELECT `noVat` FROM `tl_iao_credit` WHERE `id`=?')
+						->limit(1)
+						->execute($this->Input->get('id'));
+			
+			$noVat = $parentObj->noVat;
+
+			$pdf->drawPostenTable($header,$fields, $noVat);
 
 			//Text vor der Posten-Tabelle
 			if(strip_tags($row['after_text']))
@@ -882,9 +889,7 @@ class tl_iao_credit extends Backend
 
 		if($resultObj->numRows <= 0) return $posten;
 
-		$parentObj = $this->Database->prepare('SELECT * FROM `tl_iao_offer` WHERE `id`=?')
-						->limit(1)
-						->execute($id);
+
 
 		while($resultObj->next())
 	    {
@@ -925,6 +930,10 @@ class tl_iao_credit extends Backend
 				$posten['summe']['brutto'] += $resultObj->price_brutto;
 			}
 
+			$parentObj = $this->Database->prepare('SELECT * FROM `tl_iao_credit` WHERE `id`=?')
+						->limit(1)
+						->execute($id);
+			
 			if($parentObj->noVat != 1) $posten['summe']['mwst'][$resultObj->vat] += $resultObj->price_brutto - $resultObj->price_netto;
 		}
 
