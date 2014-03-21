@@ -175,7 +175,7 @@ $GLOBALS['TL_DCA']['tl_iao_credit'] = array
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_credit']['credit_tstamp'],
 			'exclude'                 => true,
 			'inputType'               => 'text',
-			'eval'                    => array('rgxp'=>'date', 'doNotCopy'=>true, 'datepicker'=>$this->getDatePickerString(), 'tl_class'=>'w50 wizard'),
+			'eval'                    => array('rgxp'=>'datim', 'doNotCopy'=>true, 'datepicker'=>$this->getDatePickerString(), 'tl_class'=>'w50 wizard'),
 			'load_callback' => array
 			(
 				array('tl_iao_credit', 'generateCreditTstamp')

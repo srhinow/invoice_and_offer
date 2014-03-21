@@ -843,7 +843,7 @@ class tl_iao_invoice_items extends Backend
 
 		if($itemObj->numRows > 0)
 		{
-			$parentObj = $this->Database->prepare('SELECT `paid_on_dates` FROM `tl_iao_invoice` WHERE `ìd`=?')
+			$parentObj = $this->Database->prepare('SELECT `paid_on_dates` FROM `tl_iao_invoice` WHERE `id`=?')
 										->limit(1)
 										->execute($dc->activeRecord->pid);
 

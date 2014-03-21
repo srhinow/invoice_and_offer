@@ -176,7 +176,7 @@ $GLOBALS['TL_DCA']['tl_iao_invoice'] = array
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_invoice']['invoice_date'],
 			'exclude'                 => true,
 			'inputType'               => 'text',
-			'eval'                    => array('doNotCopy'=>true,'rgxp'=>'date', 'datepicker'=>$this->getDatePickerString(), 'tl_class'=>'w50 wizard'),
+			'eval'                    => array('doNotCopy'=>true,'rgxp'=>'datim', 'datepicker'=>$this->getDatePickerString(), 'tl_class'=>'w50 wizard'),
 			'load_callback' => array
 			(
 				array('tl_iao_invoice', 'generateInvoiceTstamp')

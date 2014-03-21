@@ -49,7 +49,7 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 		'sorting' => array
 		(
 			'mode'                    => 1,
-			'fields'                  => array('offer_tstamp'),
+			'fields'                  => array('tstamp'),
 			'flag'                    => 8,
 			'panelLayout'             => 'filter;search,limit'
 		),
@@ -183,7 +183,7 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_offer']['offer_tstamp'],
 			'exclude'                 => true,
 			'inputType'               => 'text',
-			'eval'                    => array('rgxp'=>'date', 'doNotCopy'=>true, 'datepicker'=>$this->getDatePickerString(), 'tl_class'=>'w50 wizard'),
+			'eval'                    => array('rgxp'=>'datim', 'doNotCopy'=>true, 'datepicker'=>$this->getDatePickerString(), 'tl_class'=>'w50 wizard'),
 			'load_callback' => array
 			(
 				array('tl_iao_offer', 'generateOfferTstamp')
@@ -214,7 +214,7 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_offer']['expiry_date'],
 			'exclude'                 => true,
 			'inputType'               => 'text',
-			'eval'                    => array('rgxp'=>'date', 'doNotCopy'=>true, 'datepicker'=>$this->getDatePickerString(), 'tl_class'=>'w50 wizard'),
+			'eval'                    => array('rgxp'=>'datim', 'doNotCopy'=>true, 'datepicker'=>$this->getDatePickerString(), 'tl_class'=>'w50 wizard'),
 			'save_callback' => array
 			(
 				array('tl_iao_offer', 'generateExpiryDate')
