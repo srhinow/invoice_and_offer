@@ -1,26 +1,37 @@
-<?php
+<?php if (!defined('TL_ROOT')) die('You cannot access this file directly!');
 
 /**
+ * Contao Open Source CMS
+ * Copyright (C) 2005-2011 Leo Feyer
+ *
+ * Formerly known as TYPOlight Open Source CMS.
+ *
  * This program is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation, either
  * version 3 of the License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
  * License along with this program. If not, please visit the Free
  * Software Foundation website at <http://www.gnu.org/licenses/>.
  *
- * @copyright  Sven Rhinow 2011-2013
+ * PHP version 5
+ * @copyright  Leo Feyer 2005-2011
+ * @author     Leo Feyer <http://www.contao.org>
+ * @license    LGPL
+ *
+ * @copyright  Sven Rhinow 2011
  * @author     sr-tag Sven Rhinow Webentwicklung <http://www.sr-tag.de>
  * @package    invoice_and_offer
  * @license    LGPL
  * @filesource
  */
+
 
 /**
  * Table tl_iao_posten_templates
@@ -54,6 +65,7 @@ $GLOBALS['TL_DCA']['tl_iao_posten_templates'] = array
 		(
 			'fields'                  => array('headline'),
 			'format'                  => '%s',
+// 			'label_callback'          => array('tl_iao_posten_templates', 'listEntries'),			
 		),
 		'global_operations' => array
 		(
@@ -88,7 +100,7 @@ $GLOBALS['TL_DCA']['tl_iao_posten_templates'] = array
 				'href'                => 'act=copy',
 				'icon'                => 'copy.gif'
 			),
-
+			
 			'delete' => array
 			(
 				'label'               => &$GLOBALS['TL_LANG']['tl_iao_posten_templates']['delete'],
@@ -96,7 +108,7 @@ $GLOBALS['TL_DCA']['tl_iao_posten_templates'] = array
 				'icon'                => 'delete.gif',
 				'attributes'          => 'onclick="if (!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\')) return false; Backend.getScrollOffset();"',
 			),
-
+			
 		)
 	),
 
@@ -116,7 +128,7 @@ $GLOBALS['TL_DCA']['tl_iao_posten_templates'] = array
 	// Fields
 	'fields' => array
 	(
-
+		
 		'headline' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_posten_templates']['headline'],
@@ -135,7 +147,7 @@ $GLOBALS['TL_DCA']['tl_iao_posten_templates'] = array
 			'flag'                    => 2,
 			'inputType'               => 'checkbox',
 			'eval'                    => array('doNotCopy'=>true, 'tl_class'=>'w50')
-		),
+		),						
 		'text' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_posten_templates']['text'],
@@ -172,7 +184,7 @@ $GLOBALS['TL_DCA']['tl_iao_posten_templates'] = array
 			'inputType'               => 'select',
 			'options'                 => &$GLOBALS['TL_LANG']['tl_iao_posten_templates']['amountStr_options'],
                         'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>true,'submitOnChange'=>false)
-		),
+		),		
 		'vat' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_posten_templates']['vat'],
@@ -182,7 +194,7 @@ $GLOBALS['TL_DCA']['tl_iao_posten_templates'] = array
 			'inputType'               => 'select',
 			'options'            	  => &$GLOBALS['TL_LANG']['tl_iao_posten_templates']['vat_options'],
 			'eval'                    => array('tl_class'=>'w50')
-		),
+		),				
 		'vat_incl' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_posten_templates']['vat_incl'],
@@ -190,8 +202,8 @@ $GLOBALS['TL_DCA']['tl_iao_posten_templates'] = array
 			'filter'                  => true,
 			'flag'                    => 1,
 			'inputType'               => 'select',
-			'options'                 => &$GLOBALS['TL_LANG']['tl_iao_posten_templates']['vat_incl_percents'],
-			'eval'                    => array('tl_class'=>'w50')
+			'options'                 => &$GLOBALS['TL_LANG']['tl_iao_posten_templates']['vat_incl_percents'],			
+			'eval'                    => array('tl_class'=>'w50')		
 		),
 		'operator' => array
 		(
@@ -201,8 +213,8 @@ $GLOBALS['TL_DCA']['tl_iao_posten_templates'] = array
 			'flag'                    => 1,
 			'inputType'               => 'select',
 			'options'                 => &$GLOBALS['TL_LANG']['tl_iao_posten_templates']['operators'],
-			'eval'                    => array('tl_class'=>'w50')
-		),
+			'eval'                    => array('tl_class'=>'w50')			
+		),						
 		'published' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_posten_templates']['published'],
@@ -217,6 +229,7 @@ $GLOBALS['TL_DCA']['tl_iao_posten_templates'] = array
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_posten_templates']['position'],
 			'exclude'                 => true,
 			'filter'                  => true,
+// 			'flag'                    => 1,
 			'inputType'               => 'select',
 			'options' => array(
 			    'invoice'=>'Rechnung',
@@ -224,13 +237,18 @@ $GLOBALS['TL_DCA']['tl_iao_posten_templates'] = array
 			    'credit'=>'Gutschrift'
 			 ),
 		),
-
+								
 	)
 );
 
 
 /**
  * Class tl_iao_posten_templates
+ *
+ * Provide miscellaneous methods that are used by the data configuration array.
+ * @copyright  Leo Feyer 2005-2011
+ * @author     Leo Feyer <http://www.contao.org>
+ * @package    Controller
  */
 class tl_iao_posten_templates extends Backend
 {
@@ -285,7 +303,7 @@ class tl_iao_posten_templates extends Backend
 			case 'create':
 			case 'select':
 				// Allow
-			break;
+				break;
 
 			case 'edit':
 				// Dynamically add the record to the user profile
@@ -299,8 +317,8 @@ class tl_iao_posten_templates extends Backend
 						if ($this->User->inherit == 'custom' || !$this->User->groups[0])
 						{
 							$objUser = $this->Database->prepare("SELECT news, newp FROM tl_user WHERE id=?")
-											->limit(1)
-											->execute($this->User->id);
+													   ->limit(1)
+													   ->execute($this->User->id);
 
 							$arrNewp = deserialize($objUser->newp);
 
@@ -310,7 +328,7 @@ class tl_iao_posten_templates extends Backend
 								$arrNews[] = $this->Input->get('id');
 
 								$this->Database->prepare("UPDATE tl_user SET news=? WHERE id=?")
-										->execute(serialize($arrNews), $this->User->id);
+											   ->execute(serialize($arrNews), $this->User->id);
 							}
 						}
 
@@ -318,8 +336,8 @@ class tl_iao_posten_templates extends Backend
 						elseif ($this->User->groups[0] > 0)
 						{
 							$objGroup = $this->Database->prepare("SELECT news, newp FROM tl_user_group WHERE id=?")
-														->limit(1)
-														->execute($this->User->groups[0]);
+													   ->limit(1)
+													   ->execute($this->User->groups[0]);
 
 							$arrNewp = deserialize($objGroup->newp);
 
@@ -329,7 +347,7 @@ class tl_iao_posten_templates extends Backend
 								$arrNews[] = $this->Input->get('id');
 
 								$this->Database->prepare("UPDATE tl_user_group SET news=? WHERE id=?")
-												->execute(serialize($arrNews), $this->User->groups[0]);
+											   ->execute(serialize($arrNews), $this->User->groups[0]);
 							}
 						}
 
@@ -348,7 +366,7 @@ class tl_iao_posten_templates extends Backend
 					$this->log('Not enough permissions to '.$this->Input->get('act').' news archive ID "'.$this->Input->get('id').'"', 'tl_iao_posten_templates checkPermission', TL_ERROR);
 					$this->redirect('contao/main.php?act=error');
 				}
-			break;
+				break;
 
 			case 'editAll':
 			case 'deleteAll':
@@ -363,7 +381,7 @@ class tl_iao_posten_templates extends Backend
 					$session['CURRENT']['IDS'] = array_intersect($session['CURRENT']['IDS'], $root);
 				}
 				$this->Session->setData($session);
-			break;
+				break;
 
 			default:
 				if (strlen($this->Input->get('act')))
@@ -371,20 +389,22 @@ class tl_iao_posten_templates extends Backend
 					$this->log('Not enough permissions to '.$this->Input->get('act').' news archives', 'tl_iao_posten_templates checkPermission', TL_ERROR);
 					$this->redirect('contao/main.php?act=error');
 				}
-			break;
+				break;
 		}
 	}
 
-	/**
-	 * fill date-Field if this empty
-	 * @param mixed
-	 * @param object
-	 * @return date
-	*/
-	public function  generateCreditDate($varValue, DataContainer $dc)
-	{
-		return ($varValue==0) ? date('Y-m-d') : $varValue;
-	}
+	
+        /**
+        * fill date-Field if this empty
+        * @param mixed
+        * @param object
+        * @return date
+        */
+        public function  generateCreditDate($varValue, DataContainer $dc){
+	    
+	    return ($varValue==0) ? date('Y-m-d') : $varValue;
+	    
+        }	
 
 	/**
 	 * Return the edit header button
@@ -401,107 +421,109 @@ class tl_iao_posten_templates extends Backend
 		return ($this->User->isAdmin || count(preg_grep('/^tl_iao_posten_templates::/', $this->User->alexf)) > 0) ? '<a href="'.$this->addToUrl($href.'&amp;id='.$row['id']).'" title="'.specialchars($title).'"'.$attributes.'>'.$this->generateImage($icon, $label).'</a> ' : '';
 	}
 
+
+
+	
+	
 	public function changeTags($text)
 	{
-		$ctags = array('[nbsp]'=>'&nbsp;','[lg]'=>'&lg;','[gt]'=>'&gt;','[&]'=>'&amp;');
-
-		foreach($ctags as $tag => $html)
-		{
-			$text = str_replace($tag,$html,$text);
-		}
+	    $ctags = array('[nbsp]'=>'&nbsp;','[lg]'=>'&lg;','[gt]'=>'&gt;','[&]'=>'&amp;');
+	    foreach($ctags as $tag => $html)
+	    {
+		 $text = str_replace($tag,$html,$text);
+	    } 
 	    return $text;
 	}
-
+			
 	public function getPosten($id)
 	{
-		$posten = array();
-
-		if(!$id) return $posten;
-
-		$resultObj = $this->Database->prepare('SELECT * FROM `tl_iao_posten_templates_items` WHERE `pid`=? AND `published`=1 ORDER BY `sorting`')->execute($id);
-
-		if($resultObj->numRows > 0) while($resultObj->next())
-		{
-			$resultObj->price = str_replace(',','.',$resultObj->price);
-			$einzelpreis = ($resultObj->vat_incl == 1) ? $this->getBruttoPrice($resultObj->price,$resultObj->vat) : $resultObj->price;
-
-			$posten['fields'][] = array
-			(
-				$resultObj->count,
-				$resultObj->text,
-				number_format($einzelpreis,2,',','.'),
-				number_format(($resultObj->price_brutto),2,',','.')
-			);
-
-			$posten['summe']['netto'] += $resultObj->price_netto;
-			$posten['summe']['brutto'] += $resultObj->price_brutto;
-			$posten['vat'] = $resultObj->vat;
+	    $posten = array();
+	    
+	    if(!$id) return $posten;
+	    
+	    $resultObj = $this->Database->prepare('SELECT * FROM `tl_iao_posten_templates_items` WHERE `pid`=? AND `published`=1 ORDER BY `sorting`')->execute($id);
+	    
+	    if($resultObj->numRows > 0) while($resultObj->next())
+	    {
+		$resultObj->price = str_replace(',','.',$resultObj->price);
+		$einzelpreis = ($resultObj->vat_incl == 1) ? $this->getBruttoPrice($resultObj->price,$resultObj->vat) : $resultObj->price;
+		
+		$posten['fields'][] = array(
+			$resultObj->count,
+			$resultObj->text,
+			number_format($einzelpreis,2,',','.'),
+			number_format(($resultObj->price_brutto),2,',','.'));
+			
+		$posten['summe']['netto'] += $resultObj->price_netto;
+		$posten['summe']['brutto'] += $resultObj->price_brutto; 
+		$posten['vat'] = $resultObj->vat;
 	    }
-
-		$posten['summe']['mwst'] =  number_format(($posten['summe']['brutto'] - $posten['summe']['netto']),2,',','.');
-		$posten['summe']['netto'] =  number_format($posten['summe']['netto'],2,',','.');
-		$posten['summe']['brutto'] =  number_format($posten['summe']['brutto'],2,',','.');
-
-		return $posten;
+	    $posten['summe']['mwst'] =  number_format(($posten['summe']['brutto'] - $posten['summe']['netto']),2,',','.');
+	    $posten['summe']['netto'] =  number_format($posten['summe']['netto'],2,',','.');
+	    $posten['summe']['brutto'] =  number_format($posten['summe']['brutto'],2,',','.');	    
+	    return $posten;
 	}
-
+		
 	/**
 	 * Get netto-price from brutto
 	 * @param float
 	 * @param integer
 	 * @return float
-	 */
-	public function getNettoPrice($brutto,$vat)
-	{
-		return ($brutto * 100) / ($vat + 100);
-	}
-
+	 */	
+	 public function getNettoPrice($brutto,$vat)
+	 {
+	     return ($brutto * 100) / ($vat + 100);
+	 }
+	 
 	/**
 	 * Get brutto-price from netto
 	 * @param float
 	 * @param integer
 	 * @return float
-	 */
-	public function getBruttoPrice($netto,$vat)
-	{
-		return ($netto / 100) * ($vat + 100);
-	}
-
+	 */	
+	 public function getBruttoPrice($netto,$vat)
+	 {
+	     return ($netto / 100) * ($vat + 100);
+	 }
+	 	
 	public function createCreditNumberStr($varValue, DataContainer $dc)
 	{
-		if(!$varValue)
-		{
-			$tstamp = $dc->activeRecord->tstamp ? $dc->activeRecord->tstamp : time();
-
-			$format = $GLOBALS['TL_CONFIG']['iao_credit_number_format'];
-			$format =  str_replace('{date}',date('Ymd',$tstamp),$format);
-			$format =  str_replace('{nr}',$dc->activeRecord->credit_id,$format);
-			$varValue = $format;
-		}
-		return $varValue;
+	   if(!$varValue)
+	   {
+	       $tstamp = $dc->activeRecord->tstamp ? $dc->activeRecord->tstamp : time();
+	       
+	       $format = $GLOBALS['TL_CONFIG']['iao_credit_number_format']; 
+	       $format =  str_replace('{date}',date('Ymd',$tstamp),$format);
+	       $format =  str_replace('{nr}',$dc->activeRecord->credit_id,$format);
+	       $varValue = $format;
+	   }
+	   return $varValue;
 	}
+	
+      
+    /**
+     * List a particular record
+     * @param array
+     * @return string
+     */
+    public function listEntries($arrRow)
+    {
+	    
+	    $this->import('Database');
+	    $result = $this->Database->prepare("SELECT `firstname`,`lastname`,`company` FROM `tl_member`  WHERE id=?")
+				       ->limit(1)
+				       ->execute($arrRow['member']);
+	    $row = $result->fetchAssoc();
 
-	/**
-	 * List a particular record
-	 * @param array
-	 * @return string
-	 */
-	public function listEntries($arrRow)
-	{
-		$this->import('Database');
-		$result = $this->Database->prepare("SELECT `firstname`,`lastname`,`company` FROM `tl_member`  WHERE id=?")
-						->limit(1)
-						->execute($arrRow['member']);
-		$row = $result->fetchAssoc();
-
-		return '
+	    return '
 		<div class="comment_wrap">
 		<div class="cte_type status' . $arrRow['status'] . '"><strong>' . $arrRow['title'] . '</strong> '.$arrRow['credit_id_str'].'</div>
 		<div>'.$GLOBALS['TL_LANG']['tl_iao_posten_templates']['price_brutto'][0].': <strong>'.number_format($arrRow['price_brutto'],2,',','.').' '.$GLOBALS['TL_CONFIG']['currency_symbol'].'</strong></div>
 		<div>'.$GLOBALS['TL_LANG']['tl_iao_posten_templates']['member'][0].': '.$row['firstname'].' '.$row['lastname'].' ('.$row['company'].')</div>
 		</div>' . "\n    ";
-	}
-
+    }
+    	
+	
 	/**
 	 * Return the "toggle visibility" button
 	 * @param array
@@ -515,11 +537,12 @@ class tl_iao_posten_templates extends Backend
 	public function toggleIcon($row, $href, $label, $title, $icon, $attributes)
 	{
 		$this->import('BackendUser', 'User');
-
+				
 		if (strlen($this->Input->get('tid')))
 		{
 			$this->toggleVisibility($this->Input->get('tid'), ($this->Input->get('state')));
 			$this->redirect($this->getReferer());
+			
 		}
 
 
@@ -528,7 +551,7 @@ class tl_iao_posten_templates extends Backend
 		if ($row['status']==2)
 		{
 			$icon = 'logout.gif';
-		}
+		}		
 
 		return '<a href="'.$this->addToUrl($href).'" title="'.$GLOBALS['TL_LANG']['tl_iao_posten_templates']['toggle'].'"'.$attributes.'>'.$this->generateImage($icon, $label).'</a> ';
 	}
@@ -539,10 +562,11 @@ class tl_iao_posten_templates extends Backend
 	 * @param boolean
 	 */
 	public function toggleVisibility($intId, $blnVisible)
-	{
+	{       
 		// Check permissions to edit
 		$this->Input->setGet('id', $intId);
 		$this->Input->setGet('act', 'toggle');
+		#$this->checkPermission();
 
 		// Check permissions to publish
 		if (!$this->User->isAdmin && !$this->User->hasAccess('tl_iao_posten_templates::status', 'alexf'))
@@ -552,7 +576,7 @@ class tl_iao_posten_templates extends Backend
 		}
 
 		$this->createInitialVersion('tl_iao_posten_templates', $intId);
-
+	
 		// Trigger the save_callback
 		if (is_array($GLOBALS['TL_DCA']['tl_iao_posten_templates']['fields']['status']['save_callback']))
 		{
@@ -562,11 +586,13 @@ class tl_iao_posten_templates extends Backend
 				$blnVisible = $this->$callback[0]->$callback[1]($blnVisible, $this);
 			}
 		}
-
+                
 		// Update the database
 		$this->Database->prepare("UPDATE tl_iao_posten_templates SET status='" . ($blnVisible==1 ? '1' : '2') . "' WHERE id=?")
-						->execute($intId);
+					   ->execute($intId);
 
 		$this->createNewVersion('tl_iao_posten_templates', $intId);
-	}
+	}    	
 }
+
+?>
