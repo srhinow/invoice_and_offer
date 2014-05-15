@@ -7,34 +7,24 @@
 -- *                                                      *
 -- ********************************************************
 
--- update zu aelteren Versionen
--- 1.1.3
-RENAME TABLE `tl_iao_posten_templates` TO `tl_iao_templates_items`;
-UPDATE `tl_iao_offer` SET `setting_id`=1 WHERE `setting_id`=0;
-UPDATE `tl_iao_invoice` SET `setting_id`=1 WHERE `setting_id`=0;
-UPDATE `tl_iao_credit` SET `setting_id`=1 WHERE `setting_id`=0;
 
-INSERT INTO `tl_iao_item_units` (`id`, `tstamp`, `sorting`, `name`, `singular`, `majority`, `value`) VALUES
-(3, 1385626569, 4, 'Stunde&#40;n&#41;', 'Stunde', 'Stunden', 'hour'),
-(4, 1385626499, 3, 'Tag&#40;e&#41;', 'Tag', 'Tage', 'days'),
-(5, 1385626455, 1, 'Stück&#40;e&#41;', 'Stück', 'Stücke', 'piece'),
-(6, 1385626476, 2, 'Pauschale', 'Pauschale', 'Pauschalen', 'flaterate'),
-(7, 1385626562, 5, 'Minute&#40;n&#41;', 'Minute', 'Minuten', 'minutes'),
-(8, 1385626591, 6, 'Jahr&#40;e&#41;', 'Jahr', 'Jahre', 'year'),
-(9, 1385626422, 0, '--', '', '', '');
-
-INSERT INTO `tl_iao_tax_rates` (`id`, `tstamp`, `name`, `value`, `sorting`) VALUES
-(4, 1385626949, '19% Umsatzsteuer', 19, 0),
-(5, 1385626956, '7% Umsatzsteuer', 7, 1),
-(6, 1385626962, 'keine Umsatzsteuer', 0, 2);
 
 --
--- Table `tl_iao_invoice`
+-- Table `tl_member`
 --
 CREATE TABLE `tl_member` (
    `title` varchar(255) NOT NULL default '',
    `myid` int(10) unsigned NOT NULL default '0',
    `iao_group` varchar(255) NOT NULL default '',
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+--
+-- Table `tl_module`
+--
+CREATE TABLE `tl_module` (
+  `fe_iao_template` varchar(32) NOT NULL default '',
+  `fe_iao_numberOfItems` smallint(5) unsigned NOT NULL default '0',
+  `status` char(1) NOT NULL default '',
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 --
@@ -94,7 +84,7 @@ CREATE TABLE `tl_iao_invoice_items` (
   `date` int(10) unsigned NOT NULL default '0',
   `time` int(10) unsigned NOT NULL default '0',
   `text` mediumtext NULL,
-  `count` varchar(64) NULL default '0',
+  `count` varchar(64) NOT NULL default '0',
   `amountStr` varchar(64) NOT NULL default '',
   `operator` char(1) NOT NULL default '+',
   `price` varchar(64) NOT NULL default '0',
@@ -156,7 +146,7 @@ CREATE TABLE `tl_iao_offer_items` (
   `date` int(10) unsigned NOT NULL default '0',
   `time` int(10) unsigned NOT NULL default '0',
   `text` mediumtext NULL,
-  `count` varchar(64) NULL default '0',
+  `count` varchar(64) NOT NULL default '0',
   `amountStr` varchar(64) NOT NULL default '',
   `operator` char(1) NOT NULL default '+',
   `price` varchar(64) NOT NULL default '0',
@@ -219,7 +209,7 @@ CREATE TABLE `tl_iao_credit_items` (
   `date` int(10) unsigned NOT NULL default '0',
   `time` int(10) unsigned NOT NULL default '0',
   `text` mediumtext NULL,
-  `count` varchar(64) NULL default '0',
+  `count` varchar(64) NOT NULL default '0',
   `amountStr` varchar(64) NOT NULL default '',
   `operator` char(1) NOT NULL default '+',
   `price` varchar(64) NOT NULL default '0',
@@ -254,7 +244,7 @@ CREATE TABLE `tl_iao_templates_items` (
   `date` int(10) unsigned NOT NULL default '0',
   `time` int(10) unsigned NOT NULL default '0',
   `text` mediumtext NULL,
-  `count` varchar(64) NULL default '0',
+  `count` varchar(64) NOT NULL default '0',
   `amountStr` varchar(64) NOT NULL default '',
   `operator` char(1) NOT NULL default '+',
   `price` varchar(64) NOT NULL default '0',
@@ -390,12 +380,4 @@ CREATE TABLE `tl_iao_item_units` (
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
---
--- Table `tl_module`
---
 
-CREATE TABLE `tl_module` (
-  `fe_iao_template` varchar(32) NOT NULL default '',
-  `fe_iao_numberOfItems` smallint(5) unsigned NOT NULL default '0',
-  `status` char(1) NOT NULL default '',
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;

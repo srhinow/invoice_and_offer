@@ -4,7 +4,7 @@
  * PHP version 5
  * @copyright  Sven Rhinow Webentwicklung 2014 <http://www.sr-tag.de>
  * @author     Sven Rhinow
- * @package    IAO (invoice_and_offer)
+ * @package    invoice_and_offer
  * @license	   LGPL
  * @filesource
  */
@@ -52,10 +52,10 @@ class ModuleMemberInvoices extends Module
 		}
 
         // Fallback template
-		// if (strlen($this->fe_iao_template)) $this->strTemplate = $this->fe_iao_template;
+		if (strlen($this->fe_iao_template)) $this->strTemplate = $this->fe_iao_template;
 
 		// Set the item from the auto_item parameter
-		if ($GLOBALS['TL_CONFIG']['useAutoItem'] && isset($_GET['auto_item']))
+		if ($GLOBALS['TL_CONFIG']['useAutoItem'] && isset($this->Input->get('auto_item') ))
 		{
 			$this->Input->setGet('iao', $this->Input->get('auto_item'));
 		}
@@ -92,11 +92,11 @@ class ModuleMemberInvoices extends Module
 			}
 
 			// get library-name
-			if((int)$this->User->id > 0)
+			if( (int) $this->User->id > 0)
 			{
 				// Get the total number of items
 				$objTotal = $this->Database->prepare("SELECT COUNT(*) AS total FROM tl_iao_invoice WHERE `member`=? AND `published`=?")
-											->execute($this->User->id,1);
+											->execute($this->User->id, 1);
 				$total = $objTotal->total;
 
 				// Split the results
@@ -156,7 +156,7 @@ class ModuleMemberInvoices extends Module
 		    			'status' => 'status'.$itemObj->status,
 		    			'date' => date($GLOBALS['TL_CONFIG']['dateFormat'],$itemObj->invoice_tstamp),
 		    			'price' => $this->iao->getPriceStr($itemObj->price_brutto,'iao_currency_symbol'),
-		    			'remaining' => $itemObj->remaining,
+		    			'remaining' => $this->iao->getPriceStr($itemObj->remaining,'iao_currency_symbol'),
 		    			'file' => ''
 	    			);
 		    	}

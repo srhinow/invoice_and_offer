@@ -1,21 +1,8 @@
 <?php
 
 /**
- * This program is free software: you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation, either
- * version 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this program. If not, please visit the Free
- * Software Foundation website at <http://www.gnu.org/licenses/>.
- *
- * @copyright  Sven Rhinow 2011-2013
+ * @copyright  Sven Rhinow 2011-2014
  * @author     sr-tag Sven Rhinow Webentwicklung <http://www.sr-tag.de>
  * @package    invoice_and_offer
  * @license    LGPL
@@ -193,7 +180,10 @@ class ModuleIAOSetup extends BackendModule
 			}
 
 			$dataContainer = 'DC_' . $GLOBALS['TL_DCA'][$strTable]['config']['dataContainer'];
-			require_once(sprintf('%s/system/drivers/%s.php', TL_ROOT, $dataContainer));
+
+			if (version_compare(VERSION,'3','>=')) 	require_once(sprintf('%s/system/modules/core/drivers/%s.php', TL_ROOT, $dataContainer));
+			else require_once(sprintf('%s/system/drivers/%s.php', TL_ROOT, $dataContainer));
+
 			$dc = new $dataContainer($strTable);
 		}
 

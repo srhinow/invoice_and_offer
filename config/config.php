@@ -28,6 +28,7 @@
  */
 @define('IAO_VERSION', '1.1');
 @define('IAO_BUILD', '3');
+@define('IAO_PATH','system/modules/invoice_and_offer');
 
 /**
  * back-end modules
@@ -38,49 +39,49 @@ $GLOBALS['BE_MOD']['iao'] = array
 	'iao_offer' => array
 	(
 		'tables' => array('tl_iao_offer','tl_iao_offer_items'),
-		'icon'   => 'system/modules/invoice_and_offer/html/icons/16-file-page.png',
-		'stylesheet' => 'system/modules/invoice_and_offer/html/be.css',
+		'icon'   => IAO_PATH.'/html/icons/16-file-page.png',
+		'stylesheet' => IAO_PATH.'/html/be.css',
 		'importOffer'=> array('iao_offer', 'importOffer'),
 		'exportOffer'=> array('iao_offer', 'exportOffer')
 	),
 	'iao_invoice' => array
 	(
 		'tables' => array('tl_iao_invoice','tl_iao_invoice_items'),
-		'icon'   => 'system/modules/invoice_and_offer/html/icons/kontact_todo.png',
-		'stylesheet' => 'system/modules/invoice_and_offer/html/be.css',
+		'icon'   => IAO_PATH.'/html/icons/kontact_todo.png',
+		'stylesheet' => IAO_PATH.'/html/be.css',
 		'importInvoices'=> array('iao_invoice', 'importInvoices'),
 		'exportInvoices'=> array('iao_invoice', 'exportInvoices')
 	),
 	'iao_credit' => array
 	(
 		'tables' => array('tl_iao_credit','tl_iao_credit_items'),
-		'icon'   => 'system/modules/invoice_and_offer/html/icons/16-tag-pencil.png',
-		'stylesheet' => 'system/modules/invoice_and_offer/html/be.css'
+		'icon'   => IAO_PATH.'/html/icons/16-tag-pencil.png',
+		'stylesheet' => IAO_PATH.'/html/be.css'
 	),
 	'iao_reminder' => array
 	(
 		'tables' => array('tl_iao_reminder'),
-		'icon'   => 'system/modules/invoice_and_offer/html/icons/warning.png',
-		'stylesheet' => 'system/modules/invoice_and_offer/html/be.css',
+		'icon'   => IAO_PATH.'/html/icons/warning.png',
+		'stylesheet' => IAO_PATH.'/html/be.css',
 		'checkReminder'=> array('iao_reminder', 'checkReminder'),
 	),
 	'iao_agreements' => array
 	(
 		'tables' => array('tl_iao_agreements'),
-		'icon'   => 'system/modules/invoice_and_offer/html/icons/clock_history_frame.png',
-		'stylesheet' => 'system/modules/invoice_and_offer/html/be.css',
+		'icon'   => IAO_PATH.'/html/icons/clock_history_frame.png',
+		'stylesheet' => IAO_PATH.'/html/be.css',
 	),
 	'iao_customer' => array
 	(
 		'tables'	=> array('tl_member'),
 		'callback'	=> 'ModuleCustomerMember',
-		'icon'		=> 'system/modules/invoice_and_offer/html/icons/users.png'
+		'icon'		=> IAO_PATH.'/html/icons/users.png'
 	),
 	'iao_setup' => array
 	(
 		'callback'	=> 'ModuleIAOSetup',
 		'tables'	=> array(),
-		'icon'		=> 'system/modules/invoice_and_offer/html/icons/process.png',
+		'icon'		=> IAO_PATH.'/html/icons/process.png',
 	)
 );
 
@@ -96,17 +97,17 @@ $GLOBALS['IAO_MOD'] = array
 		'iao_settings' => array
 		(
 			'tables'					=> array('tl_iao_settings'),
-			'icon'						=> 'system/modules/invoice_and_offer/html/icons/construction.png',
+			'icon'						=> IAO_PATH.'/html/icons/construction.png',
 		),
 		'iao_tax_rates' => array
 		(
 			'tables'					=> array('tl_iao_tax_rates'),
-			'icon'						=> 'system/modules/invoice_and_offer/html/icons/calculator.png',
+			'icon'						=> IAO_PATH.'/html/icons/calculator.png',
 		),
 		'iao_item_units' => array
 		(
 			'tables'					=> array('tl_iao_item_units'),
-			'icon'						=> 'system/modules/invoice_and_offer/html/icons/category.png',
+			'icon'						=> IAO_PATH.'/html/icons/category.png',
 		),
 	),
 	'templates' => array
@@ -114,12 +115,12 @@ $GLOBALS['IAO_MOD'] = array
 		'iao_templates' => array
 		(
 			'tables' => array('tl_iao_templates'),
-			'icon'   => 'system/modules/invoice_and_offer/html/icons/text_templates_16.png'
+			'icon'   => IAO_PATH.'/html/icons/text_templates_16.png'
 		),
 		'iao_templates_items' => array
 		(
 			'tables' => array('tl_iao_templates_items'),
-			'icon'   => 'system/modules/invoice_and_offer/html/icons/templates_items_16.png'
+			'icon'   => IAO_PATH.'/html/icons/templates_items_16.png'
 		)
 	)
 );

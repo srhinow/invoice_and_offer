@@ -25,32 +25,9 @@
 /**
  * Table tl_member
  */
-$GLOBALS['TL_DCA']['tl_member']['list']['label'] = array
-(
-	'fields'                  => array('title','firstname','lastname'),
-	'format'                  => '%s %s %s',
-	'label_callback'          => array('tl_member', 'addIcon')
-);
-$GLOBALS['TL_DCA']['tl_member']['list']['sorting'] = array
-(
-	'mode'                    => 1,
-	'fields'                  => array('lastname'),
-	'flag'                    => 1,
-	'panelLayout'             => 'filter;sort,search,limit'
-);
-$GLOBALS['TL_DCA']['tl_member']['config'] = array
-(
-	'dataContainer'               => 'Table',
-	'enableVersioning'            => true,
-	'onsubmit_callback' => array
-	(
-		array('tl_member', 'storeDateAdded')
-	)
-);
-
 if($this->Input->get('do') == 'iao_customer')
 {
-    unset($GLOBALS['TL_DCA']['tl_member']['list']['operations']['addresses']);
+
 }
 
 /**
