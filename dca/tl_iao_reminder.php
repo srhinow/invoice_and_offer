@@ -1,21 +1,7 @@
 <?php
 
 /**
- * This program is free software: you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation, either
- * version 3 of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this program. If not, please visit the Free
- * Software Foundation website at <http://www.gnu.org/licenses/>.
- *
- * @copyright  Sven Rhinow 2011-2013
+ * @copyright  Sven Rhinow 2014
  * @author     sr-tag Sven Rhinow Webentwicklung <http://www.sr-tag.de>
  * @package    invoice_and_offer
  * @license    LGPL
@@ -508,8 +494,8 @@ class tl_iao_reminder extends Backend
 	{
 		$varValue= array();
 		$this->import('String');
-		$all = $this->Database->prepare('SELECT `i`.*, `m`.`company` FROM `tl_iao_invoice` as `i` LEFT JOIN `tl_member` as `m` ON `i`.`member` = `m`.`id` WHERE `status`=? ORDER BY `invoice_id_str` DESC')
-								->execute('1');
+		$all = $this->Database->prepare('SELECT `i`.*, `m`.`company` FROM `tl_iao_invoice` as `i` LEFT JOIN `tl_member` as `m` ON `i`.`member` = `m`.`id` WHERE `status` IN (1,4) ORDER BY `invoice_id_str` DESC')
+								->execute();
 
 		while($all->next())
 		{
@@ -571,14 +557,10 @@ class tl_iao_reminder extends Backend
 								->limit(1)
 								->execute($dc->id);
 
-        if(!$obj->text_finish)
-        {
-			$this->import('iao');
+		$this->import('iao');
 
-			$text_finish = $this->iao->changeIAOTags($obj->text,'reminder',$dc->id);
-			$text_finish = $this->iao->changeTags($text_finish);
-        }
-        else $text_finish =  $obj->text_finish;
+		$text_finish = $this->iao->changeIAOTags($obj->text,'reminder',$dc->id);
+		$text_finish = $this->iao->changeTags($text_finish);
 
 		return '<h3><label for="ctrl_text_finish">'.$GLOBALS['TL_LANG']['tl_iao_reminder']['text_finish'][0].'</label></h3><div id="ctrl_text_finish" class="preview" style="border:1px solid #ddd; padding:5px;">'.$text_finish.'</div>';
 	}

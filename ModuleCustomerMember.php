@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @copyright  Sven Rhinow 2011-2014
+ * @copyright  Sven Rhinow 2014
  * @author     sr-tag Sven Rhinow Webentwicklung <http://www.sr-tag.de>
  * @package    invoice_and_offer
  * @license    LGPL
@@ -13,6 +13,13 @@
  */
 class ModuleCustomerMember extends BackendModule
 {
+
+	/**
+	 * Template
+	 * @var string
+	 */
+	protected $strTemplate = 'mod_member';
+
 
 	/**
 	 * Change the palette of the current table and switch to edit mode
@@ -33,20 +40,12 @@ class ModuleCustomerMember extends BackendModule
 
 		$GLOBALS['TL_DCA'][$this->table]['list']['sorting'] = array
 		(
-			'mode'                  => 2,
-			'fields'                => array('company'),
-			'flag'                  =>11,
-			'panelLayout'           => 'filter;sort,search,limit',
-			'filter'		  		=> array(array('iao_group=?',$GLOBALS['TL_CONFIG']['iao_costumer_group']))
+			'mode'                    => 2,
+			'fields'                  => array('company'),
+			'flag'                    =>11,
+			'panelLayout'             => 'filter;sort,search,limit',
+			'filter'		  => array(array('iao_group=?',$GLOBALS['TL_CONFIG']['iao_costumer_group']))
 		);
-		
-		$GLOBALS['TL_DCA'][$this->table]['list']['label'] = array
-		(
-			'fields'                => array('title','firstname','lastname'),
-			'format'                => '%s %s %s',
-		);
-
-    	unset($GLOBALS['TL_DCA'][$this->table]['list']['operations']['addresses']);
 
 		$GLOBALS['TL_DCA'][$this->table]['fields']['company']['flag'] = false;
 

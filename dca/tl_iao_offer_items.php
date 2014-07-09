@@ -1,21 +1,7 @@
 <?php
 
 /**
- * This program is free software: you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation, either
- * version 3 of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this program. If not, please visit the Free
- * Software Foundation website at <http://www.gnu.org/licenses/>.
- *
- * @copyright  Sven Rhinow 2011-2013
+ * @copyright  Sven Rhinow 2014
  * @author     sr-tag Sven Rhinow Webentwicklung <http://www.sr-tag.de>
  * @package    invoice_and_offer
  * @license    LGPL
@@ -479,7 +465,7 @@ class tl_iao_offer_items extends Backend
 			return;
 		}
 
-		$itemObj = $this->Database->prepare('SELECT `price`,`count`,`vat`,`vat_incl` FROM `tl_iao_offer_items` WHERE `pid`=? AND published =?')
+		$itemObj = $this->Database->prepare('SELECT `price`,`count`,`vat`,`vat_incl`,`operator` FROM `tl_iao_offer_items` WHERE `pid`=? AND published =?')
 						->execute($dc->activeRecord->pid,1);
 
 		if($itemObj->numRows > 0)
@@ -492,15 +478,29 @@ class tl_iao_offer_items extends Backend
 				$englprice = str_replace(',','.',$itemObj->price);
 				$priceSum = $englprice * $itemObj->count;
 
+				//if MwSt inclusive
 				if($itemObj->vat_incl == 1)
 				{
-					$allNetto += $priceSum;
-					$allBrutto += $this->getBruttoPrice($priceSum,$itemObj->vat);
+					$Netto = $priceSum;
+					$Brutto = $this->getBruttoPrice($priceSum,$itemObj->vat);
 				}
 				else
 				{
-					$allNetto += $this->getNettoPrice($priceSum,$itemObj->vat);
-					$allBrutto += $priceSum;
+					$Netto = $this->getNettoPrice($priceSum,$itemObj->vat);
+					$Brutto = $priceSum;
+				}
+				
+				//which operator is set?
+				if($itemObj->operator == '-')
+				{
+					$allNetto -= $Netto;
+					$allBrutto -= $Brutto;
+
+		    	}
+				else
+				{
+					$allNetto += $Netto;
+					$allBrutto += $Brutto;
 				}
 
 				$this->Database->prepare('UPDATE `tl_iao_offer` SET `price_netto`=?, `price_brutto`=? WHERE `id`=?')

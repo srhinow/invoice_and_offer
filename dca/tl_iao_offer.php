@@ -1,21 +1,7 @@
 <?php
 
 /**
- * This program is free software: you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation, either
- * version 3 of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this program. If not, please visit the Free
- * Software Foundation website at <http://www.gnu.org/licenses/>.
- *
- * @copyright  Sven Rhinow 2011-2013
+ * @copyright  Sven Rhinow 2014
  * @author     sr-tag Sven Rhinow Webentwicklung <http://www.sr-tag.de>
  * @package    invoice_and_offer
  * @license    LGPL
@@ -529,9 +515,11 @@ class tl_iao_offer extends Backend
 	{
 		if($varValue == 0)
 		{
-			$format = ( $GLOBALS['TL_CONFIG']['iao_offer_expiry_date'] ) ? $GLOBALS['TL_CONFIG']['iao_offer_expiry_date'] : '+3 month';
+			$this->import('iao');
+
+			$format = ( $GLOBALS['TL_CONFIG']['iao_offer_expiry_date'] ) ? $GLOBALS['TL_CONFIG']['iao_offer_expiry_date'] : '+3 months';
 			$tstamp = ($dc->activeRecord->offer_tstamp) ? $dc->activeRecord->offer_tstamp : time();
-			$varValue = strtotime($format,$tstamp);
+			$varValue = $this->iao->noWE($tstamp,$format,'strtotime');
 		}
 		return  $varValue;
 	}
@@ -848,7 +836,7 @@ class tl_iao_offer extends Backend
 				exit();
 			}
 
-			if( !file_exists(TL_ROOT . '/' . $GLOBALS['TL_CONFIG']['iao_offer_pdf']) ) return;  // template file not found
+			if( !file_exists(TL_ROOT . '/' . $GLOBALS['TL_CONFIG']['iao_offer_pdf_template']) ) return;  // template file not found
 
 			$pdfname = 'Angebot-'.$row['offer_id_str'];
 
@@ -860,7 +848,7 @@ class tl_iao_offer extends Backend
 				default:        $factor = 1.0;
 		    }
 
-			require_once(TL_ROOT . '/system/modules/invoice_and_offer/iaoPDF.php');
+			require_once(TL_ROOT . IAO_PATH . '/iaoPDF.php');
 
 			$dim['top']    = !is_numeric($margins['top'])   ? PDF_MARGIN_TOP    : $margins['top'] * $factor;
 			$dim['right']  = !is_numeric($margins['right']) ? PDF_MARGIN_RIGHT  : $margins['right'] * $factor;
@@ -874,8 +862,13 @@ class tl_iao_offer extends Backend
 			$l['w_page'] = 'page';
 
 			// Create new PDF document with FPDI extension
-			$pdf = new iaoPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true);
-			$pdf->setSourceFile( TL_ROOT . '/' . $GLOBALS['TL_CONFIG']['iao_offer_pdf']);          // Set PDF template
+			$pdf = new iaoPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true); 
+
+			// Set PDF template
+			if(file_exists(TL_ROOT . '/' . $GLOBALS['TL_CONFIG']['iao_offer_pdf_template']))
+			{
+				$pdf->setSourceFile( TL_ROOT . '/' . $GLOBALS['TL_CONFIG']['iao_offer_pdf_template']);
+			}
 
 			// Set document information
 			$pdf->SetCreator(PDF_CREATOR);

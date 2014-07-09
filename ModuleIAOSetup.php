@@ -1,8 +1,7 @@
 <?php
 
 /**
- *
- * @copyright  Sven Rhinow 2011-2014
+ * @copyright  Sven Rhinow 2014
  * @author     sr-tag Sven Rhinow Webentwicklung <http://www.sr-tag.de>
  * @package    invoice_and_offer
  * @license    LGPL
@@ -180,10 +179,7 @@ class ModuleIAOSetup extends BackendModule
 			}
 
 			$dataContainer = 'DC_' . $GLOBALS['TL_DCA'][$strTable]['config']['dataContainer'];
-
-			if (version_compare(VERSION,'3','>=')) 	require_once(sprintf('%s/system/modules/core/drivers/%s.php', TL_ROOT, $dataContainer));
-			else require_once(sprintf('%s/system/drivers/%s.php', TL_ROOT, $dataContainer));
-
+			require_once(sprintf('%s/system/drivers/%s.php', TL_ROOT, $dataContainer));
 			$dc = new $dataContainer($strTable);
 		}
 

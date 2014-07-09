@@ -1,8 +1,7 @@
 <?php
 
 /**
- *
- * @copyright  Sven Rhinow 2011-2014
+ * @copyright  Sven Rhinow 2014
  * @author     sr-tag Sven Rhinow Webentwicklung <http://www.sr-tag.de>
  * @package    invoice_and_offer
  * @license    LGPL
@@ -313,15 +312,33 @@ class iao extends Backend
 	 * @param integer
 	 * @return integer
 	 */
-	public function noWE($time,$dur)
+	public function noWE($time,$dur,$type = "days")
 	{
-		//auf Sonabend prüfen wenn ja dann auf Montag setzen
-		if(date('N',$time+($dur * 24 * 60 * 60)) == 6)  $dur = $dur+2;
+		$nextDate = $time;
+		$d2s = 24 * 60 * 60; //day in seconds
 
-		//auf Sontag prüfen wenn ja dann auf Montag setzen
-		if(date('N',$time+($dur * 24 * 60 * 60)) == 7)  $dur = $dur+1;
+		if($type == 'days')
+		{
+			//auf Sonabend prüfen wenn ja dann auf Montag setzen
+			if(date('N', $time + ($dur * $d2s))  == 6)  $dur = $dur+2;
 
-		$nextDate = $time+($dur * 24 * 60 * 60);
+			//auf Sontag prüfen wenn ja dann auf Montag setzen
+			if(date('N',$time + ($dur * $d2s)) == 7)  $dur = $dur+1;
+
+			$nextDate = $time + ($dur * $d2s);
+		}
+		elseif($type == 'strtotime') //give from strtotime
+		{
+			$moreDays = 0;
+
+			//auf Sonabend prüfen wenn ja dann auf Montag setzen
+			if(date('N',$time) == 6)  $moreDays = 2;
+
+			//auf Sontag prüfen wenn ja dann auf Montag setzen
+			if(date('N',$time) == 7)  $moreDays = 1;
+
+			$nextDate = strtotime($dur,$time + ($moreDays * $d2s));
+		}
 
 		return	$nextDate;
     }

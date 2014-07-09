@@ -1,21 +1,7 @@
 <?php
 
 /**
- * This program is free software: you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation, either
- * version 3 of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this program. If not, please visit the Free
- * Software Foundation website at <http://www.gnu.org/licenses/>.
- *
- * @copyright  Sven Rhinow 2011-2013
+ * @copyright  Sven Rhinow 2014
  * @author     sr-tag Sven Rhinow Webentwicklung <http://www.sr-tag.de>
  * @package    invoice_and_offer
  * @license    LGPL
@@ -368,7 +354,7 @@ $GLOBALS['TL_DCA']['tl_iao_invoice'] = array
 						'exclude'                 => true,
 						'inputType'         => 'text',
 						'default'				=> '',
-						'eval'              => array( 'tl_class'=>'wizard','style' => 'width:100px;'),
+						'eval'              => array('rgxp'=>'date', 'tl_class'=>'wizard', 'style' => 'width:100px;'),
 					),
 					'payamount' => array
 					(
@@ -654,20 +640,13 @@ class tl_iao_invoice extends Backend
 	{
 		if(!$varValue)
 		{
-			$dur = (int) ($GLOBALS['TL_CONFIG']['iao_invoice_duration']) ? $GLOBALS['TL_CONFIG']['iao_invoice_duration'] : 14;
+			$this->import('iao');
+
+			$dur = (int) ($GLOBALS['TL_CONFIG']['iao_invoice_duration']) ? $GLOBALS['TL_CONFIG']['iao_invoice_duration'] : '+3 months';
 			$invoiceTstamp = ($dc->activeRecord->invoice_tstamp) ? $dc->activeRecord->invoice_tstamp : time();
-
-			//auf Sonabend prüfen wenn ja dann auf Montag setzen
-			if(date('N',$invoiceTstamp+($dur * 24 * 60 * 60)) == 6)  $dur = $dur+2;
-
-			//auf Sontag prüfen wenn ja dann auf Montag setzen
-			if(date('N',$invoiceTstamp+($dur * 24 * 60 * 60)) == 7)  $dur = $dur+1;
-
-			$varValue = $invoiceTstamp+($dur * 24 * 60 * 60);
-
+			$varValue = $this->iao->noWE($invoiceTstamp, $dur, 'strtotime');
 	    }
 		return $varValue;
-
 	}
 
 	/**
@@ -934,7 +913,7 @@ class tl_iao_invoice extends Backend
 
 			// Create new PDF document with FPDI extension
 			$pdf = new iaoPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true);
-			$pdf->setSourceFile( TL_ROOT . '/' . $GLOBALS['TL_CONFIG']['iao_invoice_pdf']);          // Set PDF template
+			$pdf->setSourceFile( TL_ROOT . '/' . $GLOBALS['TL_CONFIG']['iao_invoice_pdf_template']);          // Set PDF template
 
 			// Set document information
 			$pdf->SetCreator(PDF_CREATOR);
