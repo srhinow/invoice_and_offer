@@ -36,6 +36,12 @@
 
 $GLOBALS['BE_MOD']['iao'] = array
 (
+	'iao_projects' => array
+	(
+		'tables' => array('tl_iao_projects'),
+		'icon'   => IAO_PATH.'/html/icons/blackboard_steps.png',
+		'stylesheet' => IAO_PATH.'/html/be.css',
+	),
 	'iao_offer' => array
 	(
 		'tables' => array('tl_iao_offer','tl_iao_offer_items'),
@@ -77,6 +83,7 @@ $GLOBALS['BE_MOD']['iao'] = array
 		'callback'	=> 'ModuleCustomerMember',
 		'icon'		=> IAO_PATH.'/html/icons/users.png'
 	),
+
 	'iao_setup' => array
 	(
 		'callback'	=> 'ModuleIAOSetup',

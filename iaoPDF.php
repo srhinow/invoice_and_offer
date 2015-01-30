@@ -11,8 +11,14 @@
 
 // Include library
 require_once(TL_ROOT . '/system/config/tcpdf.php');
-require_once(TL_ROOT . '/plugins/tcpdf/tcpdf.php');
-require_once(TL_ROOT . '/plugins/fpdi/fpdi.php'); // FPDI plugin
+if(version_compare(VERSION.BUILD, '3.0.0','>='))
+{
+     require_once TL_ROOT . '/system/modules/core/vendor/tcpdf/tcpdf.php';
+     require_once(TL_ROOT . '/assets/fpdi/fpdi.php'); // FPDI plugin
+}else{	
+     require_once(TL_ROOT . '/plugins/tcpdf/tcpdf.php');
+     require_once(TL_ROOT . '/plugins/fpdi/fpdi.php'); // FPDI plugin
+}
 
 class iaoPDF extends FPDI
 {
@@ -41,6 +47,7 @@ class iaoPDF extends FPDI
 	//-- store the number of pages found
 	function setSourceFile($filename)
 	{
+
 		$this->num_pages = parent::setSourceFile($filename);
 		return $this->num_pages;
 	}
@@ -50,7 +57,9 @@ class iaoPDF extends FPDI
 		$y = $this->getY();
 		$this->SetFont('helvetica', '', 10);
 		$this->SetFillColor(255, 255, 255);
-		$this->writeHTMLCell(120, '', '', $y+2, $text, 0, 0, 1, true, 'L', true);
+		// $this->SetXY(34, 84.5);
+		if($y == 0) $y = 34;
+		$this->writeHTMLCell(120, 0, '', 53, $text, 0, 0, 1, true, 'L', true);
 	}
 
 	public function drawDocumentNumber($nr)

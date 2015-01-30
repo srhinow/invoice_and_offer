@@ -54,6 +54,20 @@ class iao extends Backend
 	}
 
 	/**
+	* get current settings
+	* @param integer
+	*/
+	public function getSettings($id)
+	{
+		if(!$id) return;
+
+		$dbObj = $this->Database->prepare('SELECT * FROM `tl_iao_settings` WHERE `id`=?')
+						->limit(1)
+						->execute($id);
+		return $dbObj->fetchAssoc();
+
+	}
+	/**
 	 * Get netto-price from brutto
 	 * @param float
 	 * @param integer

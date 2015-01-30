@@ -888,31 +888,37 @@ class tl_iao_invoice extends Backend
 			return '';
 		}
 
-		if ($this->Input->get('key') == 'pdf' && $this->Input->get('id') == $row['id'])
+		if (\Input::get('key') == 'pdf' && \Input::get('id') == $row['id'])
 		{
-
 			$this->import('iao');
-
-			if(!empty($row['invoice_pdf_file']) && file_exists(TL_ROOT . '/' . $row['invoice_pdf_file']))
+			$settings = $this->iao->getSettings($row['setting_id']);
+			
+			//wenn eine feste Rechnung als PDF zugewiesen wurde
+			if(strlen($row['invoice_pdf_file']) > 0 )
 			{
+				$objPdf = 	\FilesModel::findByPk($row['invoice_pdf_file']);			
+				if(!empty($objPdf->path) && file_exists(TL_ROOT . '/' . $objPdf->path))
+				{
 
-				header("Content-type: application/pdf");
-				header('Expires: Sat, 26 Jul 1997 05:00:00 GMT'); // Date in the past
-				header('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT');
-	 			header('Content-Length: '.strlen($row['invoice_pdf_file']));
-				header('Content-Disposition: inline; filename="'.basename($row['invoice_pdf_file']).'";');
+					header("Content-type: application/pdf");
+					header('Expires: Sat, 26 Jul 1997 05:00:00 GMT'); // Date in the past
+					header('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT');
+		 			header('Content-Length: '.strlen($row['invoice_pdf_file']));
+					header('Content-Disposition: inline; filename="'.basename($row['invoice_pdf_file']).'";');
 
-				// The PDF source is in original.pdf
-				readfile(TL_ROOT . '/' . $row['invoice_pdf_file']);
-				exit();
-		    }
+					// The PDF source is in original.pdf
+					readfile(TL_ROOT . '/' . $row['invoice_pdf_file']);
+					exit();
+			    }				
+			}
 
-			if( !file_exists(TL_ROOT . '/' . $GLOBALS['TL_CONFIG']['iao_invoice_pdf']) ) return;  // template file not found
+		    $objPdfTemplate = 	\FilesModel::findByPk($settings['iao_invoice_pdf']);	
+			if( !file_exists(TL_ROOT . '/' . $objPdfTemplate->path) ) return;  // template file not found
 
 			$pdfname = 'Rechnung-'.$row['invoice_id_str'];
 
 			// Calculating dimensions
-			$margins = unserialize($GLOBALS['TL_CONFIG']['iao_pdf_margins']);         // Margins as an array
+			$margins = unserialize($settings['iao_pdf_margins']);         // Margins as an array
 			switch( $margins['unit'] )
 			{
 				case 'cm':      $factor = 10.0;   break;
@@ -934,7 +940,7 @@ class tl_iao_invoice extends Backend
 
 			// Create new PDF document with FPDI extension
 			$pdf = new iaoPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true);
-			$pdf->setSourceFile( TL_ROOT . '/' . $GLOBALS['TL_CONFIG']['iao_invoice_pdf']);          // Set PDF template
+			$pdf->setSourceFile( TL_ROOT . '/' .$objPdfTemplate->path);          // Set PDF template
 
 			// Set document information
 			$pdf->SetCreator(PDF_CREATOR);
@@ -964,9 +970,9 @@ class tl_iao_invoice extends Backend
 			$pdf->AddPage();
 
 		    // Include CSS (TCPDF 5.1.000 an newer)
-		    if(file_exists(TL_ROOT . '/' . $GLOBALS['TL_CONFIG']['iao_pdf_css']) )
+		    if(file_exists(TL_ROOT . '/' . $settings->iao_pdf_css) )
 		    {
-				$styles = "<style>\n" . file_get_contents(TL_ROOT . '/' . $GLOBALS['TL_CONFIG']['iao_pdf_css']) . "\n</style>\n";
+				$styles = "<style>\n" . file_get_contents(TL_ROOT . '/' . $settings->iao_pdf_css) . "\n</style>\n";
 				$pdf->writeHTML($styles, true, false, true, false, '');
 			}
 
@@ -1114,7 +1120,7 @@ class tl_iao_invoice extends Backend
 		{
 			$tstamp = $dc->activeRecord->date ? $dc->activeRecord->date : time();
 
-			$format = $GLOBALS['TL_CONFIG']['iao_invoice_number_format'];
+			$format = $settings['iao_invoice_number_format'];
 			$format =  str_replace('{date}',date('Ymd',$tstamp),$format);
 			$format =  str_replace('{nr}',$dc->activeRecord->invoice_id,$format);
 			$varValue = $format;
