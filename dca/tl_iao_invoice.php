@@ -925,7 +925,7 @@ class tl_iao_invoice extends Backend
 				default:        $factor = 1.0;
 		    }
 
-			require_once(TL_ROOT . '/system/modules/invoice_and_offer/iaoPDF.php');
+			require_once(TL_ROOT . '/system/modules/invoice_and_offer/classes/iaoPDF.php');
 
 			$dim['top']    = !is_numeric($margins['top'])   ? PDF_MARGIN_TOP    : $margins['top'] * $factor;
 			$dim['right']  = !is_numeric($margins['right']) ? PDF_MARGIN_RIGHT  : $margins['right'] * $factor;
@@ -1051,8 +1051,11 @@ class tl_iao_invoice extends Backend
 		while($resultObj->next())
 		{
 			$resultObj->price = str_replace(',','.',$resultObj->price);
+
 			$einzelpreis = ($resultObj->vat_incl == 1) ? $this->iao->getBruttoPrice($resultObj->price,$resultObj->vat) : $resultObj->price;
+			
 			if($resultObj->headline_to_pdf == 1) $resultObj->text = substr_replace($resultObj->text, '<p><strong>'.$resultObj->headline.'</strong><br>', 0, 3);
+			
 			$resultObj->text = $this->iao->changeTags($resultObj->text);
 
 			// get units from DB-Table

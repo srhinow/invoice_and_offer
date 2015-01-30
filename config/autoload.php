@@ -3,11 +3,9 @@
 /**
  * Contao Open Source CMS
  *
- * Copyright (c) 2005-2014 Leo Feyer
+ * Copyright (c) 2005-2015 Leo Feyer
  *
- * @package Invoice_and_offer
- * @link    https://contao.org
- * @license http://www.gnu.org/licenses/lgpl-3.0.html LGPL
+ * @license LGPL-3.0+
  */
 
 
@@ -16,18 +14,24 @@
  */
 ClassLoader::addClasses(array
 (
-	'iao_invoice'            => 'system/modules/invoice_and_offer/iao_invoice.php',
-	'iaoCrons'               => 'system/modules/invoice_and_offer/iaoCrons.php',
+	// Classes
+	'iaoCrons'               => 'system/modules/invoice_and_offer/classes/iaoCrons.php',
+	'iaoPDF'                 => 'system/modules/invoice_and_offer/classes/iaoPDF.php',
+	'iao'                    => 'system/modules/invoice_and_offer/classes/iao.php',
+
 	// Html
 	'import_phprechnung'     => 'system/modules/invoice_and_offer/html/libs_import/import_phprechnung.php',
 	'import_invoiceandoffer' => 'system/modules/invoice_and_offer/html/libs_import/import_invoiceandoffer.php',
-	'iao_reminder'           => 'system/modules/invoice_and_offer/iao_reminder.php',
-	'ModuleCustomerMember'   => 'system/modules/invoice_and_offer/ModuleCustomerMember.php',
-	'iaoPDF'                 => 'system/modules/invoice_and_offer/iaoPDF.php',
-	'ModuleMemberInvoices'   => 'system/modules/invoice_and_offer/ModuleMemberInvoices.php',
-	'ModuleIAOSetup'         => 'system/modules/invoice_and_offer/ModuleIAOSetup.php',
-	'iao_offer'              => 'system/modules/invoice_and_offer/iao_offer.php',
-	'iao'                    => 'system/modules/invoice_and_offer/iao.php',
+
+	// Modules
+	'ModuleCustomerMember'   => 'system/modules/invoice_and_offer/modules/ModuleCustomerMember.php',
+	'ModuleMemberInvoices'   => 'system/modules/invoice_and_offer/modules/ModuleMemberInvoices.php',
+	'ModuleIAOSetup'         => 'system/modules/invoice_and_offer/modules/ModuleIAOSetup.php',
+
+	// Export_import
+	'iao_invoice'            => 'system/modules/invoice_and_offer/export_import/iao_invoice.php',
+	'iao_reminder'           => 'system/modules/invoice_and_offer/export_import/iao_reminder.php',
+	'iao_offer'              => 'system/modules/invoice_and_offer/export_import/iao_offer.php',
 ));
 
 

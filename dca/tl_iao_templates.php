@@ -473,7 +473,7 @@ class tl_iao_templates extends Backend
 			return '';
 		}
 
-		if ($this->Input->get('key') == 'pdf' && $this->Input->get('id') == $row['id'])
+		if (\Input::get('key') == 'pdf' && \Input::get('id') == $row['id'])
 		{
 			if( !file_exists(TL_ROOT . '/' . $GLOBALS['TL_CONFIG']['iao_credit_pdf']) ) return;  // template file not found
 
@@ -487,7 +487,7 @@ class tl_iao_templates extends Backend
 				default:        $factor = 1.0;
 			}
 
-			require_once(TL_ROOT . '/system/modules/invoice_and_offer/iaoPDF.php');
+			require_once(TL_ROOT . '/system/modules/invoice_and_offer/classes/iaoPDF.php');
 
 			$dim['top']    = !is_numeric($margins['top'])   ? PDF_MARGIN_TOP    : $margins['top'] * $factor;
 			$dim['right']  = !is_numeric($margins['right']) ? PDF_MARGIN_RIGHT  : $margins['right'] * $factor;
