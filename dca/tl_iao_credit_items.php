@@ -1,21 +1,7 @@
 <?php
 
 /**
- * This program is free software: you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation, either
- * version 3 of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this program. If not, please visit the Free
- * Software Foundation website at <http://www.gnu.org/licenses/>.
- *
- * @copyright  Sven Rhinow 2011-2013
+ * @copyright  Sven Rhinow 2011-2015
  * @author     sr-tag Sven Rhinow Webentwicklung <http://www.sr-tag.de>
  * @package    invoice_and_offer
  * @license    LGPL
@@ -41,12 +27,22 @@ $GLOBALS['TL_DCA']['tl_iao_credit_items'] = array
 		'dataContainer'		=> 'Table',
 		'ptable'			=> 'tl_iao_credit',
 		'enableVersioning'	=> true,
-		'onload_callback'		=> array(
-			array('tl_iao_credit_items','IAOSettings')
+		'onload_callback'		=> array
+		(
+			array('tl_iao_credit_items','setIaoSettings')
 		),
-		'onsubmit_callback'	=> array(
+		'onsubmit_callback'	=> array
+		(
 			array('tl_iao_credit_items','saveAllPricesToParent'),
 			array('tl_iao_credit_items','saveNettoAndBrutto')
+		),
+		'sql' => array
+		(
+			'keys' => array
+			(
+				'id' => 'primary',
+				'pid' => 'index'
+			)
 		)
 	),
 
@@ -139,7 +135,7 @@ $GLOBALS['TL_DCA']['tl_iao_credit_items'] = array
 	(
 		'__selector__'                => array('type'),
 		'default'                     => '{type_legend},type',
-		'item'                        => '{type_legend},type;{templates_legend:hide},posten_template;{title_legend},headline;{item_legend},text,price,vat,count,amountStr,vat_incl;{publish_legend},published',
+		'item'                        => '{type_legend},type;{templates_legend:hide},posten_template;{title_legend},headline,headline_to_pdf;{item_legend},text,price,vat,count,amountStr,vat_incl;{publish_legend},published',
 		'devider'                     => '{type_legend},type;{publish_legend},published'
 	),
 
@@ -152,6 +148,20 @@ $GLOBALS['TL_DCA']['tl_iao_credit_items'] = array
 	// Fields
 	'fields' => array
 	(
+		'id' => array
+		(
+			'sql'                     => "int(10) unsigned NOT NULL auto_increment"
+		),
+		'pid' => array
+		(
+			'foreignKey'              => 'tl_iao_invoice.title',
+			'sql'                     => "int(10) unsigned NOT NULL default '0'",
+			'relation'                => array('type'=>'belongsTo', 'load'=>'eager')
+		),
+		'tstamp' => array
+		(
+			'sql'                     => "int(10) unsigned NOT NULL default '0'"
+		),			
 		'type' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_credit_items']['type'],
@@ -159,8 +169,9 @@ $GLOBALS['TL_DCA']['tl_iao_credit_items'] = array
 			'exclude'                 => true,
 			'filter'                  => true,
 			'inputType'               => 'select',
-			'options' 		 => &$GLOBALS['TL_LANG']['tl_iao_credit_items']['type_options'],
-			'eval'                    => array( 'submitOnChange'=>true)
+			'options' 		 		  => &$GLOBALS['TL_LANG']['tl_iao_credit_items']['type_options'],
+			'eval'                    => array( 'submitOnChange'=>true),
+			'sql'					=> "varchar(32) NOT NULL default 'item'"
 		),
 		'posten_template' => array
 		(
@@ -175,7 +186,8 @@ $GLOBALS['TL_DCA']['tl_iao_credit_items'] = array
 			'save_callback' => array
 			(
 				array('tl_iao_credit_items', 'fillPostenFields')
-			)
+			),
+			'sql'					=> "int(10) unsigned NOT NULL default '0'"
 		),
 		'headline' => array
 		(
@@ -185,7 +197,30 @@ $GLOBALS['TL_DCA']['tl_iao_credit_items'] = array
 			'sorting'                 => true,
 			'flag'                    => 1,
 			'inputType'               => 'text',
-			'eval'                    => array('mandatory'=>true, 'maxlength'=>255)
+			'eval'                    => array('mandatory'=>true, 'maxlength'=>255),
+			'sql'					  => "varchar(255) NOT NULL default ''"
+		),
+		'headline_to_pdf' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_credit_items']['headline_to_pdf'],
+			'default'				  => '1',
+			'filter'                  => true,
+			'flag'                    => 2,
+			'inputType'               => 'checkbox',
+			'eval'                    => array('tl_class'=>'w50'),
+			'sql'					  => "char(1) NOT NULL default '1'"
+		),
+		'sorting' => array
+		(
+			'sql'					  => "int(10) unsigned NOT NULL default '0'"
+		),
+		'date' => array
+		(
+			'sql'					  => "int(10) unsigned NOT NULL default '0'"
+		),
+		'time' => array
+		(
+			'sql'					  => "int(10) unsigned NOT NULL default '0'"
 		),
 		'text' => array
 		(
@@ -194,16 +229,7 @@ $GLOBALS['TL_DCA']['tl_iao_credit_items'] = array
 			'search'                  => true,
 			'inputType'               => 'textarea',
 			'eval'                    => array('rte'=>'tinyMCE', 'helpwizard'=>true,'style'=>'height:60px;', 'tl_class'=>'clr'),
-		),
-		'price' => array
-		(
-			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_credit_items']['price'],
-			'exclude'                 => true,
-			'search'                  => true,
-			'sorting'                 => true,
-			'flag'                    => 1,
-			'inputType'               => 'text',
-			'eval'                    => array('mandatory'=>true, 'maxlength'=>255, 'tl_class'=>'w50')
+			'sql'					  => "mediumtext NULL"
 		),
 		'count' => array
 		(
@@ -211,7 +237,8 @@ $GLOBALS['TL_DCA']['tl_iao_credit_items'] = array
 			'exclude'                 => true,
 			'flag'                    => 1,
 			'inputType'               => 'text',
-			'eval'                    => array('mandatory'=>true, 'maxlength'=>255, 'tl_class'=>'w50')
+			'eval'                    => array('mandatory'=>true, 'maxlength'=>255, 'tl_class'=>'w50'),
+			'sql'					  => "varchar(64) NOT NULL default '0'"
 		),
 		'amountStr' => array
 		(
@@ -221,7 +248,37 @@ $GLOBALS['TL_DCA']['tl_iao_credit_items'] = array
 			'flag'                    => 1,
 			'inputType'               => 'select',
 			'options_callback'        => array('tl_iao_credit_items', 'getItemUnitsOptions'),
-            'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>true,'submitOnChange'=>false)
+            'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>true,'submitOnChange'=>false),
+            'sql'					  => "varchar(64) NOT NULL default ''"
+		),
+		'operator' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_invoice_items']['operator'],
+			'filter'                  => true,
+			'flag'                    => 1,
+			'inputType'               => 'select',
+			'options'                 => &$GLOBALS['TL_LANG']['tl_iao_invoice_items']['operators'],
+			'eval'                    => array('tl_class'=>'w50'),
+			'sql'					  => "char(1) NOT NULL default '+'"
+		),
+		'price' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_credit_items']['price'],
+			'exclude'                 => true,
+			'search'                  => true,
+			'sorting'                 => true,
+			'flag'                    => 1,
+			'inputType'               => 'text',
+			'eval'                    => array('mandatory'=>true, 'maxlength'=>255, 'tl_class'=>'w50'),
+			'sql'					  => "varchar(64) NOT NULL default '0'"
+		),
+		'price_netto' => array
+		(
+			'sql'					  => "varchar(64) NOT NULL default '0'"
+		),
+		'price_brutto' => array
+		(
+			'sql'					  => "varchar(64) NOT NULL default '0'"
 		),
 		'vat' => array
 		(
@@ -231,7 +288,8 @@ $GLOBALS['TL_DCA']['tl_iao_credit_items'] = array
 			'flag'                    => 1,
 			'inputType'               => 'select',
 			'options_callback'        => array('tl_iao_credit_items', 'getTaxRatesOptions'),
-			'eval'                    => array('tl_class'=>'w50')
+			'eval'                    => array('tl_class'=>'w50'),
+			'sql'					  => "int(10) unsigned NOT NULL default '19'"
 		),
 		'vat_incl' => array
 		(
@@ -241,6 +299,7 @@ $GLOBALS['TL_DCA']['tl_iao_credit_items'] = array
 			'flag'                    => 1,
 			'inputType'               => 'select',
 			'options'                 => $GLOBALS['TL_LANG']['tl_iao_credit_items']['vat_incl_percents'],
+			'sql'					  => "int(10) unsigned NOT NULL default '1'"
 		),
 		'published' => array
 		(
@@ -249,7 +308,8 @@ $GLOBALS['TL_DCA']['tl_iao_credit_items'] = array
 			'filter'                  => true,
 			'flag'                    => 2,
 			'inputType'               => 'checkbox',
-			'eval'                    => array('doNotCopy'=>true)
+			'eval'                    => array('doNotCopy'=>true),
+			'sql'					  => "char(1) NOT NULL default ''"
 		)
 	)
 );
@@ -258,8 +318,11 @@ $GLOBALS['TL_DCA']['tl_iao_credit_items'] = array
 /**
  * Class tl_iao_credit_items
  */
-class tl_iao_credit_items extends Backend
+class tl_iao_credit_items extends \iao\iaoBackend
 {
+
+	protected $settings = array();
+
 	/**
 	 * Import the back end user object
 	 */
@@ -270,20 +333,17 @@ class tl_iao_credit_items extends Backend
 	}
 
 	/**
-	* add all iao-Settings in $GLOBALS['TL_CONFIG'] 
+	* add all iao-Settings in array
 	*/
-	public function IAOSettings(DataContainer $dc)
+	public function setIaoSettings(DataContainer $dc)
 	{
 		if($dc->id)
 		{
-			$dbObj = $this->Database->prepare('SELECT `p`.* FROM `tl_iao_invoice` `p` LEFT JOIN `tl_iao_invoice_items` `i` ON `p`.`id`= `i`.`pid` WHERE `i`.`id`=?')
+			$dbObj = $this->Database->prepare('SELECT `p`.* FROM `tl_iao_credit` `p` LEFT JOIN `tl_iao_credit_items` `i` ON `p`.`id`= `i`.`pid` WHERE `i`.`id`=?')
 							->limit(1)
 							->execute($dc->id);
 
-			$setting_id = ($dbObj->numRows > 0) ? $dbObj->setting_id : '';
-
-			$this->import('iao');
-			$this->iao->setIAOSettings($setting_id);
+			$this->settings = ($dbObj->numRows > 0) ? $this->getSettings($dbObj->setting_id) : array();			 
 		}
 	}
 
@@ -428,8 +488,8 @@ class tl_iao_credit_items extends Backend
 
 			return '<div class="cte_type' . $key . $pagebreak . '">
 			<strong>' . $arrRow['headline'] . '</strong>
-			<br />Netto: '.number_format($arrRow['price_netto'],2,',','.') .$GLOBALS['TL_CONFIG']['iao_currency_symbol'].'
-			<br />Brutto: ' . number_format($arrRow['price_brutto'],2,',','.') .$GLOBALS['TL_CONFIG']['iao_currency_symbol']. ' (inkl. '.$arrRow['vat'].'% MwSt.)
+			<br />Netto: '.number_format($arrRow['price_netto'],2,',','.') .$this->settings['iao_currency_symbol'].'
+			<br />Brutto: ' . number_format($arrRow['price_brutto'],2,',','.') .$this->settings['iao_currency_symbol']. ' (inkl. '.$arrRow['vat'].'% MwSt.)
 			<br />'.$arrRow['text'].'
 			</div>' . "\n";
 	}
@@ -444,14 +504,10 @@ class tl_iao_credit_items extends Backend
 	public function saveAllPricesToParent(DataContainer $dc)
 	{
 		// Return if there is no active record (override all)
-		if (!$dc->activeRecord)
-		{
-			return;
-		}
+		if (!$dc->activeRecord) return;
 
 		$itemObj = $this->Database->prepare('SELECT `price`,`count`,`vat`,`vat_incl` FROM `tl_iao_credit_items` WHERE `pid`=? AND published =?')
-		->execute($dc->activeRecord->pid,1);
-
+								  ->execute($dc->activeRecord->pid,1);
 
 		if($itemObj->numRows > 0)
 		{
@@ -513,32 +569,11 @@ class tl_iao_credit_items extends Backend
 			$Brutto = $priceSum;
 		}
 
-	$this->Database->prepare('UPDATE `tl_iao_credit_items` SET `price_netto`=?, `price_brutto`=? WHERE `id`=?')
-		->limit(1)
-		->execute($Netto, $Brutto, $dc->id);
+		$this->Database->prepare('UPDATE `tl_iao_credit_items` SET `price_netto`=?, `price_brutto`=? WHERE `id`=?')
+			->limit(1)
+			->execute($Netto, $Brutto, $dc->id);
 	}
 
-	/**
-	 * Get netto-price from brutto
-	 * @param float
-	 * @param integer
-	 * @return float
-	 */
-	public function getNettoPrice($brutto,$vat)
-	{
-		return ($brutto * 100) / ($vat + 100);
-	}
-
-	/**
-	 * Get brutto-price from netto
-	 * @param float
-	 * @param integer
-	 * @return float
-	 */
-	public function getBruttoPrice($netto,$vat)
-	{
-		return ($netto / 100) * ($vat + 100);
-	}
 
 	/**
 	 * Return the "toggle visibility" button
@@ -633,7 +668,7 @@ class tl_iao_credit_items extends Backend
 			return '';
 		}
 
-		if ($this->Input->get('key') == 'addPostenTemplate' && $this->Input->get('ptid') == $row['id'])
+		if (\Input::get('key') == 'addPostenTemplate' && \Input::get('ptid') == $row['id'])
 		{
 			$result = $this->Database->prepare('SELECT * FROM `tl_iao_credit_items` WHERE `id`=?')
 						->limit(1)
@@ -711,6 +746,7 @@ class tl_iao_credit_items extends Backend
 		$postenset = array (
 			'tstamp' => time(),
 			'headline' => $result->headline,
+			'headline_to_pdf' => $result->headline_to_pdf,
 			'sorting' => $result->sorting,
 			'author' => $result->author,
 			'date' => $result->date,
@@ -718,6 +754,8 @@ class tl_iao_credit_items extends Backend
 			'text' => $result->text,
 			'count' => $result->count,
 			'price' => $result->price,
+			'amountStr' => $result->amountStr,
+			'operator' => $result->operator,
 			'price_netto' => $result->price_netto,
 			'price_brutto' => $result->price_brutto,
 			'published' => $result->published,
@@ -734,41 +772,4 @@ class tl_iao_credit_items extends Backend
 		return $varValue;
 	}
 
-	/**
-	 * get options for tax rates
-	 * @param object
-	 * @throws Exception
-	 */
-	public function getTaxRatesOptions(DataContainer $dc)
-	{
-		$varValue= array();
-
-		$all = $this->Database->prepare('SELECT `value`,`name` FROM `tl_iao_tax_rates`  ORDER BY `sorting` ASC')
-				->execute();
-
-		while($all->next())
-		{
-			$varValue[$all->value] = $all->name;
-		}
-		return $varValue;
-	}
-
-	/**
-	 * get options for item units
-	 * @param object
-	 * @throws Exception
-	 */
-	public function getItemUnitsOptions(DataContainer $dc)
-	{
-		$varValue= array();
-
-		$all = $this->Database->prepare('SELECT `value`,`name` FROM `tl_iao_item_units`  ORDER BY `sorting` ASC')
-				->execute();
-
-		while($all->next())
-		{
-			$varValue[$all->value] = $all->name;
-		}
-		return $varValue;
-	}
 }

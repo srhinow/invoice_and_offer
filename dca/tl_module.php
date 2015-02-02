@@ -39,7 +39,8 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['fe_iao_template'] = array
 	'exclude'                 => true,
 	'inputType'               => 'select',
 	'options_callback'        => array('tl_module_iao', 'getTemplates'),
-	'eval'                    => array('tl_class'=>'w50')
+	'eval'                    => array('tl_class'=>'w50'),
+	'sql'					  => "varchar(32) NOT NULL default ''"
 );
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['fe_iao_numberOfItems'] = array
@@ -48,7 +49,8 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['fe_iao_numberOfItems'] = array
 	'default'                 => 3,
 	'exclude'                 => true,
 	'inputType'               => 'text',
-	'eval'                    => array('mandatory'=>true, 'rgxp'=>'digit', 'tl_class'=>'w50')
+	'eval'                    => array('mandatory'=>true, 'rgxp'=>'digit', 'tl_class'=>'w50'),
+	'sql'					  => "smallint(5) unsigned NOT NULL default '0'"
 );
 
 
@@ -61,6 +63,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['status'] = array
 	'inputType'             => 'select',
 	'options'				=>  &$GLOBALS['TL_LANG']['tl_iao_invoice']['status_options'],
     'eval'					=> array('doNotCopy'=>true,'includeBlankOption'=>true),
+	'sql'					=> "char(1) NOT NULL default ''"
 );
 
 /**

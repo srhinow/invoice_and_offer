@@ -65,3 +65,8 @@ $GLOBALS['TL_LANG']['tl_iao_credit']['text_legend']	=	'Gutschrift-Texte';
 $GLOBALS['TL_LANG']['tl_iao_credit']['extend_legend']	=	'weitere Einstellungen';
 $GLOBALS['TL_LANG']['tl_iao_credit']['status_legend']	=	'Status-Einstellungen';
 $GLOBALS['TL_LANG']['tl_iao_credit']['notice_legend']	=	'Notiz anlegen';
+
+/**
+ * Select-fiels options
+ */
+$GLOBALS['TL_LANG']['tl_iao_invoice']['status_options'] = array('1'=>'nicht angenommen','2'=>'angenommen');

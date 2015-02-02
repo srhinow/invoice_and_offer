@@ -12,7 +12,7 @@
 /**
  * Class iao_reminder
  */
-class iao_reminder extends Backend
+class iao_reminder extends \iao\iaoBackend
 {
 	/**
 	 * check all Invoices of reminder
@@ -20,7 +20,6 @@ class iao_reminder extends Backend
 	public function checkReminder()
 	{
 		$this->import('Database');
-		$this->import('iao');
 
 		//get all invoices where is active, not paid and have not reminder
 		$invoiceObj = $this->Database->prepare('SELECT * FROM `tl_iao_invoice` WHERE `status`=? AND `published`=? AND `expiry_date`<?')
@@ -59,7 +58,7 @@ class iao_reminder extends Backend
 				// drop all where status = 2
 				if($reminderObj->status == 2) continue;
 
-				$this->iao->fillReminderFields($invoiceObj->id, $reminderObj);
+				$this->fillReminderFields($invoiceObj->id, $reminderObj);
 
 			}
 		}

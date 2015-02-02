@@ -43,7 +43,8 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['title'] = array
 	'sorting'                 => true,
 	'flag'                    => 1,
 	'inputType'               => 'text',
-	'eval'                    => array('mandatory'=>false, 'maxlength'=>255, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'personal')
+	'eval'                    => array('mandatory'=>false, 'maxlength'=>255, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'personal'),
+	'sql'					  => "varchar(255) NOT NULL default ''"
 );
 
 $GLOBALS['TL_DCA']['tl_member']['fields']['myid'] = array
@@ -52,6 +53,12 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['myid'] = array
 	'exclude'                 => true,
 	'inputType'               => 'text',
 	'eval'                    => array('rgxp'=>'alnum', 'doNotCopy'=>true, 'spaceToUnderscore'=>true, 'maxlength'=>128, 'tl_class'=>'w50'),
+	'sql'					  => "int(10) unsigned NOT NULL default '0'"
+);
+
+$GLOBALS['TL_DCA']['tl_member']['fields']['iao_group'] = array
+(
+	'sql'					=> "varchar(255) NOT NULL default ''"
 );
 
 /**

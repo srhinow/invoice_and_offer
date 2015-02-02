@@ -1,21 +1,7 @@
 <?php
 
 /**
- * This program is free software: you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation, either
- * version 3 of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this program. If not, please visit the Free
- * Software Foundation website at <http://www.gnu.org/licenses/>.
- *
- * @copyright  Sven Rhinow 2011-2013
+ * @copyright  Sven Rhinow 2011-2015
  * @author     sr-tag Sven Rhinow Webentwicklung <http://www.sr-tag.de>
  * @package    invoice_and_offer
  * @license    LGPL
@@ -38,10 +24,17 @@ $GLOBALS['TL_DCA']['tl_iao_credit'] = array
 		'enableVersioning'            => false,
 		'onload_callback' => array
 		(
-			array('tl_iao_credit','IAOSettings'),
+			array('tl_iao_credit','setIaoSettings'),
 			array('tl_iao_credit', 'checkPermission'),
 			// array('tl_iao_credit', 'updateExpiryToTstmp')
 		),
+		'sql' => array
+		(
+			'keys' => array
+			(
+				'id' => 'primary'
+			)
+		)
 	),
 
 	// List
@@ -127,7 +120,7 @@ $GLOBALS['TL_DCA']['tl_iao_credit'] = array
 	'palettes' => array
 	(
 		'__selector__'                => array(),
-		'default'                     => '{settings_legend},setting_id;title;{credit_id_legend:hide},credit_id,credit_id_str,credit_date,credit_tstamp,credit_pdf_file,expiry_date;{address_legend},member,address_text;{text_legend},before_template,before_text,after_template,after_text;{extend_legend},noVat;{status_legend},published,status;{notice_legend:hide},notice'
+		'default'                     => '{settings_legend},setting_id;title;{credit_id_legend:hide},credit_id,credit_id_str,credit_tstamp,credit_pdf_file,expiry_date;{address_legend},member,address_text;{text_legend},before_template,before_text,after_template,after_text;{extend_legend},noVat;{status_legend},published,status;{notice_legend:hide},notice'
 	),
 
 	// Subpalettes
@@ -139,6 +132,18 @@ $GLOBALS['TL_DCA']['tl_iao_credit'] = array
 	// Fields
 	'fields' => array
 	(
+		'id' => array
+		(
+			'sql'                     => "int(10) unsigned NOT NULL auto_increment"
+		),
+		'tstamp' => array
+		(
+			'sql'                     => "int(10) unsigned NOT NULL default '0'"
+		),	
+		'sorting' => array
+		(
+			'sql'					  => "int(10) unsigned NOT NULL default '0'"
+		),	
 		'setting_id' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_credit']['setting_id'],
@@ -147,8 +152,9 @@ $GLOBALS['TL_DCA']['tl_iao_credit'] = array
 			'sorting'                 => true,
 			'flag'                    => 11,
 			'inputType'               => 'select',
-			'options_callback'        => array('tl_iao_credit', 'getSettings'),
+			'options_callback'        => array('tl_iao_credit', 'getSettingOptions'),
 			'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>false, 'chosen'=>true),
+			'sql'                     => "int(10) unsigned NOT NULL default '0'"
 		),
 		'title' => array
 		(
@@ -156,19 +162,8 @@ $GLOBALS['TL_DCA']['tl_iao_credit'] = array
 			'exclude'                 => true,
 			'search'                  => true,
 			'inputType'               => 'text',
-			'eval'                    => array('mandatory'=>true, 'maxlength'=>255)
-		),
-
-		'alias' => array
-		(
-			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_credit']['alias'],
-			'exclude'                 => true,
-			'inputType'               => 'text',
-			'eval'                    => array('rgxp'=>'alnum', 'doNotCopy'=>true, 'spaceToUnderscore'=>true, 'maxlength'=>128),
-			'save_callback' => array
-			(
-				array('tl_iao_credit', 'generateAlias')
-			)
+			'eval'                    => array('mandatory'=>true, 'maxlength'=>255),
+			'sql'                     => "varchar(255) NOT NULL default ''"
 		),
 		'credit_tstamp' => array
 		(
@@ -179,7 +174,8 @@ $GLOBALS['TL_DCA']['tl_iao_credit'] = array
 			'load_callback' => array
 			(
 				array('tl_iao_credit', 'generateCreditTstamp')
-			)
+			),
+			'sql'                     => "int(10) unsigned NOT NULL default '0'"
 		),
 		'expiry_date' => array
 		(
@@ -190,7 +186,8 @@ $GLOBALS['TL_DCA']['tl_iao_credit'] = array
 			'save_callback' => array
 			(
 				array('tl_iao_credit', 'generateExpiryDate')
-			)
+			),
+			'sql'                     => "varchar(255) NOT NULL default ''"
 		),
 		'credit_id' => array
 		(
@@ -201,7 +198,8 @@ $GLOBALS['TL_DCA']['tl_iao_credit'] = array
 			'save_callback' => array
 			(
 				array('tl_iao_credit', 'generateCreditNumber')
-			)
+			),
+			'sql'					  => "int(10) unsigned NOT NULL default '0'"
 		),
 		'credit_id_str' => array
 		(
@@ -212,14 +210,16 @@ $GLOBALS['TL_DCA']['tl_iao_credit'] = array
 			'save_callback' => array
 			(
 				array('tl_iao_credit', 'createCreditNumberStr')
-			)
+			),
+			'sql'					  => "varchar(255) NOT NULL default ''"
 		),
 		'credit_pdf_file' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_credit']['credit_pdf_file'],
 			'exclude'                 => true,
 			'inputType'               => 'fileTree',
-			'eval'                    => array('fieldType'=>'radio', 'tl_class'=>'clr','extensions'=>'pdf','files'=>true, 'filesOnly'=>true, 'mandatory'=>false)
+			'eval'                    => array('fieldType'=>'radio', 'tl_class'=>'clr','extensions'=>'pdf','files'=>true, 'filesOnly'=>true, 'mandatory'=>false),
+			'sql'					  => "varchar(255) NOT NULL default ''"
 		),
 		'member' => array
 		(
@@ -229,12 +229,13 @@ $GLOBALS['TL_DCA']['tl_iao_credit'] = array
 			'sorting'                 => true,
 			'flag'                    => 11,
 			'inputType'               => 'select',
-			'options_callback'        => array('tl_iao_credit', 'getMembers'),
+			'options_callback'        => array('tl_iao_credit', 'getMemberOptions'),
 			'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>true,'submitOnChange'=>true, 'chosen'=>true),
 			'save_callback' => array
 			(
 				array('tl_iao_credit', 'fillAdressText')
-			)
+			),
+			'sql'					  => "varbinary(128) NOT NULL default ''"
 		),
 		'address_text' => array
 		(
@@ -243,7 +244,8 @@ $GLOBALS['TL_DCA']['tl_iao_credit'] = array
 			'search'                  => true,
 			'inputType'               => 'textarea',
 			'eval'                    => array('rte'=>'tinyMCE','style'=>'height:60px;', 'tl_class'=>'clr'),
-			'explanation'             => 'insertTags'
+			'explanation'             => 'insertTags',
+			'sql'					  => "mediumtext NULL"
 		),
 		'before_template' => array
 		(
@@ -258,7 +260,8 @@ $GLOBALS['TL_DCA']['tl_iao_credit'] = array
 			'save_callback' => array
 			(
 				array('tl_iao_credit', 'fillBeforeText')
-			)
+			),
+			'sql'					  => "int(10) unsigned NOT NULL default '0'"
 		),
 		'before_text' => array
 		(
@@ -267,7 +270,8 @@ $GLOBALS['TL_DCA']['tl_iao_credit'] = array
 			'search'                  => true,
 			'inputType'               => 'textarea',
 			'eval'                    => array('rte'=>'tinyMCE', 'helpwizard'=>true,'style'=>'height:60px;', 'tl_class'=>'clr'),
-			'explanation'             => 'insertTags'
+			'explanation'             => 'insertTags',
+			'sql'					  => "text NULL"
 		),
 		'after_template' => array
 		(
@@ -282,7 +286,8 @@ $GLOBALS['TL_DCA']['tl_iao_credit'] = array
 			'save_callback' => array
 			(
 				array('tl_iao_credit', 'fillAfterText')
-			)
+			),
+			'sql'					  => "int(10) unsigned NOT NULL default '0'"
 		),
 		'after_text' => array
 		(
@@ -291,7 +296,16 @@ $GLOBALS['TL_DCA']['tl_iao_credit'] = array
 			'search'                  => true,
 			'inputType'               => 'textarea',
 			'eval'                    => array('rte'=>'tinyMCE', 'helpwizard'=>true,'style'=>'height:60px;', 'tl_class'=>'clr'),
-			'explanation'             => 'insertTags'
+			'explanation'             => 'insertTags',
+			'sql'					  => "text NULL"
+		),
+		'price_netto' => array
+		(
+			'sql'					  => "varchar(64) NOT NULL default '0'"
+		),
+		'price_brutto' => array
+		(
+			'sql'					  => "varchar(64) NOT NULL default '0'"
 		),
 		'published' => array
 		(
@@ -300,7 +314,8 @@ $GLOBALS['TL_DCA']['tl_iao_credit'] = array
 			'filter'                  => true,
 			'flag'                    => 1,
 			'inputType'               => 'checkbox',
-			'eval'                    => array('doNotCopy'=>true)
+			'eval'                    => array('doNotCopy'=>true),
+			'sql'					  => "char(1) NOT NULL default ''"
 		),
 		'status' => array
 		(
@@ -309,19 +324,18 @@ $GLOBALS['TL_DCA']['tl_iao_credit'] = array
 			'filter'                  => true,
 			'flag'                    => 1,
 			'inputType'               => 'select',
-			'options' => array(
-			'1'=>'nicht angenommen',
-			'2'=>'angenommen'
-			 ),
+			'options'				=>  &$GLOBALS['TL_LANG']['tl_iao_invoice']['status_options'],
+            'eval'					=> array('doNotCopy'=>true),
+			'sql'					=> "char(1) NOT NULL default ''"
 		),
 		'noVat' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_credit']['noVat'],
-			'exclude'                 => true,
 			'filter'                  => true,
 			'flag'                    => 1,
 			'inputType'               => 'checkbox',
-			'eval'                    => array('doNotCopy'=>true,'tl_class'=>'w50')
+			'eval'                    => array('doNotCopy'=>true),
+			'sql'					  => "char(1) NOT NULL default ''"
 		),
 		'notice' => array
 		(
@@ -330,8 +344,8 @@ $GLOBALS['TL_DCA']['tl_iao_credit'] = array
 			'search'		  => true,
 			'filter'                  => false,
 			'inputType'               => 'textarea',
-			'eval'                    => array('mandatory'=>false, 'cols'=>'10','rows'=>'10','style'=>'height:100px','rte'=>false)
-
+			'eval'                    => array('mandatory'=>false, 'cols'=>'10','rows'=>'10','style'=>'height:100px','rte'=>false),
+			'sql'					  => "text NULL"
 		)
 	)
 );
@@ -340,8 +354,10 @@ $GLOBALS['TL_DCA']['tl_iao_credit'] = array
 /**
  * Class tl_iao_credit
  */
-class tl_iao_credit extends Backend
+class tl_iao_credit  extends \iao\iaoBackend
 {
+
+	protected $settings = array();
 
 	/**
 	 * Import the back end user object
@@ -353,12 +369,11 @@ class tl_iao_credit extends Backend
 	}
 
 	/**
-	* add all iao-Settings in $GLOBALS['TL_CONFIG'] 
+	* add all iao-Settings in array
 	*/
-	public function IAOSettings(DataContainer $dc)
+	public function setIaoSettings(DataContainer $dc)
 	{
-		$this->import('iao');
-		$this->iao->setIAOSettings($dc->activeRecord->setting_id);
+			$this->settings = ($dc->id) ? $this->getSettings($dc->id) : array();			 
 	}
 
 	/**
@@ -491,40 +506,6 @@ class tl_iao_credit extends Backend
 		}
 	}
 
-	/**
-	 * Autogenerate an article alias if it has not been set yet
-	 * @param mixed
-	 * @param object
-	 * @return string
-	 */
-	public function generateAlias($varValue, DataContainer $dc)
-	{
-		$autoAlias = false;
-
-		// Generate alias if there is none
-		if (!strlen($varValue))
-		{
-			$autoAlias = true;
-			$varValue = standardize($dc->activeRecord->title);
-		}
-
-
-		$objAlias = $this->Database->prepare("SELECT id FROM `tl_iao_credit` WHERE id=? OR alias=?")
-								   ->execute($dc->id, $varValue);
-
-		// Check whether the page alias exists
-		if ($objAlias->numRows > 1)
-		{
-			if (!$autoAlias)
-			{
-				throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'], $varValue));
-			}
-
-			$varValue .= '-' . $dc->id;
-		}
-
-		return $varValue;
-	}
     /**
 	 * fill date-Field if this empty
 	 * @param mixed
@@ -546,7 +527,7 @@ class tl_iao_credit extends Backend
 	{
 		if($varValue==0)
 	    {
-			$format = ( $GLOBALS['TL_CONFIG']['iao_credit_expiry_date'] ) ? $GLOBALS['TL_CONFIG']['iao_credit_expiry_date'] : '+3 month';
+			$format = ( $this->settings['iao_credit_expiry_date'] ) ? $this->settings['iao_credit_expiry_date'] : '+3 month';
 			$tstamp = ($dc->activeRecord->credit_tstamp) ? $dc->activeRecord->credit_tstamp : time();
 			$varValue = strtotime($format,$tstamp);
 	    }
@@ -650,45 +631,6 @@ class tl_iao_credit extends Backend
 		return $varValue;
 	}
 
-	/**
-	 * get all members to valid groups
-	 * @param object
-	 * @throws Exception
-	 */
-	public function getMembers(DataContainer $dc)
-	{
-		$varValue= array();
-
-		if(!$GLOBALS['TL_CONFIG']['iao_costumer_group'])  return $varValue;
-
-		$member = $this->Database->prepare('SELECT `id`,`groups`,`firstname`,`lastname`,`company` FROM `tl_member` WHERE `iao_group`')
-						 ->execute($GLOBALS['TL_CONFIG']['iao_costumer_group']);
-		while($member->next())
-		{
-			$varValue[$member->id] =  $member->firstname.' '.$member->lastname.' ('.$member->company.')';
-		}
-
-		return $varValue;
-	}
-
-	/**
-	 * get all settings to valid groups
-	 * @param object
-	 * @throws Exception
-	 */
-	public function getSettings(DataContainer $dc)
-	{
-		$varValue= array();
-
-		$settings = $this->Database->prepare('SELECT `id`,`name` FROM `tl_iao_settings` ORDER BY `fallback` DESC, `name` DESC')
-						 ->execute();
-		while($settings->next())
-		{
-			$varValue[$settings->id] =  $settings->name;
-		}
-
-		return $varValue;
-	}
 
 	/**
 	 * get all invoice before template
@@ -761,24 +703,21 @@ class tl_iao_credit extends Backend
 			return '';
 		}
 
-		if ($this->Input->get('key') == 'pdf' && $this->Input->get('id') == $row['id'])
+		if (\Input::get('key') == 'pdf' && \Input::get('id') == $row['id'])
 		{
-
-			if( !file_exists(TL_ROOT . '/' . $GLOBALS['TL_CONFIG']['iao_credit_pdf']) ) return;  // template file not found
-
-			$this->import('iao');
+		    
+		    $objPdfTemplate = 	\FilesModel::findByUuid($this->settings['iao_credit_pdf']);	
+			if(strlen($objPdfTemplate->path) < 1 || !file_exists(TL_ROOT . '/' . $objPdfTemplate->path) ) return;  // template file not found
 
 			$pdfname = 'Gutschrift-'.$row['credit_id_str'];
 
 			//-- Calculating dimensions
-			$margins = unserialize($GLOBALS['TL_CONFIG']['iao_pdf_margins']);         // Margins as an array
+			$margins = unserialize($this->settings['iao_pdf_margins']);         // Margins as an array
 			switch( $margins['unit'] )
 			{
 				case 'cm':      $factor = 10.0;   break;
 				default:        $factor = 1.0;
 			}
-
-			require_once(TL_ROOT . '/system/modules/invoice_and_offer/classes/iaoPDF.php');
 
 			$dim['top']    = !is_numeric($margins['top'])   ? PDF_MARGIN_TOP    : $margins['top'] * $factor;
 			$dim['right']  = !is_numeric($margins['right']) ? PDF_MARGIN_RIGHT  : $margins['right'] * $factor;
@@ -792,8 +731,10 @@ class tl_iao_credit extends Backend
 			$l['w_page'] = 'page';
 
 			// Create new PDF document with FPDI extension
+			require_once(TL_ROOT . '/system/modules/invoice_and_offer/classes/iaoPDF.php');
+			
 			$pdf = new iaoPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true);
-			$pdf->setSourceFile( TL_ROOT . '/' . $GLOBALS['TL_CONFIG']['iao_credit_pdf']);          // Set PDF template
+			$pdf->setSourceFile( TL_ROOT . '/' . $objPdfTemplate->path);          // Set PDF template
 
 			// Set document information
 			$pdf->SetCreator(PDF_CREATOR);
@@ -825,13 +766,16 @@ class tl_iao_credit extends Backend
 			$pdf->AddPage();
 
 			// Include CSS (TCPDF 5.1.000 an newer)
-			if(file_exists(TL_ROOT . '/' . $GLOBALS['TL_CONFIG']['iao_pdf_css']) )
-			{
-				$styles = "<style>\n" . file_get_contents(TL_ROOT . '/' . $GLOBALS['TL_CONFIG']['iao_pdf_css']) . "\n</style>\n";
+		    $file = \FilesModel::findByUuid($settings['iao_pdf_css']);
+
+		    if(strlen($file->path) > 0 && file_exists(TL_ROOT . '/' . $file->path) )
+		    {
+				$styles = "<style>\n" . file_get_contents(TL_ROOT . '/' . $file->path) . "\n</style>\n";
+				$pdf->writeHTML($styles, true, false, true, false, '');
 			}
 
 			// write the address-data
-			$pdf->drawAddress($styles.$this->iao->changeTags($row['address_text']));
+			$pdf->drawAddress($this->changeTags($row['address_text']));
 
 			//Rechnungsnummer
 			$pdf->drawDocumentNumber($row['credit_id_str']);
@@ -845,7 +789,7 @@ class tl_iao_credit extends Backend
 			//Text vor der Posten-Tabelle
 		    if(strip_tags($row['before_text']))
 		    {
-				$row['before_text']  = $this->iao->changeTags($row['before_text']);
+				$row['before_text']  = $this->changeTags($row['before_text']);
 				$pdf->drawTextBefore($row['before_text']);
 			}
 
@@ -864,7 +808,7 @@ class tl_iao_credit extends Backend
 			//Text vor der Posten-Tabelle
 			if(strip_tags($row['after_text']))
 			{
-				$row['after_text']  = $this->iao->changeTags($row['after_text']);
+				$row['after_text']  = $this->changeTags($row['after_text']);
 				$pdf->drawTextAfter($row['after_text']);
 			}
 
@@ -885,19 +829,17 @@ class tl_iao_credit extends Backend
 
 		if(!$id) return $posten;
 
-	    $resultObj = $this->Database->prepare('SELECT * FROM `tl_iao_credit_items` WHERE `pid`=? AND `published`=1 ORDER BY `sorting`')->execute($id);
+	    $resultObj = $this->Database->prepare('SELECT * FROM `tl_iao_credit_items` WHERE `pid`=? AND `published`=? ORDER BY `sorting`')->execute($id,1);
 
 		if($resultObj->numRows <= 0) return $posten;
-
-
 
 		while($resultObj->next())
 	    {
 			$resultObj->price = str_replace(',','.',$resultObj->price);
-			$einzelpreis = ($resultObj->vat_incl == 1) ? $this->iao->getBruttoPrice($resultObj->price,$resultObj->vat) : $resultObj->price;
+			$einzelpreis = ($resultObj->vat_incl == 1) ? $this->getBruttoPrice($resultObj->price,$resultObj->vat) : $resultObj->price;
 
 			if($resultObj->headline_to_pdf == 1) $resultObj->text = substr_replace($resultObj->text, '<p><strong>'.$resultObj->headline.'</strong><br>', 0, 3);
-			$resultObj->text = $this->iao->changeTags($resultObj->text);
+			$resultObj->text = $this->changeTags($resultObj->text);
 
 			// get units from DB-Table
 			$unitObj = $this->Database->prepare('SELECT * FROM `tl_iao_item_units` WHERE `value`=?')
@@ -949,7 +891,7 @@ class tl_iao_credit extends Backend
 		if(!$varValue)
 		{
 			$tstamp = $dc->activeRecord->tstamp ? $dc->activeRecord->tstamp : time();
-			$format = $GLOBALS['TL_CONFIG']['iao_credit_number_format'];
+			$format = $this->settings['iao_credit_number_format'];
 			$format =  str_replace('{date}',date('Ymd',$tstamp),$format);
 			$format =  str_replace('{nr}',$dc->activeRecord->credit_id,$format);
 			$varValue = $format;
@@ -976,7 +918,7 @@ class tl_iao_credit extends Backend
 			->limit(1)
 			->execute();
 
-			if($objNr->numRows < 1 || $objNr->credit_id == 0)  $varValue = $GLOBALS['TL_CONFIG']['iao_credit_startnumber'];
+			if($objNr->numRows < 1 || $objNr->credit_id == 0)  $varValue = $this->settings['iao_credit_startnumber'];
 			else  $varValue =  $objNr->credit_id +1;
 	    }
 	    else

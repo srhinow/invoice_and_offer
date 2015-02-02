@@ -1,20 +1,6 @@
 <?php
 
 /**
- * This program is free software: you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation, either
- * version 3 of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this program. If not, please visit the Free
- * Software Foundation website at <http://www.gnu.org/licenses/>.
- *
  * @copyright  Sven Rhinow 2011-2013
  * @author     sr-tag Sven Rhinow Webentwicklung <http://www.sr-tag.de>
  * @package    invoice_and_offer
@@ -37,10 +23,16 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 		'enableVersioning'            => false,
 		'onload_callback' => array
 		(
-			array('tl_iao_offer','IAOSettings'),
 			array('tl_iao_offer', 'checkPermission'),
 			array('tl_iao_offer', 'updateExpiryToTstmp')
 		),
+		'sql' => array
+		(
+			'keys' => array
+			(
+				'id' => 'primary'
+			)
+		)
 	),
 
 	// List
@@ -49,7 +41,7 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 		'sorting' => array
 		(
 			'mode'                    => 1,
-			'fields'                  => array('tstamp'),
+			'fields'                  => array('offer_tstamp'),
 			'flag'                    => 8,
 			'panelLayout'             => 'filter;search,limit'
 		),
@@ -159,6 +151,18 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 	// Fields
 	'fields' => array
 	(
+		'id' => array
+		(
+			'sql'                     => "int(10) unsigned NOT NULL auto_increment"
+		),
+		'tstamp' => array
+		(
+			'sql'                     => "int(10) unsigned NOT NULL default '0'"
+		),	
+		'sorting' => array
+		(
+			'sql'					  => "int(10) unsigned NOT NULL default '0'"
+		),		
 		'setting_id' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_offer']['setting_id'],
@@ -167,8 +171,9 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 			'sorting'                 => true,
 			'flag'                    => 11,
 			'inputType'               => 'select',
-			'options_callback'        => array('tl_iao_offer', 'getSettings'),
+			'options_callback'        => array('tl_iao_offer', 'getSettingOptions'),
 			'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>false, 'chosen'=>true),
+			'sql'                     => "int(10) unsigned NOT NULL default '0'"
 		),
 		'title' => array
 		(
@@ -176,7 +181,8 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 			'exclude'                 => true,
 			'search'                  => true,
 			'inputType'               => 'text',
-			'eval'                    => array('mandatory'=>true, 'maxlength'=>255,'tl_class'=>'long')
+			'eval'                    => array('mandatory'=>true, 'maxlength'=>255,'tl_class'=>'long'),
+			'sql'                     => "varchar(255) NOT NULL default ''"
 		),
 		'offer_tstamp' => array
 		(
@@ -187,27 +193,8 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 			'load_callback' => array
 			(
 				array('tl_iao_offer', 'generateOfferTstamp')
-			)
-		),
-		'csv_export_dir' => array
-		(
-			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_offer']['csv_export_dir'],
-			'eval'                    => array('fieldType'=>'radio', 'files'=>false, 'filesOnly'=>false, 'class'=>'mandatory')
-		),
-		'pdf_import_dir' => array
-		(
-			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_offer']['pdf_import_dir'],
-			'eval'                    => array('fieldType'=>'radio', 'files'=>false, 'filesOnly'=>false, 'class'=>'mandatory')
-		),
-		'csv_source' => array
-		(
-			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_offer']['csv_source'],
-			'eval'                    => array('fieldType'=>'radio', 'files'=>true, 'filesOnly'=>true, 'extensions'=>'csv', 'class'=>'mandatory')
-		),
-		'csv_posten_source' => array
-		(
-			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_offer']['csv_posten_source'],
-			'eval'                    => array('fieldType'=>'radio', 'files'=>true, 'filesOnly'=>true, 'extensions'=>'csv', 'class'=>'mandatory')
+			),
+			'sql'                     => "int(10) unsigned NOT NULL default '0'"
 		),
 		'expiry_date' => array
 		(
@@ -218,7 +205,8 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 			'save_callback' => array
 			(
 				array('tl_iao_offer', 'generateExpiryDate')
-			)
+			),
+			'sql'                     => "varchar(255) NOT NULL default ''"
 		),
 		'offer_id' => array
 		(
@@ -230,7 +218,8 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 			'save_callback' => array
 			(
 				array('tl_iao_offer', 'generateOfferNumber')
-			)
+			),
+			'sql'					  => "int(10) unsigned NOT NULL default '0'"
 		),
 		'offer_id_str' => array
 		(
@@ -242,7 +231,8 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 			'save_callback' => array
 			(
 				array('tl_iao_offer', 'createOfferNumberStr')
-			)
+			),
+			'sql'					  => "varchar(255) NOT NULL default ''"
 		),
 		'offer_pdf_file' => array
 		(
@@ -250,7 +240,8 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 			'exclude'                 => true,
 			'search'                  => true,
 			'inputType'               => 'fileTree',
-			'eval'                    => array('fieldType'=>'radio', 'tl_class'=>'clr','extensions'=>'pdf','files'=>true, 'filesOnly'=>true, 'mandatory'=>false)
+			'eval'                    => array('fieldType'=>'radio', 'tl_class'=>'clr','extensions'=>'pdf','files'=>true, 'filesOnly'=>true, 'mandatory'=>false),
+			'sql'					  => "varchar(255) NOT NULL default ''"
 		),
 		'member' => array
 		(
@@ -261,12 +252,13 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 			'search'                  => true,
 			'flag'                    => 11,
 			'inputType'               => 'select',
-			'options_callback'        => array('tl_iao_offer', 'getMembers'),
+			'options_callback'        => array('tl_iao_offer', 'getMemberOptions'),
 			'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>true,'submitOnChange'=>true, 'chosen'=>true),
 			'save_callback' => array
 			(
 				array('tl_iao_offer', 'fillAdressText')
-			)
+			),
+			'sql'					  => "varbinary(128) NOT NULL default ''"
 		),
 		'address_text' => array
 		(
@@ -275,7 +267,8 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 			'search'                  => true,
 			'inputType'               => 'textarea',
 			'eval'                    => array('rte'=>'tinyMCE','style'=>'height:60px;', 'tl_class'=>'clr'),
-			'explanation'             => 'insertTags'
+			'explanation'             => 'insertTags',
+			'sql'					  => "mediumtext NULL"
 		),
 		'before_template' => array
 		(
@@ -289,7 +282,8 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 			'save_callback' => array
 			(
 				array('tl_iao_offer', 'fillBeforeText')
-			)
+			),
+			'sql'					  => "int(10) unsigned NOT NULL default '0'"
 		),
 		'before_text' => array
 		(
@@ -298,7 +292,8 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 			'search'                  => true,
 			'inputType'               => 'textarea',
 			'eval'                    => array('rte'=>'tinyMCE', 'helpwizard'=>true,'style'=>'height:60px;', 'tl_class'=>'clr'),
-			'explanation'             => 'insertTags'
+			'explanation'             => 'insertTags',
+			'sql'					  => "text NULL"
 		),
 		'after_template' => array
 		(
@@ -312,7 +307,8 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 			'save_callback' => array
 			(
 				array('tl_iao_offer', 'fillAfterText')
-			)
+			),
+			'sql'					  => "int(10) unsigned NOT NULL default '0'"
 		),
 		'after_text' => array
 		(
@@ -321,7 +317,8 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 			'search'                  => true,
 			'inputType'               => 'textarea',
 			'eval'                    => array('rte'=>'tinyMCE', 'helpwizard'=>true,'style'=>'height:60px;', 'tl_class'=>'clr'),
-			'explanation'             => 'insertTags'
+			'explanation'             => 'insertTags',
+			'sql'					  => "text NULL"
 		),
 		'published' => array
 		(
@@ -330,7 +327,8 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 			'filter'                  => true,
 			'flag'                    => 1,
 			'inputType'               => 'checkbox',
-			'eval'                    => array('doNotCopy'=>true)
+			'eval'                    => array('doNotCopy'=>true),
+			'sql'					  => "char(1) NOT NULL default ''"
 		),
 		'status' => array
 		(
@@ -340,6 +338,7 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 			'flag'                    => 1,
 			'inputType'               => 'select',
 			'options'                 => &$GLOBALS['TL_LANG']['tl_iao_offer']['status_options'],
+			'sql'					=> "char(1) NOT NULL default ''"
 		),
 		'noVat' => array
 		(
@@ -348,7 +347,8 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 			'filter'                  => true,
 			'flag'                    => 1,
 			'inputType'               => 'checkbox',
-			'eval'                    => array('doNotCopy'=>true,'tl_class'=>'w50')
+			'eval'                    => array('doNotCopy'=>true,'tl_class'=>'w50'),
+			'sql'					  => "char(1) NOT NULL default ''"
 		),
 		'notice' => array
 		(
@@ -357,18 +357,27 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 			'search'		  => true,
 			'filter'                  => false,
 			'inputType'               => 'textarea',
-			'eval'                    => array('mandatory'=>false, 'cols'=>'10','rows'=>'10','style'=>'height:100px','rte'=>false)
-
+			'eval'                    => array('mandatory'=>false, 'cols'=>'10','rows'=>'10','style'=>'height:100px','rte'=>false),
+			'sql'					  => "text NULL"
+		),
+		'price_netto' => array
+		(
+			'sql' 					=> "varchar(64) NOT NULL default '0'"
+		),
+		'price_brutto' => array
+		(
+			'sql' 					=> "varchar(64) NOT NULL default '0'"
 		)
-
 	)
 );
 
 /**
  * Class tl_iao_offer
  */
-class tl_iao_offer extends Backend
+class tl_iao_offer extends \iao\iaoBackend
 {
+
+	protected $settings = array();
 
 	/**
 	 * Import the back end user object
@@ -380,12 +389,11 @@ class tl_iao_offer extends Backend
 	}
 
 	/**
-	* add all iao-Settings in $GLOBALS['TL_CONFIG'] 
+	* add all iao-Settings in array
 	*/
-	public function IAOSettings(DataContainer $dc)
+	public function setIaoSettings($id)
 	{
-		$this->import('iao');
-		$this->iao->setIAOSettings($dc->activeRecord->setting_id);
+			$this->settings = ($id) ? $this->getSettings($id) : array();
 	}
 
 	/**
@@ -423,7 +431,7 @@ class tl_iao_offer extends Backend
 		}
 
 		// Check current action
-		switch ($this->Input->get('act'))
+		switch (\Input::get('act'))
 		{
 			case 'create':
 			case 'select':
@@ -432,11 +440,11 @@ class tl_iao_offer extends Backend
 
 			case 'edit':
 				// Dynamically add the record to the user profile
-				if (!in_array($this->Input->get('id'), $root))
+				if (!in_array(\Input::get('id'), $root))
 				{
-					$arrNew = $this->Session->get('new_records');
+					$arrNew = \Session::get('new_records');
 
-					if (is_array($arrNew['tl_iao_offer']) && in_array($this->Input->get('id'), $arrNew['tl_iao_offer']))
+					if (is_array($arrNew['tl_iao_offer']) && in_array(\Input::get('id'), $arrNew['tl_iao_offer']))
 					{
 						// Add permissions on user level
 						if ($this->User->inherit == 'custom' || !$this->User->groups[0])
@@ -450,7 +458,7 @@ class tl_iao_offer extends Backend
 							if (is_array($arrNewp) && in_array('create', $arrNewp))
 							{
 								$arrNews = deserialize($objUser->news);
-								$arrNews[] = $this->Input->get('id');
+								$arrNews[] = \Input::get('id');
 
 								$this->Database->prepare("UPDATE tl_user SET news=? WHERE id=?")
 											   ->execute(serialize($arrNews), $this->User->id);
@@ -469,7 +477,7 @@ class tl_iao_offer extends Backend
 							if (is_array($arrNewp) && in_array('create', $arrNewp))
 							{
 								$arrNews = deserialize($objGroup->news);
-								$arrNews[] = $this->Input->get('id');
+								$arrNews[] = \Input::get('id');
 
 								$this->Database->prepare("UPDATE tl_user_group SET news=? WHERE id=?")
 												->execute(serialize($arrNews), $this->User->groups[0]);
@@ -477,7 +485,7 @@ class tl_iao_offer extends Backend
 						}
 
 						// Add new element to the user object
-						$root[] = $this->Input->get('id');
+						$root[] = \Input::get('id');
 						$this->User->news = $root;
 					}
 				}
@@ -486,9 +494,9 @@ class tl_iao_offer extends Backend
 			case 'copy':
 			case 'delete':
 			case 'show':
-				if (!in_array($this->Input->get('id'), $root) || ($this->Input->get('act') == 'delete' && !$this->User->hasAccess('delete', 'newp')))
+				if (!in_array(\Input::get('id'), $root) || (\Input::get('act') == 'delete' && !$this->User->hasAccess('delete', 'newp')))
 				{
-					$this->log('Not enough permissions to '.$this->Input->get('act').' news archive ID "'.$this->Input->get('id').'"', 'tl_iao_offer checkPermission', TL_ERROR);
+					$this->log('Not enough permissions to '.\Input::get('act').' news archive ID "'.\Input::get('id').'"', 'tl_iao_offer checkPermission', TL_ERROR);
 					$this->redirect('contao/main.php?act=error');
 				}
 			break;
@@ -497,7 +505,7 @@ class tl_iao_offer extends Backend
 			case 'deleteAll':
 			case 'overrideAll':
 				$session = $this->Session->getData();
-				if ($this->Input->get('act') == 'deleteAll' && !$this->User->hasAccess('delete', 'newp'))
+				if (\Input::get('act') == 'deleteAll' && !$this->User->hasAccess('delete', 'newp'))
 				{
 					$session['CURRENT']['IDS'] = array();
 				}
@@ -509,9 +517,9 @@ class tl_iao_offer extends Backend
 			break;
 
 			default:
-				if (strlen($this->Input->get('act')))
+				if (strlen(\Input::get('act')))
 				{
-					$this->log('Not enough permissions to '.$this->Input->get('act').' news archives', 'tl_iao_offer checkPermission', TL_ERROR);
+					$this->log('Not enough permissions to '.\Input::get('act').' news archives', 'tl_iao_offer checkPermission', TL_ERROR);
 					$this->redirect('contao/main.php?act=error');
 				}
 			break;
@@ -584,6 +592,7 @@ class tl_iao_offer extends Backend
 					->limit(1)
 					->execute($text,$dc->id);
 		}
+
 		return $varValue;
 	}
 
@@ -631,46 +640,8 @@ class tl_iao_offer extends Backend
 		return $varValue;
 	}
 
-	/**
-	 * get all members to valid groups
-	 * @param object
-	 * @throws Exception
-	 */
-	public function getMembers(DataContainer $dc)
-	{
-		$varValue= array();
 
-		if(!$GLOBALS['TL_CONFIG']['iao_costumer_group'])  return $varValue;
 
-		$member = $this->Database->prepare('SELECT `id`,`groups`,`firstname`,`lastname`,`company` FROM `tl_member` WHERE `iao_group`')
-						->execute($GLOBALS['TL_CONFIG']['iao_costumer_group']);
-
-		while($member->next())
-		{
-			$varValue[$member->id] =  $member->firstname.' '.$member->lastname.' ('.$member->company.')';
-		}
-
-		return $varValue;
-	}
-
-	/**
-	 * get all settings
-	 * @param object
-	 * @throws Exception
-	 */
-	public function getSettings(DataContainer $dc)
-	{
-		$varValue= array();
-
-		$settings = $this->Database->prepare('SELECT `id`,`name` FROM `tl_iao_settings` ORDER BY `fallback` DESC, `name` DESC')
-						 ->execute();
-		while($settings->next())
-		{
-			$varValue[$settings->id] =  $settings->name;
-		}
-
-		return $varValue;
-	}
 
 	/**
 	 * get all invoice before template
@@ -743,7 +714,7 @@ class tl_iao_offer extends Backend
 			return '';
 		}
 
-		if ($this->Input->get('key') == 'addInvoice' && $this->Input->get('id') == $row['id'])
+		if (\Input::get('key') == 'addInvoice' && \Input::get('id') == $row['id'])
 		{
 			//Insert Invoice-Entry
 			$set = array
@@ -794,8 +765,7 @@ class tl_iao_offer extends Backend
 						'price_brutto' => $posten->price_brutto,
 						'published' => $posten->published,
 						'vat' => $posten->vat,
-						'vat_incl' => $posten->vat_incl,
-						'pagebreak_after' => $posten->pagebreak_after
+						'vat_incl' => $posten->vat_incl
 					);
 
 					$newposten = $this->Database->prepare('INSERT INTO `tl_iao_invoice_items` %s')
@@ -824,31 +794,37 @@ class tl_iao_offer extends Backend
 	 */
 	public function showPDFButton($row, $href, $label, $title, $icon)
 	{
+		$this->setIaoSettings($row['setting_id']); 
+
 		if (!$this->User->isAdmin)
 		{
 			return '';
 		}
 
-		if ($this->Input->get('key') == 'pdf' && $this->Input->get('id') == $row['id'])
+		// Wenn keine PDF-Vorlage dann kein PDF-Link
+	    $objPdfTemplate = 	\FilesModel::findByUuid($this->settings['iao_offer_pdf']);			
+
+		if(strlen($objPdfTemplate->path) < 1 || !file_exists(TL_ROOT . '/' . $objPdfTemplate->path) ) return;  // template file not found
+
+		if (\Input::get('key') == 'pdf' && \Input::get('id') == $row['id'])
 		{
-
-			$this->import('iao');
-
-			if(!empty($row['offer_pdf_file']) && file_exists(TL_ROOT . '/' . $row['offer_pdf_file']))
+			//wenn eine feste Rechnung als PDF zugewiesen wurde
+			if(strlen($row['invoice_pdf_file']) > 0 )
 			{
+				$objPdf = 	\FilesModel::findByPk($row['offer_pdf_file']);			
+				if(!empty($objPdf->path) && file_exists(TL_ROOT . '/' . $objPdf->path))
+				{
+					header("Content-type: application/pdf");
+					header('Expires: Sat, 26 Jul 1997 05:00:00 GMT'); // Date in the past
+					header('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT');
+					header('Content-Length: '.strlen($row['invoice_pdf_file']));
+					header('Content-Disposition: inline; filename="'.basename($objPdf->path).'";');
 
-				header("Content-type: application/pdf");
-				header('Expires: Sat, 26 Jul 1997 05:00:00 GMT'); // Date in the past
-				header('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT');
-				header('Content-Length: '.strlen($row['invoice_pdf_file']));
-				header('Content-Disposition: inline; filename="'.basename($row['offer_pdf_file']).'";');
-
-				// The PDF source is in original.pdf
-				readfile(TL_ROOT . '/' . $row['offer_pdf_file']);
-				exit();
+					// The PDF source is in original.pdf
+					readfile(TL_ROOT . '/' . $row['offer_pdf_file']);
+					exit();
+				}
 			}
-
-			if( !file_exists(TL_ROOT . '/' . $GLOBALS['TL_CONFIG']['iao_offer_pdf']) ) return;  // template file not found
 
 			$pdfname = 'Angebot-'.$row['offer_id_str'];
 
@@ -905,13 +881,16 @@ class tl_iao_offer extends Backend
 			$pdf->AddPage();
 
 			// Include CSS (TCPDF 5.1.000 an newer)
-			if(file_exists(TL_ROOT . '/' . $GLOBALS['TL_CONFIG']['iao_pdf_css']) )
-			{
-				$styles = "<style>\n" . file_get_contents(TL_ROOT . '/' . $GLOBALS['TL_CONFIG']['iao_pdf_css']) . "\n</style>\n";
+		    $file = \FilesModel::findByUuid($settings['iao_pdf_css']);
+
+		    if(strlen($file->path) > 0 && file_exists(TL_ROOT . '/' . $file->path) )
+		    {
+				$styles = "<style>\n" . file_get_contents(TL_ROOT . '/' . $file->path) . "\n</style>\n";
+				$pdf->writeHTML($styles, true, false, true, false, '');
 			}
 
 			// write the address-data
-			$pdf->drawAddress($styles.$this->iao->changeTags($row['address_text']));
+			$pdf->drawAddress($this->changeTags($row['address_text']));
 
 			//Rechnungsnummer
 			$pdf->drawDocumentNumber($row['offer_id_str']);
@@ -925,17 +904,17 @@ class tl_iao_offer extends Backend
 			//Text vor der Posten-Tabelle
 			if(strip_tags($row['before_text']))
 			{
-				$row['before_text']  = $this->iao->changeTags($row['before_text']);
+				$row['before_text']  = $this->changeTags($row['before_text']);
 				$pdf->drawTextBefore($row['before_text']);
 			}
 
 			//Posten-Tabelle
 			$header = array('Menge','Beschreibung','Einzelpreis','Gesamt');
-			$fields = $this->getPosten($this->Input->get('id'));
+			$fields = $this->getPosten(\Input::get('id'));
 
 			$parentObj = $this->Database->prepare('SELECT `noVat` FROM `tl_iao_offer` WHERE `id`=?')
 						->limit(1)
-						->execute($this->Input->get('id'));
+						->execute(\Input::get('id'));
 			
 			$noVat = $parentObj->noVat;
 
@@ -944,7 +923,7 @@ class tl_iao_offer extends Backend
 			//Text vor der Posten-Tabelle
 			if(strip_tags($row['after_text']))
 			{
-				$row['after_text']  = $this->iao->changeTags($row['after_text']);
+				$row['after_text']  = $this->changeTags($row['after_text']);
 				$pdf->drawTextAfter($row['after_text']);
 			}
 
@@ -977,10 +956,10 @@ class tl_iao_offer extends Backend
 		while($resultObj->next())
 		{
 			$resultObj->price = str_replace(',','.',$resultObj->price);
-			$einzelpreis = ($resultObj->vat_incl == 1) ? $this->iao->getBruttoPrice($resultObj->price,$resultObj->vat) : $resultObj->price;
+			$einzelpreis = ($resultObj->vat_incl == 1) ? $this->getBruttoPrice($resultObj->price,$resultObj->vat) : $resultObj->price;
 
 			if($resultObj->headline_to_pdf == 1) $resultObj->text = substr_replace($resultObj->text, '<p><strong>'.$resultObj->headline.'</strong><br>', 0, 3);
-			$resultObj->text = $this->iao->changeTags($resultObj->text);
+			$resultObj->text = $this->changeTags($resultObj->text);
 
 			// get units from DB-Table
 			$unitObj = $this->Database->prepare('SELECT * FROM `tl_iao_item_units` WHERE `value`=?')
@@ -1152,9 +1131,9 @@ class tl_iao_offer extends Backend
 	{
 		$this->import('BackendUser', 'User');
 
-		if (strlen($this->Input->get('tid')))
+		if (strlen(\Input::get('tid')))
 		{
-			$this->toggleVisibility($this->Input->get('tid'), ($this->Input->get('state')));
+			$this->toggleVisibility(\Input::get('tid'), (\Input::get('state')));
 			$this->redirect($this->getReferer());
 		}
 
