@@ -1,20 +1,58 @@
 <?php
 
 /**
- * Run in a custom namespace, so the class can be replaced
- */
-// namespace iao;
-
-/**
- * Class iaoBackend
  *
- * Parent class for iaoBackend modules.
- * @copyright  Sven Rhinow 2011-2015
+ * @copyright  Sven Rhinow 2011-2014
  * @author     sr-tag Sven Rhinow Webentwicklung <http://www.sr-tag.de>
  * @package    invoice_and_offer
+ * @license    LGPL
+ * @filesource
  */
-abstract class iaoBackend extends \Backend
+
+
+/**
+ * Class iao
+ * Provide methods to handle invoice_and_offer-module.
+ */
+class iao extends Backend
 {
+	/**
+	* set $GLOBAL['TL_CONFIG'] - invoice_and_offer - Settings
+	* Kompatibilität zu älteren Versionen
+	*/
+	public function setIAOSettings($id = 1)
+	{
+		$this->import('Database');
+
+		if( (int) $id > 0)
+		{
+			$dbObj = $this->Database->prepare('SELECT * FROM `tl_iao_settings` WHERE `id`=?')
+							->limit(1)
+							->execute($id);
+		}
+		else
+		{
+			$dbObj = $this->Database->prepare('SELECT * FROM `tl_iao_settings` WHERE `fallback`=?')
+							->limit(1)
+							->execute(1);
+		}
+
+		if($dbObj->numRows > 0)
+		{
+			//hole alle Feldbezeichnungen
+			$fields = $this->Database->listFields('tl_iao_settings');
+
+			// diese Felder nicht als $GLOBAL['TL_CONFIG'] - Eintrag setzen (bl = Blacklist)
+			$bl_fields = array('id', 'tstamp', 'name', 'fallback');
+
+			foreach($fields as $k => $field)
+			{
+				if(in_array($field['name'], $bl_fields)) continue;
+				$GLOBALS['TL_CONFIG'][$field['name']] = $dbObj->$field['name'];
+			}
+		}
+	}
+
 	/**
 	* get current settings
 	* @param integer
@@ -29,7 +67,6 @@ abstract class iaoBackend extends \Backend
 		return $dbObj->fetchAssoc();
 
 	}
-
 	/**
 	 * Get netto-price from brutto
 	 * @param float
@@ -52,105 +89,19 @@ abstract class iaoBackend extends \Backend
 		return ($netto / 100) * ($vat + 100);
 	}
 
-	/**
-	 * Get formatet price-string
-	 * @param float
-	 * @param string
-	 * @return string
-	 */
 	public function getPriceStr($price,$currencyStr = 'iao_currency')
 	{
 		// if((float)$price < 0) return ;
 		return number_format((float)$price,2,',','.').' '.$GLOBALS['TL_CONFIG'][$currencyStr];
 	}
 
-	/**
-	 * get options for tax rates
-	 * @param object
-	 * @throws Exception
-	 */
-	public function getTaxRatesOptions($dc)
-	{
-		$varValue= array();
-
-		$all = $this->Database->prepare('SELECT `value`,`name` FROM `tl_iao_tax_rates`  ORDER BY `sorting` ASC')
-				->execute();
-
-		while($all->next())
-		{
-			$varValue[$all->value] = $all->name;
-		}
-		return $varValue;
-	}
-
-	/**
-	 * get options for item units
-	 * @param object
-	 * @throws Exception
-	 */
-	public function getItemUnitsOptions($dc)
-	{
-		$varValue= array();
-
-		$all = $this->Database->prepare('SELECT `value`,`name` FROM `tl_iao_item_units`  ORDER BY `sorting` ASC')
-				->execute();
-
-		while($all->next())
-		{
-			$varValue[$all->value] = $all->name;
-		}
-		return $varValue;
-	}	
-
-	/**
-	 * get all members to valid groups
-	 * @param object
-	 * @throws Exception
-	 */
-	public function getMemberOptions($dc)
-	{
-		$varValue= array();
-		$settings = $this->getSettings($dc->activeRecord->setting_id);
-
-		if(!$settings['iao_costumer_group'])  return $varValue;
-
-		$member = $this->Database->prepare('SELECT `id`,`groups`,`firstname`,`lastname`,`company` FROM `tl_member` WHERE `iao_group`=?')
-						->execute($settings['iao_costumer_group']);
-
-		while($member->next())
-		{
-			$varValue[$member->id] =  $member->firstname.' '.$member->lastname.' ('.$member->company.')';
-		}
-
-		return $varValue;
-	}
-
-	/**
-	 * get all settings
-	 * @param object
-	 * @throws Exception
-	 */
-	public function getSettingOptions($dc)
-	{
-		$varValue= array();
-
-		$settings = $this->Database->prepare('SELECT `id`,`name` FROM `tl_iao_settings` ORDER BY `fallback` DESC, `name` DESC')
-						 ->execute();
-		while($settings->next())
-		{
-			$varValue[$settings->id] =  $settings->name;
-		}
-
-		return $varValue;
-	}	
-
-	/**
-	* change Contao-Placeholder with html-characters
-	* @param integer
-	* @return integer
-	*/
-	public function changeTags($text)
-	{
+    /**
+    * change Contao-Placeholder with html-characters
+    * @param integer
+    * @return integer
+    */
+    public function changeTags($text)
+    {
 		// replace [&] etc.
 		$text = $this->restoreBasicEntities($text);
 
@@ -351,6 +302,46 @@ abstract class iaoBackend extends \Backend
     }
 
 	/**
+	 * get the next periode-date
+	 * @param object
+	 * @return integer
+	 */
+	public function  getPeriodeDate($reminderObj)
+	{
+		$lastReminderObj = $this->Database->prepare('SELECT * FROM `tl_iao_reminder` WHERE `invoice_id`=? AND `id`!=? ORDER BY `id` DESC')
+											->limit(1)
+											->execute($reminderObj->invoice_id,$reminderObj->id);
+
+		$lastPeriodeDate = ($lastReminderObj->periode_date) ? $lastReminderObj->periode_date : time();
+		$time = ($reminderObj->periode_date == 0) ? $lastPeriodeDate : $reminderObj->periode_date;
+		$step = (!strlen($reminderObj->step)) ? 1 : $reminderObj->step;
+		$dur = (int) ($GLOBALS['TL_CONFIG']['iao_reminder_'.$step.'_duration']) > 0 ? (int) $GLOBALS['TL_CONFIG']['iao_reminder_'.$step.'_duration'] : 14;
+		$nextDate = ($this->noWE($time,$dur) > time()) ? $this->noWE($time,$dur) : $this->noWE(time(),$dur);
+
+        return $nextDate;
+    }
+
+	/**
+	 * set monday if date on weekend
+	 * @param integer
+	 * @param integer
+	 * @return integer
+	 */
+	public function noWE($time,$dur)
+	{
+		//auf Sonabend prüfen wenn ja dann auf Montag setzen
+		if(date('N',$time+($dur * 24 * 60 * 60)) == 6)  $dur = $dur+2;
+
+		//auf Sontag prüfen wenn ja dann auf Montag setzen
+		if(date('N',$time+($dur * 24 * 60 * 60)) == 7)  $dur = $dur+1;
+
+		$nextDate = $time+($dur * 24 * 60 * 60);
+
+		return	$nextDate;
+    }
+
+
+	/**
 	 * get the Reminder-Status (Recall = 1, first reminder = 2, second reminder = 3 third reminder = 4)
 	 * @param integer
 	 * @return integer
@@ -360,13 +351,14 @@ abstract class iaoBackend extends \Backend
 		if($invoiceId == 0) return false;
 
 		$status = 1; //erinnerung
+		$this->import('Database');
 
 		$statusObj = $this->Database->prepare('SELECT count(*) as c FROM `tl_iao_reminder` WHERE `invoice_id`=? AND `published`=1 ORDER BY `id` DESC')
 									->execute($invoiceId);
 
 		if($statusObj->numRows > 0) return  $statusObj->c;
     }
-    
+
 	/**
 	 * fill Reminderfields
 	 * @param integer
@@ -405,8 +397,8 @@ abstract class iaoBackend extends \Backend
 		}
 
 		$newUnpaid = (($testStepObj->numRows > 0) && ((int) $testStepObj->sum > 0)) ? $testStepObj->sum : $objMember->price_brutto;
-		$tax =  $this->settings['iao_reminder_'.$newStep.'_tax'];
-		$postage =  $this->settings['iao_reminder_'.$newStep.'_postage'];
+		$tax =  $GLOBALS['TL_CONFIG']['iao_reminder_'.$newStep.'_tax'];
+		$postage =  $GLOBALS['TL_CONFIG']['iao_reminder_'.$newStep.'_postage'];
 		$periode_date = $this->getPeriodeDate($reminderObj);
 
 		$set = array
@@ -416,7 +408,7 @@ abstract class iaoBackend extends \Backend
 			'member' =>  $objMember->id,
 			'unpaid' => $newUnpaid,
 			'step' => $newStep,
-			'text' => $this->settings['iao_reminder_'.$newStep.'_text'],
+			'text' => $GLOBALS['TL_CONFIG']['iao_reminder_'.$newStep.'_text'],
 			'periode_date' => $periode_date,
 			'tax' => $tax,
 			'postage' =>  $postage
@@ -427,7 +419,7 @@ abstract class iaoBackend extends \Backend
 						->execute($reminderObj->id);
 
 		//set sum after other facts is saved
-		$text_finish = $this->changeIAOTags($this->settings['iao_reminder_'.$newStep.'_text'],'reminder',$reminderObj->id);
+		$text_finish = $this->changeIAOTags($GLOBALS['TL_CONFIG']['iao_reminder_'.$newStep.'_text'],'reminder',$reminderObj->id);
 		$text_finish = $this->changeTags($text_finish);
 
 		$set = array
@@ -444,44 +436,5 @@ abstract class iaoBackend extends \Backend
 		$this->Database->prepare('UPDATE `tl_iao_invoice` SET `reminder_id` = ?  WHERE `id`=?')
 						->execute($reminderObj->id, $invoiceID);
 	}
-
-	/**
-	 * get the next periode-date
-	 * @param object
-	 * @return integer
-	 */
-	public function  getPeriodeDate($reminderObj)
-	{
-		$lastReminderObj = $this->Database->prepare('SELECT * FROM `tl_iao_reminder` WHERE `invoice_id`=? AND `id`!=? ORDER BY `id` DESC')
-											->limit(1)
-											->execute($reminderObj->invoice_id,$reminderObj->id);
-
-		$lastPeriodeDate = ($lastReminderObj->periode_date) ? $lastReminderObj->periode_date : time();
-		$time = ($reminderObj->periode_date == 0) ? $lastPeriodeDate : $reminderObj->periode_date;
-		$step = (!strlen($reminderObj->step)) ? 1 : $reminderObj->step;
-		$dur = (int) ($GLOBALS['TL_CONFIG']['iao_reminder_'.$step.'_duration']) > 0 ? (int) $GLOBALS['TL_CONFIG']['iao_reminder_'.$step.'_duration'] : 14;
-		$nextDate = ($this->noWE($time,$dur) > time()) ? $this->noWE($time,$dur) : $this->noWE(time(),$dur);
-
-        return $nextDate;
-    }
-
-	/**
-	 * set monday if date on weekend
-	 * @param integer
-	 * @param integer
-	 * @return integer
-	 */
-	public function noWE($time,$dur)
-	{
-		//auf Sonabend prüfen wenn ja dann auf Montag setzen
-		if(date('N',$time+($dur * 24 * 60 * 60)) == 6)  $dur = $dur+2;
-
-		//auf Sontag prüfen wenn ja dann auf Montag setzen
-		if(date('N',$time+($dur * 24 * 60 * 60)) == 7)  $dur = $dur+1;
-
-		$nextDate = $time+($dur * 24 * 60 * 60);
-
-		return	$nextDate;
-    }
 
 }

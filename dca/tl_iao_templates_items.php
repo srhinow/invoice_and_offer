@@ -183,7 +183,7 @@ $GLOBALS['TL_DCA']['tl_iao_templates_items'] = array
 			'filter'                  => true,
 			'flag'                    => 1,
 			'inputType'               => 'select',
-			'options'                 => &$GLOBALS['TL_LANG']['tl_iao_templates_items']['amountStr_options'],
+			'options_callback'        => array('tl_iao_templates_items', 'getItemUnitsOptions'),
 			'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>true,'submitOnChange'=>false),
 			'sql'					  => "varchar(64) NOT NULL default ''"
 		),
@@ -224,7 +224,7 @@ $GLOBALS['TL_DCA']['tl_iao_templates_items'] = array
 			'filter'                  => true,
 			'flag'                    => 1,
 			'inputType'               => 'select',
-			'options'            	  => &$GLOBALS['TL_LANG']['tl_iao_templates_items']['vat_options'],
+			'options_callback'        => array('tl_iao_templates_items', 'getTaxRatesOptions'),
 			'eval'                    => array('tl_class'=>'w50'),
 			'sql'					  => "int(10) unsigned NOT NULL default '19'"
 		),
@@ -270,7 +270,7 @@ $GLOBALS['TL_DCA']['tl_iao_templates_items'] = array
 /**
  * Class tl_iao_templates_items
  */
-class tl_iao_templates_item extends \iao\iaoBackend
+class tl_iao_templates_items extends iaoBackend
 {
 
 	/**

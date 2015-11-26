@@ -16,6 +16,11 @@
  */
 class iao_invoice extends Backend
 {
+	
+	protected $seperators = array('comma'=>',','semicolon'=>';','tabulator'=>'\t','linebreak'=>'\n');
+
+	protected $csv_path = 'system/tmp';
+
 	/**
 	 * Export Invoices
 	 */
@@ -24,7 +29,12 @@ class iao_invoice extends Backend
 
 		if ($this->Input->post('FORM_SUBMIT') == 'tl_iao_export')
 		{
-			$csv_export_dir = $this->Input->post('csv_export_dir', true);
+
+			//Primary-Key
+			$path_pk = \Input::post('csv_export_dir', true);
+			
+			//Pfad ermitteln
+			$csv_export_dir = !empty($path_pk) ? \FilesModel::findByPk($path_pk)->path : $this->csv_path;
 
 			$this->import('Files');
 
@@ -56,7 +66,7 @@ class iao_invoice extends Backend
 
 			$invoice_export_csv = $this->Input->post('export_invoice_filename').'.csv';
 			$invoice_items_export_csv = $this->Input->post('export_invoice_item_filename').'.csv';
-
+			
 			// work on tl_iao_invoice
 			$dbObj = $this->Database->prepare('SELECT * FROM `tl_iao_invoice`')->execute();
 
@@ -86,11 +96,12 @@ class iao_invoice extends Backend
 
 			//set handle from file
 			$fp = $this->Files->fopen($csv_export_dir.'/'.$invoice_export_csv,'w');
-			$seperators = array('comma'=>',','semicolon'=>';','tabulator'=>'\t','linebreak'=>'\n');
+			
+			
 
 			foreach ($linesArr as $line)
 			{
-				fputcsv($fp,  $line, $seperators[$this->Input->post('separator')]);
+				fputcsv($fp,  $line, $this->seperators[\Input::post('separator')]);
 			}
 
 			$this->Files->fclose($fp);
@@ -123,14 +134,27 @@ class iao_invoice extends Backend
 
 			//set handle from file
 			$fp = $this->Files->fopen($csv_export_dir.'/'.$invoice_items_export_csv,'w');
-			$seperators = array('comma'=>',','semicolon'=>';','tabulator'=>'\t','linebreak'=>'\n');
 
 			foreach ($linesArr as $line)
 			{
-				fputcsv($fp,  $line, $seperators[$this->Input->post('separator')]);
+				fputcsv($fp,  $line, $this->seperators[\Input::post('separator')]);
 			}
 
 			$this->Files->fclose($fp);
+
+			//wenn eine Email-Adresse gesetzt wurde, dann auch die Dateien an diese Email senden
+			$csv_export_email = \Input::post('csv_export_email');
+			if($csv_export_email != '')
+			{
+				$objEmail = new \Email();
+				$objEmail->from = $GLOBALS['TL_ADMIN_EMAIL'];
+				$objEmail->fromName = $GLOBALS['TL_ADMIN_NAME'];
+				$objEmail->subject = sprintf('Rechnungen-Export von %s', $this->Environment->host);
+				$objEmail->text = 'anbei die Rechnungs-Exporte von '.date('d.m.Y').' auf dem Host von '.$this->Environment->host.' als CSV-Format';
+				$objEmail->attachFile(TL_ROOT.'/'.$csv_export_dir.'/'.$invoice_export_csv);
+				$objEmail->attachFile(TL_ROOT.'/'.$csv_export_dir.'/'.$invoice_items_export_csv);
+				$objEmail->sendTo($csv_export_email);
+			}
 
 			//after ready export
 			$_SESSION['TL_ERROR'] = '';
@@ -138,6 +162,8 @@ class iao_invoice extends Backend
 			setcookie('BE_PAGE_OFFSET', 0, 0, '/');
 			$this->redirect(str_replace('&key=exportInvoices', '', $this->Environment->request));
 		}
+
+
 
 		$objTree4Export = new FileTree($this->prepareForWidget($GLOBALS['TL_DCA']['tl_iao_invoice']['fields']['csv_export_dir'], 'csv_export_dir', null, 'csv_export_dir', 'tl_iao_invoice'));
 
@@ -174,8 +200,13 @@ class iao_invoice extends Backend
 				</fieldset>
 				<fieldset class="tl_tbox block nolegend">
 					<div class="tl_tbox block">
-					<h3><label for="csv_export_dir">'.$GLOBALS['TL_LANG']['tl_iao_invoice']['csv_export_dir'][0].'</label> <a href="contao/files.php" title="' . specialchars($GLOBALS['TL_LANG']['MSC']['fileManager']) . '" onclick="Backend.getScrollOffset(); Backend.openWindow(this, 750, 500); return false;">' . $this->generateImage('filemanager.gif', $GLOBALS['TL_LANG']['MSC']['fileManager'], 'style="vertical-align:text-bottom;"') . '</a></h3>'.$objTree4Export->generate().(strlen($GLOBALS['TL_LANG']['tl_theme']['source'][1]) ? '
-					<p class="tl_help tl_tip">'.$GLOBALS['TL_LANG']['tl_iao_invoice']['csv_export_dir'][1].'</p>' : '').'
+						<h3><label for="csv_export_dir">'.$GLOBALS['TL_LANG']['tl_iao_invoice']['csv_export_dir'][0].'</label></h3>'.$objTree4Export->generate().(strlen($GLOBALS['TL_LANG']['tl_theme']['source'][1]) ? '
+						<p class="tl_help tl_tip">'.$GLOBALS['TL_LANG']['tl_iao_invoice']['csv_export_dir'][1].'</p>' : '').'
+					</div>
+					<div class="tl_tbox block">
+						<h3><label for="csv_export_email">'.$GLOBALS['TL_LANG']['tl_iao_invoice']['csv_export_email'][0].'</label></h3>
+						<input id="ctrl_csv_export_email" class="tl_text"  type="text" name="csv_export_email" value="" />'.
+					(strlen($GLOBALS['TL_LANG']['tl_iao_invoice']['csv_export_email'][1]) ? '<p class="tl_help tl_tip">'.$GLOBALS['TL_LANG']['tl_iao_invoice']['csv_export_email'][1].'</p>' : '').'
 					</div>
 				</fieldset>
 				</div>
@@ -194,8 +225,14 @@ class iao_invoice extends Backend
 	{
 		if ($this->Input->post('FORM_SUBMIT') == 'tl_iao_import')
 		{
-			$csv_source = $this->Input->post('csv_source', true);
-			$csv_posten_source = $this->Input->post('csv_posten_source', true);
+			//Primary-Key
+			$csv_source_pk = \Input::post('csv_source', true);
+			$csv_posten_source_pk = \Input::post('csv_posten_source', true);
+
+			//Pfad ermitteln
+			$csv_source =  \FilesModel::findByPk($csv_source_pk)->path;
+			$csv_posten_source = \FilesModel::findByPk($csv_posten_source_pk)->path;
+
 
 			// Check the invoice file names
 			if (!$csv_source)
@@ -316,15 +353,15 @@ class iao_invoice extends Backend
 
 			<fieldset class="tl_tbox block nolegend">
 			<div class="clr">
-			  <h3><label for="csv_source">'.$GLOBALS['TL_LANG']['tl_iao_invoice']['csv_source'][0].'</label> <a href="contao/files.php" title="' . specialchars($GLOBALS['TL_LANG']['MSC']['fileManager']) . '" onclick="Backend.getScrollOffset(); Backend.openWindow(this, 750, 500); return false;">' . $this->generateImage('filemanager.gif', $GLOBALS['TL_LANG']['MSC']['fileManager'], 'style="vertical-align:text-bottom;"') . '</a></h3>'.$objTree4Source->generate().(strlen($GLOBALS['TL_LANG']['tl_iao_invoice']['csv_source'][1]) ? '
+			  <h3><label for="csv_source">'.$GLOBALS['TL_LANG']['tl_iao_invoice']['csv_source'][0].'</label></h3>'.$objTree4Source->generate().(strlen($GLOBALS['TL_LANG']['tl_iao_invoice']['csv_source'][1]) ? '
 			  <p class="tl_help tl_tip">'.$GLOBALS['TL_LANG']['tl_iao_invoice']['csv_source'][1].'</p>' : '').'
 			</div>
 			<div class="clr">
-			  <h3><label for="csv_posten_source">'.$GLOBALS['TL_LANG']['tl_iao_invoice']['csv_posten_source'][0].'</label> <a href="contao/files.php" title="' . specialchars($GLOBALS['TL_LANG']['MSC']['fileManager']) . '" onclick="Backend.getScrollOffset(); Backend.openWindow(this, 750, 500); return false;">' . $this->generateImage('filemanager.gif', $GLOBALS['TL_LANG']['MSC']['fileManager'], 'style="vertical-align:text-bottom;"') . '</a></h3>'.$objTree4Posten->generate().(strlen($GLOBALS['TL_LANG']['tl_iao_invoice']['csv_posten_source'][1]) ? '
+			  <h3><label for="csv_posten_source">'.$GLOBALS['TL_LANG']['tl_iao_invoice']['csv_posten_source'][0].'</label></h3>'.$objTree4Posten->generate().(strlen($GLOBALS['TL_LANG']['tl_iao_invoice']['csv_posten_source'][1]) ? '
 			  <p class="tl_help tl_tip">'.$GLOBALS['TL_LANG']['tl_iao_invoice']['csv_posten_source'][1].'</p>' : '').'
 			</div>
 			<div class="clr">
-			  <h3><label for="pdf_import_dir">'.$GLOBALS['TL_LANG']['tl_iao_invoice']['pdf_import_dir'][0].'</label> <a href="contao/files.php" title="' . specialchars($GLOBALS['TL_LANG']['MSC']['fileManager']) . '" onclick="Backend.getScrollOffset(); Backend.openWindow(this, 750, 500); return false;">' . $this->generateImage('filemanager.gif', $GLOBALS['TL_LANG']['MSC']['fileManager'], 'style="vertical-align:text-bottom;"') . '</a></h3>'.$objTree4PDF->generate().(strlen($GLOBALS['TL_LANG']['tl_iao_invoice']['pdf_import_dir'][1]) ? '
+			  <h3><label for="pdf_import_dir">'.$GLOBALS['TL_LANG']['tl_iao_invoice']['pdf_import_dir'][0].'</label></h3>'.$objTree4PDF->generate().(strlen($GLOBALS['TL_LANG']['tl_iao_invoice']['pdf_import_dir'][1]) ? '
 			  <p class="tl_help tl_tip">'.$GLOBALS['TL_LANG']['tl_iao_invoice']['pdf_import_dir'][1].'</p>' : '').'
 			</div>
 				</fieldset>

@@ -182,8 +182,8 @@ $GLOBALS['TL_DCA']['tl_iao_posten_templates'] = array
 			'filter'                  => true,
 			'flag'                    => 1,
 			'inputType'               => 'select',
-			'options'                 => &$GLOBALS['TL_LANG']['tl_iao_posten_templates']['amountStr_options'],
-                        'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>true,'submitOnChange'=>false)
+			'options_callback'        => array('tl_iao_posten_templates', 'getItemUnitsOptions'),
+            'eval'        => array('tl_class'=>'w50','includeBlankOption'=>true,'submitOnChange'=>false)
 		),		
 		'vat' => array
 		(
@@ -250,7 +250,7 @@ $GLOBALS['TL_DCA']['tl_iao_posten_templates'] = array
  * @author     Leo Feyer <http://www.contao.org>
  * @package    Controller
  */
-class tl_iao_posten_templates extends Backend
+class tl_iao_posten_templates extends iaoBackend
 {
 
 	/**

@@ -45,6 +45,7 @@ $GLOBALS['TL_LANG']['tl_iao_offer']['drop_first_row'] = array('erste Zeile über
 $GLOBALS['TL_LANG']['tl_iao_offer']['drop_exist_entries'] = array('existierende Einträge in der Datenbank-Tabelle löschen', 'Alle bereits existierenden Einträge werden vor dem Import entfernt.');
 $GLOBALS['TL_LANG']['tl_iao_offer']['importCSV'] = array('Import starten','');
 $GLOBALS['TL_LANG']['tl_iao_offer']['csv_export_dir'] = array('Export-Ziel-Verzeichnis','Wählen Sie das Verzeichnis, in welchem die Dateien exportiert werden sollen. Beachten Sie das es Schreibrechte besitzt.');
+$GLOBALS['TL_LANG']['tl_iao_offer']['csv_export_email'] = array('Export-E-Mail','Tragen Sie hier eine gültige EmailAdresse ein wenn die CSV-Dateien auch per Email versendet werden sollen.');
 $GLOBALS['TL_LANG']['tl_iao_offer']['export_offer_filename'] = array('Dateiname der Angebote','OHNE ENDUNG .csv');
 $GLOBALS['TL_LANG']['tl_iao_offer']['export_offer_item_filename'] = array('Dateiname der Angebotposten','OHNE ENDUNG .csv');
 $GLOBALS['TL_LANG']['tl_iao_offer']['exportCSV'] = array('Export starten','');

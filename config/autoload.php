@@ -26,7 +26,7 @@ ClassLoader::addClasses(array
 	// Classes
 	'iaoCrons'               => 'system/modules/invoice_and_offer/classes/iaoCrons.php',
 	'iaoPDF'                 => 'system/modules/invoice_and_offer/classes/iaoPDF.php',
-	'iao\iaoBackend'         => 'system/modules/invoice_and_offer/classes/iaoBackend.php',
+	'iaoBackend'         => 'system/modules/invoice_and_offer/classes/iaoBackend.php',
 	'iao'                    => 'system/modules/invoice_and_offer/classes/iao.php',
 
 	// Html
