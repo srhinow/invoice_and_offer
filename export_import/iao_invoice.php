@@ -70,6 +70,12 @@ class iao_invoice extends Backend
 			// work on tl_iao_invoice
 			$dbObj = $this->Database->prepare('SELECT * FROM `tl_iao_invoice`')->execute();
 
+			if($dbObj->numRows < 1)
+			{
+				$_SESSION['TL_ERROR'][] = 'Es sind keine Rechnungen zum exportieren vorhanden.';
+				$this->reload();
+			}
+
 			$isOneLine = true;
 			$oneLine = array();
 			$linesArr = array();
@@ -108,6 +114,12 @@ class iao_invoice extends Backend
 
 			// work on tl_iao_invoice_items
 			$dbObj = $this->Database->prepare('SELECT * FROM `tl_iao_invoice_items`')->execute();
+
+			if($dbObj->numRows < 1)
+			{
+				$_SESSION['TL_ERROR'][] = 'Es sind keine Rechnungs-Positionen zum exportieren vorhanden.';
+				$this->reload();
+			}
 
 			$isOneLine = true;
 			$oneLine = array();

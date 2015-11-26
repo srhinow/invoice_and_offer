@@ -68,6 +68,12 @@ class iao_offer extends Backend
 			// work on tl_iao_offer
 			$dbObj = $this->Database->prepare('SELECT * FROM `tl_iao_offer`')->execute();
 
+			if($dbObj->numRows < 1)
+			{
+				$_SESSION['TL_ERROR'][] = 'Es sind keine Angebote zum exportieren vorhanden.';
+				$this->reload();
+			}
+
 			$isOneLine = true;
 			$oneLine = array();
 			$linesArr = array();
@@ -104,6 +110,12 @@ class iao_offer extends Backend
 
 			// work on tl_iao_offer_items
 			$dbObj = $this->Database->prepare('SELECT * FROM `tl_iao_offer_items`')->execute();
+
+			if($dbObj->numRows < 1)
+			{
+				$_SESSION['TL_ERROR'][] = 'Es sind keine Angebots-Positionen zum exportieren vorhanden.';
+				$this->reload();
+			}
 
 			$isOneLine = true;
 			$oneLine = array();
@@ -196,7 +208,7 @@ class iao_offer extends Backend
 
 			 <fieldset class="tl_tbox block nolegend">
 			<div class="tl_tbox block">
-			  <h3><label for="csv_export_dir">'.$GLOBALS['TL_LANG']['tl_iao_offer']['csv_export_dir'][0].'</label> <a href="contao/files.php" title="' . specialchars($GLOBALS['TL_LANG']['MSC']['fileManager']) . '" onclick="Backend.getScrollOffset(); Backend.openWindow(this, 750, 500); return false;">' . $this->generateImage('filemanager.gif', $GLOBALS['TL_LANG']['MSC']['fileManager'], 'style="vertical-align:text-bottom;"') . '</a></h3>'.$objTree4Export->generate().(strlen($GLOBALS['TL_LANG']['tl_iao_offer']['csv_export_dir'][1]) ? '
+			  <h3><label for="csv_export_dir">'.$GLOBALS['TL_LANG']['tl_iao_offer']['csv_export_dir'][0].'</label></h3>'.$objTree4Export->generate().(strlen($GLOBALS['TL_LANG']['tl_iao_offer']['csv_export_dir'][1]) ? '
 			  <p class="tl_help tl_tip">'.$GLOBALS['TL_LANG']['tl_iao_offer']['csv_export_dir'][1].'</p>' : '').'
 			</div>
 			<div class="tl_tbox block">
@@ -344,15 +356,15 @@ class iao_offer extends Backend
 
 			<fieldset class="tl_tbox block nolegend">
 			<div class="clr">
-			  <h3><label for="csv_source">'.$GLOBALS['TL_LANG']['tl_iao_offer']['csv_source'][0].'</label> <a href="contao/files.php" title="' . specialchars($GLOBALS['TL_LANG']['MSC']['fileManager']) . '" onclick="Backend.getScrollOffset(); Backend.openWindow(this, 750, 500); return false;">' . $this->generateImage('filemanager.gif', $GLOBALS['TL_LANG']['MSC']['fileManager'], 'style="vertical-align:text-bottom;"') . '</a></h3>'.$objTree4Source->generate().(strlen($GLOBALS['TL_LANG']['tl_iao_offer']['csv_source'][1]) ? '
+			  <h3><label for="csv_source">'.$GLOBALS['TL_LANG']['tl_iao_offer']['csv_source'][0].'</label></h3>'.$objTree4Source->generate().(strlen($GLOBALS['TL_LANG']['tl_iao_offer']['csv_source'][1]) ? '
 			  <p class="tl_help tl_tip">'.$GLOBALS['TL_LANG']['tl_iao_offer']['csv_source'][1].'</p>' : '').'
 			</div>
 			<div class="clr">
-			  <h3><label for="csv_posten_source">'.$GLOBALS['TL_LANG']['tl_iao_offer']['csv_posten_source'][0].'</label> <a href="contao/files.php" title="' . specialchars($GLOBALS['TL_LANG']['MSC']['fileManager']) . '" onclick="Backend.getScrollOffset(); Backend.openWindow(this, 750, 500); return false;">' . $this->generateImage('filemanager.gif', $GLOBALS['TL_LANG']['MSC']['fileManager'], 'style="vertical-align:text-bottom;"') . '</a></h3>'.$objTree4Posten->generate().(strlen($GLOBALS['TL_LANG']['tl_iao_offer']['csv_posten_source'][1]) ? '
+			  <h3><label for="csv_posten_source">'.$GLOBALS['TL_LANG']['tl_iao_offer']['csv_posten_source'][0].'</label></h3>'.$objTree4Posten->generate().(strlen($GLOBALS['TL_LANG']['tl_iao_offer']['csv_posten_source'][1]) ? '
 			  <p class="tl_help tl_tip">'.$GLOBALS['TL_LANG']['tl_iao_offer']['csv_posten_source'][1].'</p>' : '').'
 			</div>
 			<div class="clr">
-			  <h3><label for="pdf_import_dir">'.$GLOBALS['TL_LANG']['tl_iao_offer']['pdf_import_dir'][0].'</label> <a href="contao/files.php" title="' . specialchars($GLOBALS['TL_LANG']['MSC']['fileManager']) . '" onclick="Backend.getScrollOffset(); Backend.openWindow(this, 750, 500); return false;">' . $this->generateImage('filemanager.gif', $GLOBALS['TL_LANG']['MSC']['fileManager'], 'style="vertical-align:text-bottom;"') . '</a></h3>'.$objTree4PDF->generate().(strlen($GLOBALS['TL_LANG']['tl_iao_offer']['pdf_import_dir'][1]) ? '
+			  <h3><label for="pdf_import_dir">'.$GLOBALS['TL_LANG']['tl_iao_offer']['pdf_import_dir'][0].'</label></h3>'.$objTree4PDF->generate().(strlen($GLOBALS['TL_LANG']['tl_iao_offer']['pdf_import_dir'][1]) ? '
 			  <p class="tl_help tl_tip">'.$GLOBALS['TL_LANG']['tl_iao_offer']['pdf_import_dir'][1].'</p>' : '').'
 			</div>
 			    </fieldset>
