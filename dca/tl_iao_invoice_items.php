@@ -741,10 +741,10 @@ class tl_iao_invoice_items extends iaoBackend
 
 			$newPostenID = $newposten->insertId;
 
-			$this->redirect('contao/main.php?do=iao_setup&mod=iao_templates_items&table=tl_iao_templates_items&act=edit&id='.$newPostenID);
+			$this->redirect('contao/main.php?do=iao_setup&mod=iao_templates_items&table=tl_iao_templates_items&act=edit&id='.$newPostenID.'&amp;rt='.\Input::get('rt'));
 		}
 
-		$href.='&amp;ptid='.$row['id'].'&amp;rt='.\Input::get('rt');
+		$href.='&amp;ptid='.$row['id'];
 
 		return '<a href="'.$this->addToUrl($href).'" title="'.specialchars($title).'"'.$attributes.'>'.$this->generateImage($icon, $label).'</a> ';
 	}
