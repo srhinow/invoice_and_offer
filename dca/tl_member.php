@@ -33,7 +33,7 @@ if($this->Input->get('do') == 'iao_customer')
 /**
  * Table tl_member
  */
-$GLOBALS['TL_DCA']['tl_member']['palettes']['iao_customer']   =  '{import_settings:hide},myid;{personal_legend},title,firstname,lastname,dateOfBirth,gender;{address_legend:hide},company,street,postal,city,state,country;{contact_legend},phone,mobile,fax,email,website;{login_legend},login;{homedir_legend:hide},assignDir;{account_legend},disable,start,stop';
+$GLOBALS['TL_DCA']['tl_member']['palettes']['iao_customer']   =  '{import_settings:hide},myid;{personal_legend},title,firstname,lastname,dateOfBirth,gender;{address_legend:hide},company,street,postal,city,state,country;{contact_legend},phone,mobile,fax,email,website;{groups_legend},groups;{login_legend},login;{homedir_legend:hide},assignDir;{account_legend},disable,start,stop';
 
 $GLOBALS['TL_DCA']['tl_member']['fields']['title'] = array
 (

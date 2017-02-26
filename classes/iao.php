@@ -273,6 +273,153 @@ class iao extends Backend
 		}
 		return $strBuffer;
 	}
+	/**
+	* generiert von den verschiedenen Bereichen eine PDF und gibt diese an den Browser
+	* @param integer
+	* @param string
+	* @return mixed
+	*/
+	public function generatePDF($id, $type = '')
+	{
+		//wenn type oder id fehlen abbrechen
+		if((int) $id < 1 || strlen($type) < 1) return;
+
+		$dataObj = $this->Database->prepare('SELECT * FROM `tl_iao_'.$type.'` WHERE `id`=?')->limit(1)->execute($id);
+
+		if($dataObj->numRows < 1) return;
+
+		$row = $dataObj->row();
+		// print_r($row);
+		//wenn eine feste Rechnung als PDF zugewiesen wurde
+		if(strlen($row[$type.'_pdf_file']) > 0 )
+		{
+			$objPdf = 	\FilesModel::findByPk($row[$type.'_pdf_file']);
+			if(!empty($objPdf->path) && file_exists(TL_ROOT . '/' . $objPdf->path))
+			{
+
+				header("Content-type: application/pdf");
+				header('Expires: Sat, 26 Jul 1997 05:00:00 GMT'); // Date in the past
+				header('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT');
+	 			header('Content-Length: '.strlen($row['invoice_pdf_file']));
+				header('Content-Disposition: inline; filename="'.basename($objPdf->path).'";');
+
+				// The PDF source is in original.pdf
+				readfile(TL_ROOT . '/' . $row[$type.'_pdf_file']);
+				exit();
+		    }
+		}
+
+		$pdfname = 'Rechnung-'.$row[$type.'_id_str'];
+
+		// Calculating dimensions
+		$margins = unserialize($this->settings['iao_pdf_margins']);         // Margins as an array
+		switch( $margins['unit'] )
+		{
+			case 'cm':      $factor = 10.0;   break;
+			default:        $factor = 1.0;
+	    }
+
+		$dim['top']    = !is_numeric($margins['top'])   ? PDF_MARGIN_TOP    : $margins['top'] * $factor;
+		$dim['right']  = !is_numeric($margins['right']) ? PDF_MARGIN_RIGHT  : $margins['right'] * $factor;
+		$dim['bottom'] = !is_numeric($margins['top'])   ? PDF_MARGIN_BOTTOM : $margins['bottom'] * $factor;
+		$dim['left']   = !is_numeric($margins['left'])  ? PDF_MARGIN_LEFT   : $margins['left'] * $factor;
+
+		// TCPDF configuration
+		$l['a_meta_dir'] = 'ltr';
+		$l['a_meta_charset'] = $GLOBALS['TL_CONFIG']['characterSet'];
+		$l['a_meta_language'] = $GLOBALS['TL_LANGUAGE'];
+		$l['w_page'] = 'page';
+
+		// Create new PDF document with FPDI extension
+		require_once(TL_ROOT . '/system/modules/invoice_and_offer/classes/iaoPDF.php');
+
+		$pdf = new \iaoPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true);
+		$pdf->setSourceFile( TL_ROOT . '/' .$objPdfTemplate->path);          // Set PDF template
+
+		// Set document information
+		$pdf->SetCreator(PDF_CREATOR);
+		$pdf->SetTitle($pdfname);
+		$pdf->SetSubject($pdfname);
+		$pdf->SetKeywords($pdfname);
+
+		$pdf->SetDisplayMode('fullwidth', 'OneColumn', 'UseNone');
+		$pdf->SetHeaderData();
+
+		// Remove default header/footer
+		$pdf->setPrintHeader(false);
+
+		// Set margins
+		$pdf->SetMargins($dim['left'], $dim['top'], $dim['right']);
+
+		// Set auto page breaks
+		$pdf->SetAutoPageBreak(true, $dim['bottom']);
+
+		// Set image scale factor
+		$pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+
+		// Set some language-dependent strings
+		$pdf->setLanguageArray($l);
+
+		// Initialize document and add a page
+		$pdf->AddPage();
+
+	    // Include CSS (TCPDF 5.1.000 an newer)
+	    $file = \FilesModel::findByUuid($this->settings['iao_pdf_css']);
+
+	    if(strlen($file->path) > 0 && file_exists(TL_ROOT . '/' . $file->path) )
+	    {
+			$styles = "<style>\n" . file_get_contents(TL_ROOT . '/' . $file->path) . "\n</style>\n";
+			$pdf->writeHTML($styles, true, false, true, false, '');
+		}
+
+		// write the address-data
+		$row['address_text'] = $this->changeIAOTags($row['address_text'],'invoice',$row['id']);
+		$row['address_text'] = $this->changeTags($row['address_text']);
+		$pdf->drawAddress($row['address_text']);
+
+		//Rechnungsnummer
+		$pdf->drawDocumentNumber($row[$type.'_id_str']);
+
+		//Datum
+		$pdf->drawDate(date($GLOBALS['TL_CONFIG']['dateFormat'],$row[$type.'_tstamp']));
+
+		//ausgeführt am
+		$newdate= $row['execute_date'];
+		$pdf->drawInvoiceExecuteDate(date($GLOBALS['TL_CONFIG']['dateFormat'],$newdate));
+
+		//gueltig bis
+		$newdate= $row['expiry_date'];
+		$pdf->drawInvoiceDurationDate(date($GLOBALS['TL_CONFIG']['dateFormat'],$newdate));
+
+		//Text vor der Posten-Tabelle
+		if(strip_tags($row['before_text']))
+		{
+			$row['before_text'] = $this->changeIAOTags($row['before_text'], $type, $row['id']);
+			$row['before_text'] = $this->changeTags($row['before_text']);
+			$pdf->drawTextBefore($row['before_text']);
+		}
+
+		//Posten-Tabelle
+		$header = array('Menge','Beschreibung','Einzelpreis','Gesamt');
+		$fields = $this->getPosten($row['id']);
+
+		$pdf->drawPostenTable($header, $fields, $row['noVat']);
+
+		//Text vor der Posten-Tabelle
+		if(strip_tags($row['after_text']))
+		{
+			$row['after_text'] = $this->changeIAOTags($row['after_text'],'invoice',$row['id']);
+			$row['after_text'] = $this->changeTags($row['after_text']);
+			$pdf->drawTextAfter($row['after_text']);
+		}
+
+		// Close and output PDF document
+		$pdf->lastPage();
+		$pdf->Output($pdfname. '.pdf', 'D');
+
+		// Stop script execution
+		exit();
+	}
 
     /**
     * get the sum incl. tax and postage

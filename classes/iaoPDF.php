@@ -1,5 +1,4 @@
 <?php
-
 /**
  *
  * @copyright  Sven Rhinow 2011-2014
@@ -8,6 +7,11 @@
  * @license    LGPL
  * @filesource
  */
+
+/**
+ * Run in a custom namespace, so the class can be replaced
+ */
+namespace iao;
 
 // Include library
 require_once(TL_ROOT . '/system/config/tcpdf.php');
@@ -20,7 +24,7 @@ if(version_compare(VERSION.BUILD, '3.0.0','>='))
      require_once(TL_ROOT . '/plugins/fpdi/fpdi.php'); // FPDI plugin
 }
 
-class iaoPDF extends FPDI
+class iaoPDF extends \FPDI
 {
 
 	/**
@@ -34,12 +38,6 @@ class iaoPDF extends FPDI
 	 * @var integer
 	 */
 	var $current_page = 1;
-
-	/**
-	* Settings (currency)
-	* @var array
-	*/
-	var $settings = array();
 
 	//-- loads automatically the next side of PDF template
 	public function AddPage($orientation='', $format='', $keepmargins=false, $tocpage=false)
@@ -181,8 +179,8 @@ class iaoPDF extends FPDI
 					$pagebreak = false;
 					$posten_td =	'<td style="width:'.$w[0].'mm; text-align:'.$align[0].';border:5pt solid white;">'.$row[0].'</td>'.
 									'<td style="width:'.$w[1].'mm; text-align:'.$align[1].';border:5pt solid white;">'.$row[1].'</td>'.
-				 					'<td style="width:'.$w[2].'mm; text-align:'.$align[2].';border:5pt solid white;">'.$row[2].' '.$this->settings['iao_currency'].'</td>'.
-				 					'<td style="width:'.$w[3].'mm; text-align:'.$align[3].';border:5pt solid white;">'.$row[3].' '.$this->settings['iao_currency'].'</td>';
+				 					'<td style="width:'.$w[2].'mm; text-align:'.$align[2].';border:5pt solid white;">'.$row[2].' '.$this->iaoSettings['iao_currency'].'</td>'.
+				 					'<td style="width:'.$w[3].'mm; text-align:'.$align[3].';border:5pt solid white;">'.$row[3].' '.$this->iaoSettings['iao_currency'].'</td>';
 		   			$posten_tr .= '<tr>'.$posten_td.'</tr>';
 
 					if($data['pagebreak_after'][$k] == 1)
@@ -220,14 +218,14 @@ class iaoPDF extends FPDI
 				}
 			}else $summe_tr .= 'ohne Umsatzsteuer<br />';
 
-			$summe_tr .= '<b>Gesamt '.$GLOBALS['TL_CONFIG']['iao_currency_symbol'].':</b>';
+			$summe_tr .= '<b>Gesamt '.$this->iaoSettings['iao_currency_symbol'].':</b>';
 
 			if($data['discount'])
 			{
 				$summe_tr .= '<br>'.$data['discount']['discount_title'].':';
 			}
 
-			$summe_tr .= '</td><td style="text-align:right;width:'.$w[4].'mm; ">'.number_format($data['summe']['netto'],2,',','.').' '.$this->settings['iao_currency'].'<br />';
+			$summe_tr .= '</td><td style="text-align:right;width:'.$w[4].'mm; ">'.number_format($data['summe']['netto'],2,',','.').' '.$this->iaoSettings['iao_currency'].'<br />';
 	
 			if($noVat != 1)
 			{	
@@ -235,11 +233,11 @@ class iaoPDF extends FPDI
 
 				foreach($data['summe']['mwst'] as $k => $v)
 				{
-					if((int) $k != 0) $summe_tr .= number_format($v,2,',','.').' '.$this->settings['iao_currency'].'<br />';
+					if((int) $k != 0) $summe_tr .= number_format($v,2,',','.').' '.$this->iaoSettings['iao_currency'].'<br />';
 				}
 			}else $summe_tr .= '&nbsp;<br>';
 	
-			$summe_tr .= '<b>'.number_format($data['summe']['brutto'],2,',','.').' '.$this->settings['iao_currency'].'</b>';
+			$summe_tr .= '<b>'.number_format($data['summe']['brutto'],2,',','.').' '.$this->iaoSettings['iao_currency'].'</b>';
 
 			if($data['discount'])
 			{
@@ -256,7 +254,7 @@ class iaoPDF extends FPDI
 						$discount_val = $data['summe']['brutto'] - (($data['summe']['brutto']  * $data['discount']['discount_value'])/100);
 				}
 
-				$summe_tr .= '<br>'.number_format($discount_val,2,',','.').' '.$this->settings['iao_currency'];
+				$summe_tr .= '<br>'.number_format($discount_val,2,',','.').' '.$this->iaoSettings['iao_currency'];
 			}
 
 			$summe_tr .= '</td></tr>';

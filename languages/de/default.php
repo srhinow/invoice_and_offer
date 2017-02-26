@@ -15,6 +15,10 @@
  * permanent text corrections which are update-safe.
  */
 
+$GLOBALS['TL_LANG']['tl_iao']['types']['offer']	= 'Angebot';
+$GLOBALS['TL_LANG']['tl_iao']['types']['invoice']	= 'Rechnung';
+$GLOBALS['TL_LANG']['tl_iao']['types']['credit']	= 'Gutschrift';
+
 $GLOBALS['TL_LANG']['tl_iao']['active']	= array('aktiv', '');
 $GLOBALS['TL_LANG']['tl_iao']['status']['title']	= array('Status', '');
 $GLOBALS['TL_LANG']['tl_iao']['counter']	= array('Counter','');

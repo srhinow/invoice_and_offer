@@ -15,25 +15,16 @@
 class iao_offer extends Backend
 {
 
-	protected $separators = array('comma'=>',','semicolon'=>';','tabulator'=>'\t','linebreak'=>'\n');
-
-	protected $csv_path = 'system/tmp';
 	/**
 	 * Export offer
 	 */
 	public function exportOffer()
 	{
-		
+		$separators = array('comma'=>',','semicolon'=>';','tabulator'=>'\t','linebreak'=>'\n');
 
 		if ($this->Input->post('FORM_SUBMIT') == 'tl_iao_export')
 		{
-
-			//Primary-Key
-			$path_pk = \Input::post('csv_export_dir', true);
-			
-			//Pfad ermitteln
-			$csv_export_dir = !empty($path_pk) ? \FilesModel::findByPk($path_pk)->path : $this->csv_path;
-
+			$csv_export_dir = $this->Input->post('csv_export_dir', true);
 			$this->import('Files');
 
 			// Check the file names
@@ -61,18 +52,11 @@ class iao_offer extends Backend
 			$this->import('Database');
 			$offer_fields = $this->Database->listFields('tl_iao_offer');
 			$offer_items_fields = $this->Database->listFields('tl_iao_offer_items');
-
 			$offer_export_csv = $this->Input->post('export_offer_filename').'.csv';
 			$offer_items_export_csv = $this->Input->post('export_offer_item_filename').'.csv';
 
 			// work on tl_iao_offer
 			$dbObj = $this->Database->prepare('SELECT * FROM `tl_iao_offer`')->execute();
-
-			if($dbObj->numRows < 1)
-			{
-				$_SESSION['TL_ERROR'][] = 'Es sind keine Angebote zum exportieren vorhanden.';
-				$this->reload();
-			}
 
 			$isOneLine = true;
 			$oneLine = array();
@@ -103,19 +87,13 @@ class iao_offer extends Backend
 
 			foreach ($linesArr as $line)
 			{
-				fputcsv($fp,  $line, $this->separators[\Input::post('separator')]);
+				fputcsv($fp,  $line, $separators[$this->Input->post('separator')]);
 			}
 
 			$this->Files->fclose($fp);
 
 			// work on tl_iao_offer_items
 			$dbObj = $this->Database->prepare('SELECT * FROM `tl_iao_offer_items`')->execute();
-
-			if($dbObj->numRows < 1)
-			{
-				$_SESSION['TL_ERROR'][] = 'Es sind keine Angebots-Positionen zum exportieren vorhanden.';
-				$this->reload();
-			}
 
 			$isOneLine = true;
 			$oneLine = array();
@@ -144,24 +122,10 @@ class iao_offer extends Backend
 
 			foreach ($linesArr as $line)
 			{
-				fputcsv($fp,$line,$this->separators[\Input::post('separator')]);
+				fputcsv($fp,$line,$separators[$this->Input->post('separator')]);
 			}
 
 			$this->Files->fclose($fp);
-
-			//wenn eine Email-Adresse gesetzt wurde, dann auch die Dateien an diese Email senden
-			$csv_export_email = \Input::post('csv_export_email');
-			if($csv_export_email != '')
-			{
-				$objEmail = new \Email();
-				$objEmail->from = $GLOBALS['TL_ADMIN_EMAIL'];
-				$objEmail->fromName = $GLOBALS['TL_ADMIN_NAME'];
-				$objEmail->subject = sprintf('Angebot-Export von %s', $this->Environment->host);
-				$objEmail->text = 'anbei die Angebot-Exporte von '.date('d.m.Y').' auf dem Host von '.$this->Environment->host.' als CSV-Format';
-				$objEmail->attachFile(TL_ROOT.'/'.$csv_export_dir.'/'.$invoice_export_csv);
-				$objEmail->attachFile(TL_ROOT.'/'.$csv_export_dir.'/'.$invoice_items_export_csv);
-				$objEmail->sendTo($csv_export_email);
-			}
 
 			//after ready export
 			$_SESSION['TL_ERROR'] = '';
@@ -208,13 +172,8 @@ class iao_offer extends Backend
 
 			 <fieldset class="tl_tbox block nolegend">
 			<div class="tl_tbox block">
-			  <h3><label for="csv_export_dir">'.$GLOBALS['TL_LANG']['tl_iao_offer']['csv_export_dir'][0].'</label></h3>'.$objTree4Export->generate().(strlen($GLOBALS['TL_LANG']['tl_iao_offer']['csv_export_dir'][1]) ? '
+			  <h3><label for="csv_export_dir">'.$GLOBALS['TL_LANG']['tl_iao_offer']['csv_export_dir'][0].'</label> <a href="contao/files.php" title="' . specialchars($GLOBALS['TL_LANG']['MSC']['fileManager']) . '" onclick="Backend.getScrollOffset(); Backend.openWindow(this, 750, 500); return false;">' . $this->generateImage('filemanager.gif', $GLOBALS['TL_LANG']['MSC']['fileManager'], 'style="vertical-align:text-bottom;"') . '</a></h3>'.$objTree4Export->generate().(strlen($GLOBALS['TL_LANG']['tl_iao_offer']['csv_export_dir'][1]) ? '
 			  <p class="tl_help tl_tip">'.$GLOBALS['TL_LANG']['tl_iao_offer']['csv_export_dir'][1].'</p>' : '').'
-			</div>
-			<div class="tl_tbox block">
-				<h3><label for="csv_export_email">'.$GLOBALS['TL_LANG']['tl_iao_offer']['csv_export_email'][0].'</label></h3>
-				<input id="ctrl_csv_export_email" class="tl_text"  type="text" name="csv_export_email" value="" />'.
-			(strlen($GLOBALS['TL_LANG']['tl_iao_offer']['csv_export_email'][1]) ? '<p class="tl_help tl_tip">'.$GLOBALS['TL_LANG']['tl_iao_offer']['csv_export_email'][1].'</p>' : '').'
 			</div>
 			</fieldset>
 			</div>
@@ -356,15 +315,15 @@ class iao_offer extends Backend
 
 			<fieldset class="tl_tbox block nolegend">
 			<div class="clr">
-			  <h3><label for="csv_source">'.$GLOBALS['TL_LANG']['tl_iao_offer']['csv_source'][0].'</label></h3>'.$objTree4Source->generate().(strlen($GLOBALS['TL_LANG']['tl_iao_offer']['csv_source'][1]) ? '
+			  <h3><label for="csv_source">'.$GLOBALS['TL_LANG']['tl_iao_offer']['csv_source'][0].'</label> <a href="contao/files.php" title="' . specialchars($GLOBALS['TL_LANG']['MSC']['fileManager']) . '" onclick="Backend.getScrollOffset(); Backend.openWindow(this, 750, 500); return false;">' . $this->generateImage('filemanager.gif', $GLOBALS['TL_LANG']['MSC']['fileManager'], 'style="vertical-align:text-bottom;"') . '</a></h3>'.$objTree4Source->generate().(strlen($GLOBALS['TL_LANG']['tl_iao_offer']['csv_source'][1]) ? '
 			  <p class="tl_help tl_tip">'.$GLOBALS['TL_LANG']['tl_iao_offer']['csv_source'][1].'</p>' : '').'
 			</div>
 			<div class="clr">
-			  <h3><label for="csv_posten_source">'.$GLOBALS['TL_LANG']['tl_iao_offer']['csv_posten_source'][0].'</label></h3>'.$objTree4Posten->generate().(strlen($GLOBALS['TL_LANG']['tl_iao_offer']['csv_posten_source'][1]) ? '
+			  <h3><label for="csv_posten_source">'.$GLOBALS['TL_LANG']['tl_iao_offer']['csv_posten_source'][0].'</label> <a href="contao/files.php" title="' . specialchars($GLOBALS['TL_LANG']['MSC']['fileManager']) . '" onclick="Backend.getScrollOffset(); Backend.openWindow(this, 750, 500); return false;">' . $this->generateImage('filemanager.gif', $GLOBALS['TL_LANG']['MSC']['fileManager'], 'style="vertical-align:text-bottom;"') . '</a></h3>'.$objTree4Posten->generate().(strlen($GLOBALS['TL_LANG']['tl_iao_offer']['csv_posten_source'][1]) ? '
 			  <p class="tl_help tl_tip">'.$GLOBALS['TL_LANG']['tl_iao_offer']['csv_posten_source'][1].'</p>' : '').'
 			</div>
 			<div class="clr">
-			  <h3><label for="pdf_import_dir">'.$GLOBALS['TL_LANG']['tl_iao_offer']['pdf_import_dir'][0].'</label></h3>'.$objTree4PDF->generate().(strlen($GLOBALS['TL_LANG']['tl_iao_offer']['pdf_import_dir'][1]) ? '
+			  <h3><label for="pdf_import_dir">'.$GLOBALS['TL_LANG']['tl_iao_offer']['pdf_import_dir'][0].'</label> <a href="contao/files.php" title="' . specialchars($GLOBALS['TL_LANG']['MSC']['fileManager']) . '" onclick="Backend.getScrollOffset(); Backend.openWindow(this, 750, 500); return false;">' . $this->generateImage('filemanager.gif', $GLOBALS['TL_LANG']['MSC']['fileManager'], 'style="vertical-align:text-bottom;"') . '</a></h3>'.$objTree4PDF->generate().(strlen($GLOBALS['TL_LANG']['tl_iao_offer']['pdf_import_dir'][1]) ? '
 			  <p class="tl_help tl_tip">'.$GLOBALS['TL_LANG']['tl_iao_offer']['pdf_import_dir'][1].'</p>' : '').'
 			</div>
 			    </fieldset>

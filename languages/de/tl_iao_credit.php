@@ -16,6 +16,7 @@
  */
 
 $GLOBALS['TL_LANG']['tl_iao_credit']['setting_id']	=	array('Konfiguration','');
+$GLOBALS['TL_LANG']['tl_iao_credit']['pid']	=	array('Projekt','das entsprechende Projekt auswählen.');
 $GLOBALS['TL_LANG']['tl_iao_credit']['title']	=	array('Bezeichnung','Bezeichnung des Elementes');
 $GLOBALS['TL_LANG']['tl_iao_credit']['alias']	=	array('Alias','');
 

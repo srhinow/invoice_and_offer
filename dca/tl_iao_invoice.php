@@ -9,11 +9,6 @@
  */
 
 /**
- * Run in a custom namespace, so the class can be replaced
- */
-// namespace iao;
-
-/**
  * Table tl_iao_invoice
  */
 $GLOBALS['TL_DCA']['tl_iao_invoice'] = array
@@ -23,11 +18,14 @@ $GLOBALS['TL_DCA']['tl_iao_invoice'] = array
 	'config' => array
 	(
 		'dataContainer'               => 'Table',
+		'ptable'                      => 'tl_iao_projects',
 		'ctable'                      => array('tl_iao_invoice_items'),
+		'doNotCopyRecords'			  => true,
 		'switchToEdit'                => true,
 		'enableVersioning'            => false,
 		'onload_callback' => array
 		(
+			array('tl_iao_invoice', 'generateInvoicePDF'),
 			array('tl_iao_invoice', 'checkPermission'),
 			array('tl_iao_invoice','upgradeInvoices')
 		),
@@ -35,7 +33,8 @@ $GLOBALS['TL_DCA']['tl_iao_invoice'] = array
 		(
 			'keys' => array
 			(
-				'id' => 'primary'
+				'id' => 'primary',
+				'pid' => 'index'
 			)
 		)
 	),
@@ -136,7 +135,7 @@ $GLOBALS['TL_DCA']['tl_iao_invoice'] = array
 	'palettes' => array
 	(
 		'__selector__'                => array('discount'),
-		'default'                     => '{settings_legend},setting_id;{title_legend},title;{invoice_id_legend:hide},invoice_id,invoice_id_str,invoice_tstamp,agreement_id,invoice_pdf_file,execute_date,expiry_date;{address_legend},member,address_text;{text_before_legend},before_template,before_text,beforetext_as_template;{text_after_legend},after_template,after_text,aftertext_as_template;{status_legend},published;{paid_legend},priceall_brutto,status,paid_on_dates,remaining;{extend_legend},noVat,discount;{notice_legend:hide},notice',
+		'default'                     => '{settings_legend},setting_id,pid;{title_legend},title;{invoice_id_legend:hide},invoice_id,invoice_id_str,invoice_tstamp,agreement_id,invoice_pdf_file,execute_date,expiry_date;{address_legend},member,address_text;{text_before_legend},before_template,before_text,beforetext_as_template;{text_after_legend},after_template,after_text,aftertext_as_template;{status_legend},published;{paid_legend},priceall_brutto,status,paid_on_dates,remaining;{extend_legend},noVat,discount;{notice_legend:hide},notice',
 	),
 
 	// Subpalettes
@@ -151,6 +150,18 @@ $GLOBALS['TL_DCA']['tl_iao_invoice'] = array
 		'id' => array
 		(
 			'sql'                     => "int(10) unsigned NOT NULL auto_increment"
+		),
+		'pid' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_invoice']['pid'],
+			'foreignKey'              => 'tl_iao_projects.title',
+			'filter'                  => true,
+			'sorting'                 => true,
+			'flag'                    => 11,
+			'inputType'               => 'select',
+			'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>false, 'chosen'=>true),
+			'sql'                     => "int(10) unsigned NOT NULL default '0'",
+			'relation'                => array('type'=>'belongsTo', 'load'=>'eager')
 		),
 		'reminder_id' => array
 		(
@@ -296,7 +307,7 @@ $GLOBALS['TL_DCA']['tl_iao_invoice'] = array
 			'flag'                    => 11,
 			'inputType'               => 'select',
 			'options_callback'        => array('tl_iao_invoice', 'getBeforeTemplate'),
-			'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>true,'submitOnChange'=>false, 'chosen'=>true),
+			'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>true,'submitOnChange'=>true, 'chosen'=>true),
 			'save_callback' => array
 			(
 				array('tl_iao_invoice', 'fillBeforeText')
@@ -332,7 +343,7 @@ $GLOBALS['TL_DCA']['tl_iao_invoice'] = array
 			'flag'                    => 11,
 			'inputType'               => 'select',
 			'options_callback'        => array('tl_iao_invoice', 'getAfterTemplate'),
-			'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>true,'submitOnChange'=>false, 'chosen'=>true),
+			'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>true,'submitOnChange'=>true, 'chosen'=>true),
 			'save_callback' => array
 			(
 				array('tl_iao_invoice', 'fillAfterText')
@@ -526,30 +537,41 @@ $GLOBALS['TL_DCA']['tl_iao_invoice'] = array
 		(
 			'sql' 					=> "varchar(64) NOT NULL default '0'"
 		),
-		'csv_export_dir' => array
+		'pdf_import_dir' => array
 		(
-			'exclude'                 => true,
-			'inputType'               => 'fileTree',
-			'eval'                    => array('multiple'=>false, 'fieldType'=>'radio'),
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_offer']['pdf_import_dir'],
+			'eval'                    => array('fieldType'=>'radio', 'files'=>false, 'filesOnly'=>false, 'class'=>'mandatory'),
+			'sql'					  => "text NULL"
 		),
 		'csv_source' => array
 		(
-			'exclude'                 => true,
-			'inputType'               => 'fileTree',
-			'eval'                    => array('filesOnly'=>true, 'extensions'=>'csv', 'fieldType'=>'radio'),
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_offer']['csv_source'],
+			'eval'                    => array('fieldType'=>'radio', 'files'=>true, 'filesOnly'=>true, 'extensions'=>'csv', 'class'=>'mandatory'),
+			'sql'					  => "text NULL"
 		),
 		'csv_posten_source' => array
 		(
-			'exclude'                 => true,
-			'inputType'               => 'fileTree',
-			'eval'                    => array('filesOnly'=>true, 'extensions'=>'csv', 'fieldType'=>'radio'),
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_offer']['csv_posten_source'],
+			'eval'                    => array('fieldType'=>'radio', 'files'=>true, 'filesOnly'=>true, 'extensions'=>'csv', 'class'=>'mandatory'),
+			'sql'					  => "text NULL"
 		),
-		'pdf_import_dir' => array
-			(
-				'exclude'                 => true,
-				'inputType'               => 'fileTree',
-				'eval'                    => array('filesOnly'=>false, 'extensions'=>'csv', 'fieldType'=>'radio'),
-			)
+		// -- Backport C2 SQL-Import
+		'sendEmail' => array(
+				'sql' 					=> "varchar(64) NOT NULL default '0'"
+		),
+		'sendEmail' => array(
+				'sql' 					=> "varchar(64) NOT NULL default '0'"
+		),
+		'FromEmail' => array(
+				'sql' 					=> "varchar(64) NOT NULL default '0'"
+		),
+		'ToEmail' => array(
+				'sql' 					=> "varchar(64) NOT NULL default '0'"
+		),
+		'alias' => array(
+				'sql' 					=> "varchar(64) NOT NULL default '0'"
+		),
+		//--
 	)
 );
 
@@ -557,7 +579,7 @@ $GLOBALS['TL_DCA']['tl_iao_invoice'] = array
 /**
  * Class tl_iao_invoice
  */
-class tl_iao_invoice extends \iaoBackend
+class tl_iao_invoice extends \iao\iaoBackend
 {
 
 	protected $settings = array();
@@ -571,13 +593,6 @@ class tl_iao_invoice extends \iaoBackend
 		$this->import('BackendUser', 'User');
 	}
 
-	/**
-	* add all iao-Settings in array
-	*/
-	public function setIaoSettings($id)
-	{
-		$this->settings = ($id) ? $this->getSettings($id) : array();
-	}
 
 	/**
 	 * Check permissions to edit table tl_iao_invoice
@@ -728,9 +743,11 @@ class tl_iao_invoice extends \iaoBackend
 	 */
 	public function  generateExpiryDate($varValue, DataContainer $dc)
 	{
+		$settings = $this->getSettings($dc->activeRecord->setting_id);
+
 		if(!$varValue)
 		{
-			$dur = (int) ($this->settings['iao_invoice_duration']) ? $this->settings['iao_invoice_duration'] : 14;
+			$dur = (int) ($settings['iao_invoice_duration']) ? $settings['iao_invoice_duration'] : 14;
 			$invoiceTstamp = ($dc->activeRecord->invoice_tstamp) ? $dc->activeRecord->invoice_tstamp : time();
 
 			//auf Sonabend prüfen wenn ja dann auf Montag setzen
@@ -789,7 +806,7 @@ class tl_iao_invoice extends \iaoBackend
 	 */
 	public function fillBeforeText($varValue, DataContainer $dc)
 	{
-		if(trim(strip_tags($dc->activeRecord->before_text)=='') )
+		if(strip_tags($dc->activeRecord->before_text)=='')
 		{
 			if(strlen($varValue)<=0) return $varValue;
 
@@ -799,9 +816,11 @@ class tl_iao_invoice extends \iaoBackend
 
 			$objTemplate->text = $this->changeIAOTags($objTemplate->text,'invoice',$dc->id);
 
+			$text = $this->replacePlaceholder($objTemplate->text, $dc);
+
 			$this->Database->prepare('UPDATE `tl_iao_invoice` SET `before_text`=? WHERE `id`=?')
 			->limit(1)
-			->execute($objTemplate->text,$dc->id);
+			->execute($text, $dc->id);
 		}
 
 		return $varValue;
@@ -903,6 +922,7 @@ class tl_iao_invoice extends \iaoBackend
 		return '';
 	}
 
+
 	/**
 	 * get all Agreements to valid groups
 	 * @param object
@@ -978,6 +998,15 @@ class tl_iao_invoice extends \iaoBackend
 	}
 
 	/**
+	* wenn GET-Parameter passen dann wird eine PDF erzeugt
+	*
+	*/
+	public function generateInvoicePDF(DataContainer $dc)
+	{
+		if(\Input::get('key') == 'pdf' && (int) \Input::get('id') > 0) $this->generatePDF((int) \Input::get('id'), 'invoice');
+	}
+
+	/**
 	 * Generate a "PDF" button and return it as string
 	 * @param array
 	 * @param string
@@ -988,254 +1017,29 @@ class tl_iao_invoice extends \iaoBackend
 	 */
 	public function showPDFButton($row, $href, $label, $title, $icon)
 	{
-		$this->setIaoSettings($row['setting_id']); 
+		$settings = $this->getSettings($row['setting_id']);
 
-		// wenn kein Admin dann kein PDF-Link	
-		if (!$this->User->isAdmin)
-		{
-			return '';
-		}
+		// wenn kein Admin dann kein PDF-Link
+		if (!$this->User->isAdmin)	return;
 
 		// Wenn keine PDF-Vorlage dann kein PDF-Link
-	    $objPdfTemplate = 	\FilesModel::findByUuid($this->settings['iao_invoice_pdf']);			
-
+	    $objPdfTemplate = 	\FilesModel::findByUuid($settings['iao_invoice_pdf']);
 		if(strlen($objPdfTemplate->path) < 1 || !file_exists(TL_ROOT . '/' . $objPdfTemplate->path) ) return;  // template file not found
-	
-		if (\Input::get('key') == 'pdf' && \Input::get('id') == $row['id'])
-		{
 
-			//wenn eine feste Rechnung als PDF zugewiesen wurde
-			if(strlen($row['invoice_pdf_file']) > 0 )
-			{
-				$objPdf = 	\FilesModel::findByPk($row['invoice_pdf_file']);			
-				if(!empty($objPdf->path) && file_exists(TL_ROOT . '/' . $objPdf->path))
-				{
-
-					header("Content-type: application/pdf");
-					header('Expires: Sat, 26 Jul 1997 05:00:00 GMT'); // Date in the past
-					header('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT');
-		 			header('Content-Length: '.strlen($row['invoice_pdf_file']));
-					header('Content-Disposition: inline; filename="'.basename($objPdf->path).'";');
-
-					// The PDF source is in original.pdf
-					readfile(TL_ROOT . '/' . $row['invoice_pdf_file']);
-					exit();
-			    }				
-			}
-
-			$pdfname = 'Rechnung-'.$row['invoice_id_str'];
-
-			// Calculating dimensions
-			$margins = unserialize($this->settings['iao_pdf_margins']);         // Margins as an array
-			switch( $margins['unit'] )
-			{
-				case 'cm':      $factor = 10.0;   break;
-				default:        $factor = 1.0;
-		    }
-
-			$dim['top']    = !is_numeric($margins['top'])   ? PDF_MARGIN_TOP    : $margins['top'] * $factor;
-			$dim['right']  = !is_numeric($margins['right']) ? PDF_MARGIN_RIGHT  : $margins['right'] * $factor;
-			$dim['bottom'] = !is_numeric($margins['top'])   ? PDF_MARGIN_BOTTOM : $margins['bottom'] * $factor;
-			$dim['left']   = !is_numeric($margins['left'])  ? PDF_MARGIN_LEFT   : $margins['left'] * $factor;
-
-			// TCPDF configuration
-			$l['a_meta_dir'] = 'ltr';
-			$l['a_meta_charset'] = $GLOBALS['TL_CONFIG']['characterSet'];
-			$l['a_meta_language'] = $GLOBALS['TL_LANGUAGE'];
-			$l['w_page'] = 'page';
-
-			// Create new PDF document with FPDI extension
-			require_once(TL_ROOT . '/system/modules/invoice_and_offer/classes/iaoPDF.php');
-
-			$pdf = new iaoPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true);
-			$pdf->setSourceFile( TL_ROOT . '/' .$objPdfTemplate->path);          // Set PDF template
-
-			// Set document information
-			$pdf->SetCreator(PDF_CREATOR);
-			$pdf->SetTitle($pdfname);
-			$pdf->SetSubject($pdfname);
-			$pdf->SetKeywords($pdfname);
-
-			$pdf->SetDisplayMode('fullwidth', 'OneColumn', 'UseNone');
-			$pdf->SetHeaderData();
-
-			// Remove default header/footer
-			$pdf->setPrintHeader(false);
-
-			// Set margins
-			$pdf->SetMargins($dim['left'], $dim['top'], $dim['right']);
-
-			// Set auto page breaks
-			$pdf->SetAutoPageBreak(true, $dim['bottom']);
-
-			// Set image scale factor
-			$pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
-
-			// Set some language-dependent strings
-			$pdf->setLanguageArray($l);
-
-			// Initialize document and add a page
-			$pdf->AddPage();
-
-		    // Include CSS (TCPDF 5.1.000 an newer)
-		    $file = \FilesModel::findByUuid($this->settings['iao_pdf_css']);
-
-		    if(strlen($file->path) > 0 && file_exists(TL_ROOT . '/' . $file->path) )
-		    {
-				$styles = "<style>\n" . file_get_contents(TL_ROOT . '/' . $file->path) . "\n</style>\n";
-				$pdf->writeHTML($styles, true, false, true, false, '');
-			}
-			// set settings
-			$pdf->settings = $this->settings;
-			// write the address-data
-			$row['address_text'] = $this->changeIAOTags($row['address_text'],'invoice',$row['id']);
-			$row['address_text'] = $this->changeTags($row['address_text']);
-			$pdf->drawAddress($row['address_text']);
-
-			//Rechnungsnummer
-			$pdf->drawDocumentNumber($row['invoice_id_str']);
-
-			//Datum
-			$pdf->drawDate(date($GLOBALS['TL_CONFIG']['dateFormat'],$row['invoice_tstamp']));
-
-			//ausgeführt am
-			$newdate= $row['execute_date'];
-			$pdf->drawInvoiceExecuteDate(date($GLOBALS['TL_CONFIG']['dateFormat'],$newdate));
-
-			//ausgeführt am
-			$newdate= $row['expiry_date'];
-			$pdf->drawInvoiceDurationDate(date($GLOBALS['TL_CONFIG']['dateFormat'],$newdate));
-
-			//Text vor der Posten-Tabelle
-			if(strip_tags($row['before_text']))
-			{
-				$row['before_text'] = $this->changeIAOTags($row['before_text'],'invoice',$row['id']);
-				$row['before_text'] = $this->changeTags($row['before_text']);
-				$pdf->drawTextBefore($row['before_text']);
-			}
-
-			//Posten-Tabelle
-			$header = array('Menge','Beschreibung','Einzelpreis','Gesamt');
-			$fields = $this->getPosten($this->Input->get('id'));
-			
-			$parentObj = $this->Database->prepare('SELECT `noVat` FROM `tl_iao_invoice` WHERE `id`=?')
-						->limit(1)
-						->execute($this->Input->get('id'));
-			
-			$noVat = $parentObj->noVat;
-
-			$pdf->drawPostenTable($header, $fields, $noVat);
-
-			//Text vor der Posten-Tabelle
-			if(strip_tags($row['after_text']))
-			{
-				$row['after_text'] = $this->changeIAOTags($row['after_text'],'invoice',$row['id']);
-				$row['after_text'] = $this->changeTags($row['after_text']);
-				$pdf->drawTextAfter($row['after_text']);
-			}
-
-			// Close and output PDF document
-			$pdf->lastPage();
-			$pdf->Output($pdfname. '.pdf', 'D');
-
-			// Stop script execution
-			exit();
-		}
-
-		return '<a href="'.$this->addToUrl($href.'&amp;id='.$row['id']).'" title="'.specialchars($title).'">'.$this->generateImage($icon, $label).'</a> ';
+		$href = 'contao/main.php?do=iao_invoice&amp;key=pdf&amp;id='.$row['id'];
+		return '<a href="'.$href.'" title="'.specialchars($title).'">'.$this->generateImage($icon, $label).'</a> ';
 	}
 
-	public function getPosten($id)
-	{
-		$posten = array();
-
-		if(!$id) return $posten;
-
-		$this->loadLanguageFile('tl_iao_invoice_items');
-
-		$resultObj = $this->Database->prepare('SELECT * FROM `tl_iao_invoice_items` WHERE `pid`=? AND `published`=1 ORDER BY `sorting`')->execute($id);
-
-
-		if($resultObj->numRows <= 0) return $posten;
-
-		while($resultObj->next())
-		{
-			$resultObj->price = str_replace(',','.',$resultObj->price);
-
-			$einzelpreis = ($resultObj->vat_incl == 1) ? $this->getBruttoPrice($resultObj->price,$resultObj->vat) : $resultObj->price;
-			
-			if($resultObj->headline_to_pdf == 1) $resultObj->text = substr_replace($resultObj->text, '<p><strong>'.$resultObj->headline.'</strong><br>', 0, 3);
-			
-			$resultObj->text = $this->changeTags($resultObj->text);
-
-			// get units from DB-Table
-			$unitObj = $this->Database->prepare('SELECT * FROM `tl_iao_item_units` WHERE `value`=?')
-										->limit(1)
-										->execute($resultObj->amountStr);
-
-			$formatCount = stripos($resultObj->count, '.') ? number_format($resultObj->count,1,',','.') : $resultObj->count;
-
-			$posten['fields'][] = array
-			(
-				$formatCount.' '.(($resultObj->count <= 1) ? $unitObj->singular : $unitObj->majority),
-				$resultObj->text,
-				number_format($resultObj->price,2,',','.'),
-				number_format($resultObj->price * $resultObj->count,2,',','.')
-			);
-			$posten['pagebreak_after'][] = $resultObj->pagebreak_after;
-			$posten['type'][] = $resultObj->type;
-
-			$posten['discount'] = false;
-
-			if($parentObj->discount)
-			{
-				$posten['discount'] = array
-				(
-					'discount' =>  $parentObj->discount,
-					'discount_title' => $parentObj->discount_title,
-					'discount_value' => $parentObj->discount_value,
-					'discount_operator' => $parentObj->discount_operator
-				);
-			}
-
-			if($resultObj->operator == '-')
-			{
-				$posten['summe']['price'] -= $resultObj->operator = $resultObj->price;
-				$posten['summe']['netto'] -= $resultObj->price_netto;
-				$posten['summe']['brutto'] -= $resultObj->price_brutto;
-			}
-			else
-			{
-				$posten['summe']['price'] += $resultObj->operator = $resultObj->price;
-				$posten['summe']['netto'] += $resultObj->price_netto;
-				$posten['summe']['brutto'] += $resultObj->price_brutto;
-			}
-
-			$parentObj = $this->Database->prepare('SELECT * FROM `tl_iao_invoice` WHERE `id`=?')
-					->limit(1)
-					->execute($id);
-			
-			if($parentObj->noVat != 1)
-			{
-				$posten['summe']['mwst'][$resultObj->vat] +=  $resultObj->price_brutto - $resultObj->price_netto;
-			}
-		}
-
-	    $posten['summe']['netto_format'] =  number_format($posten['summe']['netto'],2,',','.');
-	    $posten['summe']['brutto_format'] =  number_format($posten['summe']['brutto'],2,',','.');
-
-	    return $posten;
-	}
 
 	public function createInvoiceNumberStr($varValue, DataContainer $dc)
 	{
-		$this->setIaoSettings($dc->activeRecord->setting_id);
+		$settings = $this->getSettings($dc->activeRecord->setting_id);
 
 		if(!$varValue)
 		{
 			$tstamp = $dc->activeRecord->date ? $dc->activeRecord->date : time();
 
-			$format = $this->settings['iao_invoice_number_format'];
+			$format = $settings['iao_invoice_number_format'];
 			$format =  str_replace('{date}',date('Ymd',$tstamp),$format);
 			$format =  str_replace('{nr}',$dc->activeRecord->invoice_id,$format);
 			$varValue = $format;
@@ -1253,8 +1057,7 @@ class tl_iao_invoice extends \iaoBackend
 	{
 		$autoNr = false;
 		$varValue = (int) $varValue;
-		
-		$this->setIaoSettings($dc->activeRecords->setting_id);
+		$settings = $this->getSettings($dc->activeRecord->setting_id);
 
 		// Generate invoice_id if there is none
 		if($varValue == 0)
@@ -1264,14 +1067,14 @@ class tl_iao_invoice extends \iaoBackend
 					->limit(1)
 					->execute();
 
-			if($objNr->numRows < 1 || $objNr->invoice_id == 0)  $varValue = $this->settings['iao_invoice_startnumber'];
+			if($objNr->numRows < 1 || $objNr->invoice_id == 0)  $varValue = $settings['iao_invoice_startnumber'];
 			else  $varValue =  $objNr->invoice_id +1;
 	    }
 	    else
 	    {
 			$objNr = $this->Database->prepare("SELECT `invoice_id` FROM `tl_iao_invoice` WHERE `id`=? OR `invoice_id`=?")
 					    ->limit(1)
-					    ->execute($dc->id,$varValue);
+					    ->execute($dc->id, $varValue);
 
 			// Check whether the InvoiceNumber exists
 			if ($objNr->numRows > 1 )
@@ -1294,7 +1097,8 @@ class tl_iao_invoice extends \iaoBackend
     */
     public function listEntries($arrRow)
     {
-		$this->import('Database');
+		$settings = $this->getSettings($arrRow['setting_id']);
+
 		$result = $this->Database->prepare("SELECT `firstname`,`lastname`,`company` FROM `tl_member`  WHERE id=?")
 					->limit(1)
 					->execute($arrRow['member']);
@@ -1303,8 +1107,8 @@ class tl_iao_invoice extends \iaoBackend
 		return '
 		<div class="comment_wrap">
 		<div class="cte_type status' . $arrRow['status'] . '"><strong>' . $arrRow['title'] . '</strong> '.$arrRow['invoice_id_str'].'</div>
-		<div>'.$GLOBALS['TL_LANG']['tl_iao_invoice']['price_brutto'][0].': <strong>'.number_format($arrRow['price_brutto'],2,',','.').' '.$this->settings['iao_currency_symbol'].'</strong></div>
-		<div>'.$GLOBALS['TL_LANG']['tl_iao_invoice']['remaining'][0].': <strong>'.number_format($arrRow['remaining'],2,',','.').' '.$this->settings['iao_currency_symbol'].'</strong></div>
+		<div>'.$GLOBALS['TL_LANG']['tl_iao_invoice']['price_brutto'][0].': <strong>'.number_format($arrRow['price_brutto'],2,',','.').' '.$settings['iao_currency_symbol'].'</strong></div>
+		<div>'.$GLOBALS['TL_LANG']['tl_iao_invoice']['remaining'][0].': <strong>'.number_format($arrRow['remaining'],2,',','.').' '.$settings['iao_currency_symbol'].'</strong></div>
 		<div>'.$GLOBALS['TL_LANG']['tl_iao_invoice']['member'][0].': '.$row['firstname'].' '.$row['lastname'].' ('.$row['company'].')</div>
 		'.(($arrRow['notice'])?"<div>".$GLOBALS['TL_LANG']['tl_iao_invoice']['notice'][0].":".$arrRow['notice']."</div>": '').'
 		</div>' . "\n    ";

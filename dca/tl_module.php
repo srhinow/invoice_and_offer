@@ -1,28 +1,15 @@
 <?php
 
 /**
- * This program is free software: you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation, either
- * version 3 of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this program. If not, please visit the Free
- * Software Foundation website at <http://www.gnu.org/licenses/>.
- *
  * PHP version 5
- * @copyright  sr-tag.de 2011-2013
+ * @copyright  sr-tag.de 2011-2017
  * @author     Sven Rhinow
  * @package    invoice_and_offer
  * @license    LGPL
  * @filesource
  */
 $this->loadLanguageFile('tl_iao_invoice');
+
 /**
  * Add palettes to tl_module
  */
@@ -31,6 +18,8 @@ $GLOBALS['TL_DCA']['tl_module']['palettes']['fe_iao_offer'] = '{title_legend},na
 $GLOBALS['TL_DCA']['tl_module']['palettes']['fe_iao_credit']  = '{title_legend},name,headline,type,fe_iao_numberOfItems,perPage;{template_legend},fe_iao_template;{protected_legend:hide},protected;{expert_legend:hide},cssID,space';
 $GLOBALS['TL_DCA']['tl_module']['palettes']['fe_iao_reminder']  = '{title_legend},name,headline,type,fe_iao_numberOfItems,perPage;{template_legend},fe_iao_template;{protected_legend:hide},protected;{expert_legend:hide},cssID,space';
 $GLOBALS['TL_DCA']['tl_module']['palettes']['fe_iao_agreements']  = '{title_legend},name,headline,type,fe_iao_numberOfItems,perPage;{template_legend},fe_iao_template;{protected_legend:hide},protected;{expert_legend:hide},cssID,space';
+$GLOBALS['TL_DCA']['tl_module']['palettes']['fe_iao_public_project_list']  = '{title_legend},name,headline,type,fe_iao_numberOfItems,perPage;{config_legend},jumpTo;{template_legend},fe_iao_template;{protected_legend:hide},protected;{expert_legend:hide},cssID,space';
+$GLOBALS['TL_DCA']['tl_module']['palettes']['fe_iao_public_project_details']  = '{title_legend},name,headline,type;{template_legend},fe_iao_template;{protected_legend:hide},protected;{expert_legend:hide},cssID,space';
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['fe_iao_template'] = array
 (

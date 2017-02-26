@@ -1,0 +1,18 @@
+<div class="cbp-l-inline">
+    <div class="cbp-l-inline-left">
+        <img src="<?= $this->getImage($this->data['image'], 500, 0, 'center_center'); ?>" alt="Dashboard" class="cbp-l-project-img">
+    </div>
+
+    <div class="cbp-l-inline-right">
+        <div class="cbp-l-inline-title"><?=$this->data['reference_title'];?></div>
+        <div class="cbp-l-inline-subtitle"><?=$this->data['reference_subtitle'];?></div>
+
+        <div class="cbp-l-inline-desc">
+		<?php if(strlen($this->data['reference_customer'])):?><h4>über:</h4><?=$this->data['reference_customer'];?><?php endif; ?>
+		<?php if(strlen($this->data['reference_todo'])):?><h4>Aufgaben:</h4><?=$this->data['reference_todo'];?><?php endif; ?>
+		<?php if(strlen($this->data['reference_desription'])):?><h4>Beschreibung:</h4><?=$this->data['reference_desription']?><?php endif; ?>
+        </div>
+
+        <?php if($this->data['url']): ?><a href="<?=$this->data['url'];?>" target="_blank" class="cbp-l-inline-view">zur Website</a><?php endif; ?>
+    </div>
+</div>

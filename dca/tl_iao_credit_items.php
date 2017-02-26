@@ -310,7 +310,13 @@ $GLOBALS['TL_DCA']['tl_iao_credit_items'] = array
 			'inputType'               => 'checkbox',
 			'eval'                    => array('doNotCopy'=>true),
 			'sql'					  => "char(1) NOT NULL default ''"
-		)
+		),
+		// -- Backport C2 SQL-Import
+		'pagebreak_after' => array(
+				'sql' 					=> "varchar(64) NOT NULL default '0'"
+		),
+
+		//--
 	)
 );
 

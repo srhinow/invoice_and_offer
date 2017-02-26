@@ -308,6 +308,12 @@ $GLOBALS['TL_DCA']['tl_iao_invoice_items'] = array
 			'eval'                    => array('doNotCopy'=>true),
 			'sql'					  => "char(1) NOT NULL default ''"
 		),
+		// -- Backport C2 SQL-Import
+		'pagebreak_after' => array(
+				'sql' 					=> "varchar(64) NOT NULL default '0'"
+		),
+
+		//--
 	)
 );
 
@@ -315,7 +321,7 @@ $GLOBALS['TL_DCA']['tl_iao_invoice_items'] = array
 /**
  * Class tl_iao_invoice_items
  */
-class tl_iao_invoice_items extends iaoBackend
+class tl_iao_invoice_items extends \iao\iaoBackend
 {
 
 	protected $settings = array();
@@ -571,9 +577,9 @@ class tl_iao_invoice_items extends iaoBackend
 		}
 
 		//von den Haupteinstellungen holen ob diese MwSt befreit ist, dann Brutto und Netto gleich setzen.
-		$invoiceObj = $this->Database->prepare('SELECT * FROM `tl_iao_invoice` WHERE `id`=? AND published =?')
+		$invoiceObj = $this->Database->prepare('SELECT * FROM `tl_iao_invoice` WHERE `id`=?')
 					 ->limit(1)
-					 ->execute($dc->activeRecord->pid, 1);
+					 ->execute($dc->activeRecord->pid);
 
 	    $englprice = str_replace(',','.',$dc->activeRecord->price);
 
@@ -596,9 +602,8 @@ class tl_iao_invoice_items extends iaoBackend
 			$Brutto = $englprice;
 	    }
 
-
-	    $nettoSum = round($Netto * $dc->activeRecord->count,2);
-	    $bruttoSum = round($Brutto * $dc->activeRecord->count,2);
+	    $nettoSum = round($Netto,2) * $dc->activeRecord->count;
+	    $bruttoSum = round($Brutto,2) * $dc->activeRecord->count;
 
 		$this->Database->prepare('UPDATE `tl_iao_invoice_items` SET `price_netto`=?, `price_brutto`=? WHERE `id`=?')
 			->limit(1)
@@ -741,7 +746,7 @@ class tl_iao_invoice_items extends iaoBackend
 
 			$newPostenID = $newposten->insertId;
 
-			$this->redirect('contao/main.php?do=iao_setup&mod=iao_templates_items&table=tl_iao_templates_items&act=edit&id='.$newPostenID.'&amp;rt='.\Input::get('rt'));
+			$this->redirect('contao/main.php?do=iao_setup&mod=iao_templates_items&table=tl_iao_templates_items&act=edit&id='.$newPostenID);
 		}
 
 		$href.='&amp;ptid='.$row['id'];
@@ -793,8 +798,8 @@ class tl_iao_invoice_items extends iaoBackend
 			'time' => $result->time,
 			'text' => $result->text,
 			'count' => $result->count,
-			'amountStr' => $result->amountStr,
 			'price' => $result->price,
+			'amountStr' => $result->amountStr,
 			'operator' => $result->operator,
 			'price_netto' => $result->price_netto,
 			'price_brutto' => $result->price_brutto,

@@ -18,6 +18,8 @@ $GLOBALS['TL_DCA']['tl_iao_reminder'] = array
 	'config' => array
 	(
 		'dataContainer'               => 'Table',
+		'ptable'                      => 'tl_iao_projects',
+		'doNotCopyRecords'		  => true,
 		'switchToEdit'                => true,
 		'enableVersioning'            => false,
 		'onload_callback' => array
@@ -35,7 +37,8 @@ $GLOBALS['TL_DCA']['tl_iao_reminder'] = array
 		(
 			'keys' => array
 			(
-				'id' => 'primary'
+				'id' => 'primary',
+				'pid' => 'index'
 			)
 		)
 	),
@@ -122,7 +125,7 @@ $GLOBALS['TL_DCA']['tl_iao_reminder'] = array
 	'palettes' => array
 	(
 		'__selector__'                => array(),
-		'default'                     => '{invoice_legend},invoice_id,title,address_text,unpaid,periode_date,step,tax,postage,sum,text,text_finish;{status_legend},published,status,paid_on_date;{notice_legend:hide},notice'
+		'default'                     => '{settings_legend},setting_id,pid;{invoice_legend},invoice_id,title,address_text,unpaid,periode_date,step,tax,postage,sum,text,text_finish;{status_legend},published,status,paid_on_date;{notice_legend:hide},notice'
 	),
 
 	// Subpalettes
@@ -138,12 +141,32 @@ $GLOBALS['TL_DCA']['tl_iao_reminder'] = array
 		(
 			'sql'                     => "int(10) unsigned NOT NULL auto_increment"
 		),
+		'pid' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_reminder']['pid'],
+			'foreignKey'              => 'tl_iao_projects.title',
+			'filter'                  => true,
+			'sorting'                 => true,
+			'flag'                    => 11,
+			'inputType'               => 'select',
+			'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>false, 'chosen'=>true),
+			'sql'                     => "int(10) unsigned NOT NULL default '0'",
+			'relation'                => array('type'=>'belongsTo', 'load'=>'eager')
+		),
 		'tstamp' => array
 		(
 			'sql'                     => "int(10) unsigned NOT NULL default '0'"
 		),	
 		'setting_id' => array
 		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_reminder']['setting_id'],
+			'exclude'                 => true,
+			'filter'                  => true,
+			'sorting'                 => true,
+			'flag'                    => 11,
+			'inputType'               => 'select',
+			'options_callback'        => array('tl_iao_reminder', 'getSettingOptions'),
+			'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>false, 'chosen'=>true),
 			'sql'                     => "int(10) unsigned NOT NULL default '0'"
 		),
 		'title' => array
@@ -343,13 +366,6 @@ class tl_iao_reminder extends \iao\iaoBackend
 		$this->import('BackendUser', 'User');
 	}
 
-	/**
-	* add all iao-Settings in array
-	*/
-	public function setIaoSettings($id)
-	{
-		$this->settings = ($id) ? $this->getSettings($id) : array();
-	}
 
 	/**
 	 * Check permissions to edit table tl_iao_reminder
@@ -532,6 +548,8 @@ class tl_iao_reminder extends \iao\iaoBackend
 	 */
 	public function getInvoices(DataContainer $dc)
 	{
+		$settings = $this->getSettings($dc->activeRecord->setting_id);
+
 		$varValue= array();
 		$this->import('String');
 
@@ -540,7 +558,7 @@ class tl_iao_reminder extends \iao\iaoBackend
 
 		while($all->next())
 		{
-			$varValue[$all->id] = $all->invoice_id_str.' :: '.$this->String->substr($all->title,20).' ('.number_format($all->price_brutto,2,',','.').' '.$this->settings['currency_symbol'].')';
+			$varValue[$all->id] = $all->invoice_id_str.' :: '.$this->String->substr($all->title,20).' ('.number_format($all->price_brutto,2,',','.').' '.$settings['currency_symbol'].')';
 		}
 
 		return $varValue;
@@ -553,6 +571,8 @@ class tl_iao_reminder extends \iao\iaoBackend
 	 */
 	public function fillStepFields($varValue, DataContainer $dc)
 	{
+		$settings = $this->getSettings($dc->activeRecord->setting_id);
+
 		if(!$varValue) return $varValue;
 
 		$dbObj = $this->Database->prepare('SELECT * FROM `tl_iao_reminder` WHERE `id`=?')
@@ -561,12 +581,12 @@ class tl_iao_reminder extends \iao\iaoBackend
 
 		if($varValue == $dbObj->step) return $varValue;
 
-		$text = $this->settings['iao_reminder_'.$varValue.'_text'];
+		$text = $settings['iao_reminder_'.$varValue.'_text'];
 		$text_finish = $this->changeIAOTags($text,'reminder',$dc->id);
 		$text_finish = $this->changeTags($text_finish);
 
-		$tax =  $this->settings['iao_reminder_'.$varValue.'_tax'];
-		$postage =  $this->settings['iao_reminder_'.$varValue.'_postage'];
+		$tax =  $settings['iao_reminder_'.$varValue.'_tax'];
+		$postage =  $settings['iao_reminder_'.$varValue.'_postage'];
 		$periode_date = $this->getPeriodeDate($dc->activeRecord);
 
 		$set = array
@@ -652,7 +672,7 @@ class tl_iao_reminder extends \iao\iaoBackend
 	 */
 	public function showPDF($row, $href, $label, $title, $icon)
 	{
-		$this->setIaoSettings($row['setting_id']); 
+		$settings = $this->getSettings($row['setting_id']);
 
 		// wenn kein Admin dann kein PDF-Link	
 		if (!$this->User->isAdmin)
@@ -661,14 +681,14 @@ class tl_iao_reminder extends \iao\iaoBackend
 		}
 
 		// Wenn keine PDF-Vorlage dann kein PDF-Link
-	    $objPdfTemplate = 	\FilesModel::findByUuid($this->settings['iao_invoice_pdf']);			
+	    $objPdfTemplate = 	\FilesModel::findByUuid($settings['iao_invoice_pdf']);			
 
 		if(strlen($objPdfTemplate->path) < 1 || !file_exists(TL_ROOT . '/' . $objPdfTemplate->path) ) return;  // template file not found
 
 		if (\Input::get('key') == 'pdf' && \Input::get('id') == $row['id'])
 		{
 			$step = $row['step'];
-			$pdfFile = TL_ROOT . '/' . $this->settings['iao_reminder_'.$step.'_pdf'];
+			$pdfFile = TL_ROOT . '/' . $settings['iao_reminder_'.$step.'_pdf'];
 
 			if(!file_exists($pdfFile)) return;  // template file not found
 
@@ -677,7 +697,7 @@ class tl_iao_reminder extends \iao\iaoBackend
 			$reminder_Str = $GLOBALS['TL_LANG']['tl_iao_reminder']['steps'][$row['step']].'-'.$invoiceObj->invoice_id_str.'-'.$row['id'];
 
 			//-- Calculating dimensions
-			$margins = unserialize($this->settings['iao_pdf_margins']);         // Margins as an array
+			$margins = unserialize($settings['iao_pdf_margins']);         // Margins as an array
 			switch( $margins['unit'] )
 			{
 				case 'cm':      $factor = 10.0;   break;
@@ -729,7 +749,7 @@ class tl_iao_reminder extends \iao\iaoBackend
 			$pdf->AddPage();
 
 		    // Include CSS (TCPDF 5.1.000 an newer)
-		    $file = \FilesModel::findByUuid($this->settings['iao_pdf_css']);
+		    $file = \FilesModel::findByUuid($settings['iao_pdf_css']);
 
 		    if(strlen($file->path) > 0 && file_exists(TL_ROOT . '/' . $file->path) )
 		    {
@@ -778,6 +798,7 @@ class tl_iao_reminder extends \iao\iaoBackend
 	{
 		$autoNr = false;
 		$varValue = (int) $varValue;
+		$this->setIaoSettings($dc->activeRecord->setting_id);
 
 		// Generate invoice_id if there is none
 		if($varValue == 0)
@@ -788,7 +809,7 @@ class tl_iao_reminder extends \iao\iaoBackend
 									->execute();
 
 
-			if($objNr->numRows < 1 || $objNr->invoice_id == 0)  $varValue = $this->settings['iao_invoice_startnumber'];
+			if($objNr->numRows < 1 || $objNr->invoice_id == 0)  $varValue = $settings['iao_invoice_startnumber'];
 			else  $varValue =  $objNr->invoice_id +1;
 
 		}
@@ -834,7 +855,7 @@ class tl_iao_reminder extends \iao\iaoBackend
 		<div class="comment_wrap">
 		<div class="cte_type status' . $arrRow['status'] . '"><strong>' . $arrRow['title'] . '</strong> '.$row['invoice_id_str'].'</div>
 		<div>Rechnungs-Title: <strong>'.$row['invoicetitle'].'</strong></div>
-		<div>'.$GLOBALS['TL_LANG']['tl_iao_reminder']['sum'][0].': <strong>'.number_format($arrRow['sum'],2,',','.').' '.$this->settings['currency_symbol'].'</strong></div>
+		<div>'.$GLOBALS['TL_LANG']['tl_iao_reminder']['sum'][0].': <strong>'.number_format($arrRow['sum'],2,',','.').' '.$settings['currency_symbol'].'</strong></div>
 		<div>'.$GLOBALS['TL_LANG']['tl_iao_reminder']['member'][0].': '.$row['firstname'].' '.$row['lastname'].' ('.$row['company'].')</div>
 		<div>'.$GLOBALS['TL_LANG']['tl_iao_reminder']['periode_date'][0].': '.date($GLOBALS['TL_CONFIG']['dateFormat'],$row['periode_date']).'</div>
 		'.(($arrRow['notice'])?"<div>".$GLOBALS['TL_LANG']['tl_iao_reminder']['notice'][0].":".$arrRow['notice']."</div>": '').'

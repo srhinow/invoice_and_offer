@@ -1,0 +1,21 @@
+<div id="grid-container" class="cbp-l-grid-gallery">
+<?php foreach($this->items as $item): ?>
+
+					<div class="cbp-item illustration web-design">
+						<a href="<?= $item['detailUrl'];?>" class="cbp-caption cbp-singlePageInline"
+						data-title="World Clock Widget<br>by Paul Flavius Nechita">
+						<div class="cbp-caption-defaultWrap">
+							<img src="<?= $this->getImage($item['file'], 500, 370, 'center_center'); ?>" alt="">
+						</div>
+						<div class="cbp-caption-activeWrap">
+							<div class="cbp-l-caption-alignLeft">
+								<div class="cbp-l-caption-body">
+									<div class="cbp-l-caption-title"><?= ($item['short_title'])?:$item['title'];?></div>
+									<div class="cbp-l-caption-desc"><?= $item['subtitle'];?></div>
+								</div>
+							</div>
+						</div>
+					</a>
+				</div>
+<?php endforeach; ?>
+</div>

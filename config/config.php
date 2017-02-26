@@ -1,22 +1,8 @@
 <?php
 
 /**
- * This program is free software: you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation, either
- * version 3 of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this program. If not, please visit the Free
- * Software Foundation website at <http://www.gnu.org/licenses/>.
- *
  * PHP version 5
- * @copyright  sr-tag.de 2011-2013
+ * @copyright  sr-tag.de 2011-2017
  * @author     Sven Rhinow
  * @package    invoice_and_offer
  * @license    LGPL
@@ -27,7 +13,7 @@
  * invoice_and_offer Version
  */
 @define('IAO_VERSION', '1.1');
-@define('IAO_BUILD', '3');
+@define('IAO_BUILD', '4');
 @define('IAO_PATH','system/modules/invoice_and_offer');
 
 /**
@@ -38,7 +24,7 @@ $GLOBALS['BE_MOD']['iao'] = array
 (
 	'iao_projects' => array
 	(
-		'tables' => array('tl_iao_projects'),
+		'tables' => array('tl_iao_projects','tl_iao_invoice','tl_iao_invoice_items','tl_iao_offer','tl_iao_offer_items','tl_iao_credit','tl_iao_credit_items','tl_iao_reminder'),
 		'icon'   => IAO_PATH.'/html/icons/blackboard_steps.png',
 		'stylesheet' => IAO_PATH.'/html/be.css',
 	),
@@ -158,7 +144,9 @@ $GLOBALS['FE_MOD']['iao_fe'] = array
 	'fe_iao_offer' => 'ModuleMemberOffer',
 	'fe_iao_credit' => 'ModuleMemberCredit',
 	'fe_iao_reminder' => 'ModuleMemberReminder',
-	'fe_iao_agreements' => 'ModuleMemberAgreements'
+	'fe_iao_agreements' => 'ModuleMemberAgreements',
+	'fe_iao_public_project_list' => 'ModulePublicProjectList',
+	'fe_iao_public_project_details' => 'ModulePublicProjectDetails'
 );
 
 /**

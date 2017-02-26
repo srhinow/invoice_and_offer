@@ -20,10 +20,10 @@
  */
  $GLOBALS['TL_LANG']['MOD']['iao']  = 'Rechnungen & Angebote';
  $GLOBALS['TL_LANG']['MOD']['iao_projects']	= array('Projekte', 'Verwalten Sie hier Ihre Projekte.');
- $GLOBALS['TL_LANG']['MOD']['iao_offer']	= array('Angebote', 'Verwalten Sie hier Ihre Angebote.');
- $GLOBALS['TL_LANG']['MOD']['iao_invoice']	= array('Rechnungen', 'Verwalten Sie hier Ihre Rechnungen.');
- $GLOBALS['TL_LANG']['MOD']['iao_reminder']	= array('Rückstände', 'Verwalten Sie hier Ihre Rückstände.');
- $GLOBALS['TL_LANG']['MOD']['iao_credit']	= array('Gutschriften', 'Verwalten Sie hier Ihre Gutschriften.');
+ $GLOBALS['TL_LANG']['MOD']['iao_offer']	= array('alle Angebote', 'Verwalten Sie hier Ihre Angebote.');
+ $GLOBALS['TL_LANG']['MOD']['iao_invoice']	= array('alle Rechnungen', 'Verwalten Sie hier Ihre Rechnungen.');
+ $GLOBALS['TL_LANG']['MOD']['iao_reminder']	= array('alle Rückstände', 'Verwalten Sie hier Ihre Rückstände.');
+ $GLOBALS['TL_LANG']['MOD']['iao_credit']	= array('alle Gutschriften', 'Verwalten Sie hier Ihre Gutschriften.');
  $GLOBALS['TL_LANG']['MOD']['iao_agreements']	= array('Verträge', 'Verwalten Sie hier Ihre Service-Verträge und ale zeitlich wiederkehrenden Rechnungsstellungen.');
  $GLOBALS['TL_LANG']['MOD']['iao_templates']	= array('Vorlagen (Text)', 'Verwalten Sie die Vorlagen für die Standarttexte vor und nach den Posten von Rechnungen, Angebote und Gutschriften.');
  $GLOBALS['TL_LANG']['MOD']['iao_templates_items']	= array('Vorlagen (Posten)', 'Verwalten Sie die Vorlagen für die Posten von Rechnungen, Angebote und Gutschriften.');
@@ -60,3 +60,4 @@ $GLOBALS['TL_LANG']['FMD']['fe_iao_offer'] = array('Liste der Angebote','Eine Li
 $GLOBALS['TL_LANG']['FMD']['fe_iao_credit'] = array('Liste der Gutschriften','Eine Liste aller Gutschriften zu dem angemeldeten Mitglied.');
 $GLOBALS['TL_LANG']['FMD']['fe_iao_reminder'] = array('Liste der Mahnungen','Eine Liste aller Mahnungen zu dem angemeldeten Mitglied.');
 $GLOBALS['TL_LANG']['FMD']['fe_iao_agreements'] = array('Liste der Verträge','Eine Liste aller Verträge zu dem angemeldeten Mitglied.');
+$GLOBALS['TL_LANG']['FMD']['fe_iao_public_project_list'] = array('öffentliche Projekt-Liste','Eine Liste aller öffentlich zugänglichen Projekte.');
