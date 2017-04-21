@@ -119,7 +119,7 @@ abstract class iaoBackend extends \Backend
 	{
 		//fallback
 		$setId = ($dc->activeRecord->setting_id)?:1;
-		$settings = $this->getSettings($dc->activeRecord->setting_id);
+		$settings = $this->getSettings($setId);
 		$varValue= array();
 
 		if(!$settings['iao_costumer_group'])  return $varValue;
