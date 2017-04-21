@@ -14,7 +14,7 @@
  * Class iao
  * Provide methods to handle invoice_and_offer-module.
  */
-class iao extends Backend
+class iao extends \Backend
 {
 	/**
 	* set $GLOBAL['TL_CONFIG'] - invoice_and_offer - Settings
