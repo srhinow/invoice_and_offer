@@ -24,6 +24,13 @@ $GLOBALS['TL_DCA']['tl_iao_agreements'] = array
 		(
 			array('tl_iao_agreements','IAOSettings')
 		),
+		'sql' => array
+		(
+			'keys' => array
+			(
+				'id' => 'primary',
+			)
+		)
 	),
 
 	// List
@@ -116,6 +123,14 @@ $GLOBALS['TL_DCA']['tl_iao_agreements'] = array
 	// Fields
 	'fields' => array
 	(
+		'id' => array
+		(
+			'sql'                     => "int(10) unsigned NOT NULL auto_increment"
+		),
+		'tstamp' => array
+		(
+			'sql'                     => "int(10) unsigned NOT NULL default '0'"
+		),	
 		'title' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_agreements']['title'],
@@ -123,6 +138,7 @@ $GLOBALS['TL_DCA']['tl_iao_agreements'] = array
 			'search'                  => true,
 			'inputType'               => 'text',
 			'eval'                    => array('mandatory'=>false, 'maxlength'=>255,'tl_class'=>'long'),
+			'sql'                     => "varchar(255) NOT NULL default ''"
 		),
 		'agreement_date' =>  array
 		(
@@ -132,7 +148,8 @@ $GLOBALS['TL_DCA']['tl_iao_agreements'] = array
 			'eval'                    => array('rgxp'=>'date', 'datepicker'=>$this->getDatePickerString(), 'tl_class'=>'w50 wizard'),
 			'load_callback'			=> array (
 				array('tl_iao_agreements','getAgreementValue')
-			)
+			),
+			'sql'                     => "int(10) unsigned NOT NULL default '0'"
 		),
 		'periode' => array
 		(
@@ -143,7 +160,8 @@ $GLOBALS['TL_DCA']['tl_iao_agreements'] = array
 			'eval'                    => array('mandatory'=>true, 'maxlength'=>255,'tl_class'=>'w50'),
 			'load_callback'			=> array (
 				array('tl_iao_agreements','getPeriodeValue')
-			)
+			),
+			'sql'                     => "varchar(255) NOT NULL default ''"
 		),
 		'beginn_date' =>  array
 		(
@@ -154,7 +172,8 @@ $GLOBALS['TL_DCA']['tl_iao_agreements'] = array
 			'load_callback'				=> array
 			(
 				array('tl_iao_agreements','getBeginnDateValue')
-			)
+			),
+			'sql'                     => "varchar(255) NOT NULL default ''"
 		),
 		'end_date' =>  array
 		(
@@ -165,8 +184,8 @@ $GLOBALS['TL_DCA']['tl_iao_agreements'] = array
 			'load_callback'				=> array
 			(
 				array('tl_iao_agreements','getEndDateValue')
-			)
-
+			),
+			'sql'                     => "varchar(255) NOT NULL default ''"
 		),
 		'new_generate' => array
 		(
@@ -178,7 +197,8 @@ $GLOBALS['TL_DCA']['tl_iao_agreements'] = array
 			'save_callback'				=> array
 			(
 				array('tl_iao_agreements','generateNewCycle')
-			)
+			),
+			'sql'                     => "char(1) NOT NULL default ''"
 		),
 		'terminated_date' =>  array
 		(
@@ -186,6 +206,7 @@ $GLOBALS['TL_DCA']['tl_iao_agreements'] = array
 			'exclude'                 => true,
 			'inputType'               => 'text',
 			'eval'                    => array('rgxp'=>'date', 'datepicker'=>$this->getDatePickerString(), 'tl_class'=>'w50 wizard'),
+			'sql'                     => "varchar(255) NOT NULL default ''"
 		),
 		'price' =>  array
 		(
@@ -193,6 +214,7 @@ $GLOBALS['TL_DCA']['tl_iao_agreements'] = array
 			'exclude'                 => true,
 			'inputType'               => 'text',
 			'eval'                    => array('mandatory'=>true, 'tl_class'=>'w50 wizard'),
+			'sql'                     => "varchar(64) NOT NULL default '0'"
 		),
 		'member' => array
 		(
@@ -208,7 +230,8 @@ $GLOBALS['TL_DCA']['tl_iao_agreements'] = array
 			'save_callback' => array
 			(
 				array('tl_iao_agreements', 'fillAdressText')
-			)
+			),
+			'sql'                     => "varbinary(128) NOT NULL default ''"
 		),
 		'address_text' => array
 		(
@@ -217,9 +240,9 @@ $GLOBALS['TL_DCA']['tl_iao_agreements'] = array
 			'search'                  => true,
 			'inputType'               => 'textarea',
 			'eval'                    => array('rte'=>'tinyMCE','style'=>'height:60px;', 'tl_class'=>'clr'),
-			'explanation'             => 'insertTags'
+			'explanation'             => 'insertTags',
+			'sql'                     => "mediumtext NULL"
 		),
-
 		'status' => array
 		(
 			'label'                 => &$GLOBALS['TL_LANG']['tl_iao_agreements']['status'],
@@ -229,13 +252,15 @@ $GLOBALS['TL_DCA']['tl_iao_agreements'] = array
 			'inputType'             => 'select',
 			'options'               => &$GLOBALS['TL_LANG']['tl_iao_agreements']['status_options'],
             'eval'			  		=> array('tl_class'=>'w50'),
+            'sql'                     => "char(1) NOT NULL default ''"
 		),
 		'agreement_pdf_file' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_agreements']['agreement_pdf_file'],
 			'exclude'                 => true,
 			'inputType'               => 'fileTree',
-			'eval'                    => array('fieldType'=>'radio', 'files'=>true, 'filesOnly'=>true, 'mandatory'=>false,'extensions'=>'pdf')
+			'eval'                    => array('fieldType'=>'radio', 'files'=>true, 'filesOnly'=>true, 'mandatory'=>false,'extensions'=>'pdf'),
+			'sql'                     => "varchar(255) NOT NULL default ''"
 		),
 		'sendEmail' => array
 		(
@@ -243,7 +268,8 @@ $GLOBALS['TL_DCA']['tl_iao_agreements'] = array
 			'filter'                  => true,
 			'flag'                    => 1,
 			'inputType'               => 'checkbox',
-			'eval'                    => array('doNotCopy'=>true,'submitOnChange'=>true)
+			'eval'                    => array('doNotCopy'=>true,'submitOnChange'=>true),
+			'sql'                     => "char(1) NOT NULL default ''"
 		),
 		'remind_before' => array
 		(
@@ -251,13 +277,15 @@ $GLOBALS['TL_DCA']['tl_iao_agreements'] = array
 			'exclude'                 => true,
 			'inputType'               => 'text',
 			'eval'                    => array('mandatory'=>true, 'maxlength'=>255,'tl_class'=>'clr'),
+			'sql'                     => "varchar(32) NOT NULL default ''"
 		),
 		'email_from' => array
 	    (
 		    'label'                   => &$GLOBALS['TL_LANG']['tl_iao_agreements']['email_from'],
 		    'exclude'                 => true,
 		    'inputType'               => 'text',
-		    'eval'                    => array('mandatory'=>true, 'rgxp'=>'email', 'maxlength'=>32, 'decodeEntities'=>true, 'tl_class'=>'clr w50')
+		    'eval'                    => array('mandatory'=>true, 'rgxp'=>'email', 'maxlength'=>32, 'decodeEntities'=>true, 'tl_class'=>'clr w50'),
+		    'sql'                     => "varchar(32) NOT NULL default ''"
 	    ),
 	    'email_to' => array
 	    (
@@ -265,7 +293,8 @@ $GLOBALS['TL_DCA']['tl_iao_agreements'] = array
 		    'exclude'                 => true,
 		    'flag'                    => 11,
 		    'inputType'               => 'text',
-		    'eval'                    => array('mandatory'=>true, 'decodeEntities'=>true, 'maxlength'=>128, 'tl_class'=>'w50')
+		    'eval'                    => array('mandatory'=>true, 'decodeEntities'=>true, 'maxlength'=>128, 'tl_class'=>'w50'),
+		    'sql'                     => "varchar(32) NOT NULL default ''"
 	    ),
 	    'email_subject' => array
 	    (
@@ -274,14 +303,16 @@ $GLOBALS['TL_DCA']['tl_iao_agreements'] = array
 		    'flag'                    => 11,
 		    'inputType'               => 'text',
 		    // 'default'		  		=> &$GLOBALS['TL_LANG']['tl_iao_agreements']['email_subject_default'],
-		    'eval'                    => array('mandatory'=>false, 'maxlength'=>255, 'tl_class'=>'clr long')
+		    'eval'                    => array('mandatory'=>false, 'maxlength'=>255, 'tl_class'=>'clr long'),
+		    'sql'                     => "varchar(255) NOT NULL default ''"
 	    ),
 	    'email_text' => array
 	    (
 		    'label'                   => &$GLOBALS['TL_LANG']['tl_iao_agreements']['email_text'],
 		    'exclude'                 => true,
 		    'inputType'               => 'textarea',
-		    'eval'                    => array('mandatory'=>true, 'decodeEntities'=>true)
+		    'eval'                    => array('mandatory'=>true, 'decodeEntities'=>true),
+		    'sql'                     => "text NULL"
 	    ),
 		'notice' => array
 		(
@@ -289,7 +320,8 @@ $GLOBALS['TL_DCA']['tl_iao_agreements'] = array
 			'exclude'                 => true,
 			'search'		  		=> true,
 			'inputType'               => 'textarea',
-			'eval'                    => array('mandatory'=>false, 'cols'=>'10','rows'=>'10','style'=>'height:100px','rte'=>false)
+			'eval'                    => array('mandatory'=>false, 'cols'=>'10','rows'=>'10','style'=>'height:100px','rte'=>false),
+			'sql'                     => "text NULL"
 		),
 	)
 );

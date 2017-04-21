@@ -59,6 +59,16 @@ $GLOBALS['TL_LANG']['tl_iao_settings']['iao_reminder_4_duration']= array('3. Mah
 $GLOBALS['TL_LANG']['tl_iao_settings']['iao_reminder_4_text']= array('3. Mahnung-Text', 'Platzhalter: alle Contao-Inserttags http://de.contaowiki.org/Insert-Tags , Rechnungsdatum = {{invoice::date}} , Rechnungsnummer = {{invoice::invoice_id_str}}, Frist-Datum = {{iao::period-date}}');
 $GLOBALS['TL_LANG']['tl_iao_settings']['iao_reminder_4_pdf']= array('3. Mahnung-PDF-Vorlage', '');
 
+$GLOBALS['TL_LANG']['tl_iao_settings']['iao_agreements_remind_before'] = array('erinnern vor Ablauf des Vertrags-Zyklus','Die Angaben im strtotime-Format z.B. -3 weeks');
+$GLOBALS['TL_LANG']['tl_iao_settings']['iao_agreements_mail_from'] = array('Email-Sender','');
+$GLOBALS['TL_LANG']['tl_iao_settings']['iao_agreements_mail_to'] = array('Email-Empfänger','');
+$GLOBALS['TL_LANG']['tl_iao_settings']['iao_agreements_mail_subject'] = array('Email-Betreff','');
+$GLOBALS['TL_LANG']['tl_iao_settings']['iao_agreements_mail_text'] = array('Email-Text','');
+
+$GLOBALS['TL_LANG']['tl_iao_settings']['remind_before_default'] = '-3 weeks';
+$GLOBALS['TL_LANG']['tl_iao_settings']['email_subject_default'] = 'Servicevertrag von ##iao::project::name##';
+$GLOBALS['TL_LANG']['tl_iao_settings']['email_text_default'] = 'Der jährliche Vertrag läuft am ##iao::project::end_date## aus';
+
 /**
  * Buttons
  */
@@ -85,4 +95,5 @@ $GLOBALS['TL_LANG']['tl_iao_settings']['pdf_legend'] = 'PDF-Einstellungen';
 $GLOBALS['TL_LANG']['tl_iao_settings']['invoice_legend'] = 'Rechnung-Einstellungen';
 $GLOBALS['TL_LANG']['tl_iao_settings']['offer_legend'] = 'Angebot-Einstellungen';
 $GLOBALS['TL_LANG']['tl_iao_settings']['credit_legend'] = 'Gutschrift-Einstellungen';
+$GLOBALS['TL_LANG']['tl_iao_settings']['agreements_legend'] = 'Vertrags-Einstellungen';
 $GLOBALS['TL_LANG']['tl_iao_settings']['reminder_legend'] = 'Mahnung-Einstellungen';

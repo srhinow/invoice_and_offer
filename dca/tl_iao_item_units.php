@@ -1,21 +1,7 @@
 <?php
 
 /**
- * This program is free software: you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation, either
- * version 3 of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this program. If not, please visit the Free
- * Software Foundation website at <http://www.gnu.org/licenses/>.
- *
- * @copyright  Sven Rhinow 2011-2013
+ * @copyright  Sven Rhinow 2011-2017
  * @author     sr-tag Sven Rhinow Webentwicklung <http://www.sr-tag.de>
  * @package    invoice_and_offer
  * @license    LGPL
@@ -32,7 +18,14 @@ $GLOBALS['TL_DCA']['tl_iao_item_units'] = array
 	'config' => array
 	(
 		'dataContainer'               => 'Table',
-		'enableVersioning'            => true
+		'enableVersioning'            => true,
+		'sql' => array
+		(
+			'keys' => array
+			(
+				'id' => 'primary'
+			)
+		)
 	),
 	// List
 	'list' => array
@@ -113,6 +106,21 @@ $GLOBALS['TL_DCA']['tl_iao_item_units'] = array
 	// Fields
 	'fields' => array
 	(
+		'id' => array
+		(
+			'sql'                     => "int(10) unsigned NOT NULL auto_increment"
+		),
+		'tstamp' => array
+		(
+			'sql'                     => "int(10) unsigned NOT NULL default '0'"
+		),
+		'sorting' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_item_units']['sorting'],
+			'inputType'               => 'text',
+			'eval'                    => array('maxlength'=>3, 'tl_class'=>'w50'),
+			'sql'                     => "int(10) unsigned NOT NULL default '0'"
+		),
 		'name' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_item_units']['name'],
@@ -120,6 +128,7 @@ $GLOBALS['TL_DCA']['tl_iao_item_units'] = array
 			'search'                  => true,
 			'inputType'               => 'text',
 			'eval'                    => array('mandatory'=>true, 'maxlength'=>255, 'tl_class'=>'w50'),
+			'sql'                     => "varchar(25) NOT NULL default ''"
 		),
 		'value' => array
 		(
@@ -128,6 +137,7 @@ $GLOBALS['TL_DCA']['tl_iao_item_units'] = array
 			'search'                  => true,
 			'inputType'               => 'text',
 			'eval'                    => array(  'maxlength'=>255, 'tl_class'=>'w50'),
+			'sql'                     => "varchar(25) NOT NULL default ''"
 		),
 		'singular' => array
 		(
@@ -136,6 +146,7 @@ $GLOBALS['TL_DCA']['tl_iao_item_units'] = array
 			'search'                  => true,
 			'inputType'               => 'text',
 			'eval'                    => array('maxlength'=>255, 'tl_class'=>'w50'),
+			'sql'                     => "varchar(25) NOT NULL default ''"
 		),
 		'majority' => array
 		(
@@ -144,30 +155,9 @@ $GLOBALS['TL_DCA']['tl_iao_item_units'] = array
 			'search'                  => true,
 			'inputType'               => 'text',
 			'eval'                    => array('maxlength'=>255, 'tl_class'=>'w50'),
+			'sql'                     => "varchar(25) NOT NULL default ''"
 		),
-		'sorting' => array
-		(
-			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_item_units']['sorting'],
-			'inputType'               => 'text',
-			'eval'                    => array('maxlength'=>3, 'tl_class'=>'w50'),
-		),
+
 	)
 );
 
-
-/**
- * Class tl_iao_item_units
- */
-class tl_iao_item_units extends Backend
-{
-	/**
-	 * Return the link picker wizard
-	 * @param object
-	 * @return string
-	 */
-	public function pagePicker(DataContainer $dc)
-	{
-		$strField = 'ctrl_' . $dc->field . (($this->Input->get('act') == 'editAll') ? '_' . $dc->id : '');
-		return ' ' . $this->generateImage('pickpage.gif', $GLOBALS['TL_LANG']['MSC']['pagepicker'], 'style="vertical-align:top; cursor:pointer;" onclick="Backend.pickPage(\'' . $strField . '\')"');
-	}
-}
