@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @copyright  Sven Rhinow 2011-2015
+ * @copyright  Sven Rhinow 2011-2017
  * @author     sr-tag Sven Rhinow Webentwicklung <http://www.sr-tag.de>
  * @package    invoice_and_offer
  * @license    LGPL
