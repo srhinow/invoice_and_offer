@@ -15,6 +15,7 @@
  * permanent text corrections which are update-safe.
  */
 
+$GLOBALS['TL_LANG']['tl_iao_projects']['setting_id']	=	array('Konfiguration','');
 $GLOBALS['TL_LANG']['tl_iao_projects']['title']	=	array('Bezeichnung','Bezeichnung des Elementes');
 $GLOBALS['TL_LANG']['tl_iao_projects']['member']	=	array('Kunde','Adresse aus gespeicherten Kunden in nachstehendes Feld befüllen');
 $GLOBALS['TL_LANG']['tl_iao_projects']['reference_title']	=	array('Titel für die Referenzen','');
@@ -45,5 +46,6 @@ $GLOBALS['TL_LANG']['tl_iao_projects']['show']	=	array('Details anzeigen','Detai
 /**
  * Legends
  */
+$GLOBALS['TL_LANG']['tl_iao_projects']['settings_legend']	=	'Konfiguration-Zuweisung';
 $GLOBALS['TL_LANG']['tl_iao_projects']['project_legend']	=	'Projekt-Einstellungen';
 $GLOBALS['TL_LANG']['tl_iao_projects']['reference_legend']	=	'Referenz-Zuweisung';

@@ -121,7 +121,7 @@ $GLOBALS['TL_DCA']['tl_iao_projects'] = array
 	'palettes' => array
 	(
 		'__selector__'                => array('in_reference','finished'),
-		'default'                     => '{project_legend},title,member,url,notice;{finshed_legend},finished;{reference_legend},in_reference'
+		'default'                     => '{settings_legend},setting_id;{project_legend},title,member,url,notice;{finshed_legend},finished;{reference_legend},in_reference'
 	),
 
 	// Subpalettes
@@ -146,7 +146,19 @@ $GLOBALS['TL_DCA']['tl_iao_projects'] = array
 		(
 			'sql'					  => "int(10) unsigned NOT NULL default '0'",
 			'sorting'                 => true,
-		),	
+		),
+		'setting_id' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_projects']['setting_id'],
+			'exclude'                 => true,
+			'filter'                  => true,
+			'sorting'                 => true,
+			'flag'                    => 11,
+			'inputType'               => 'select',
+			'options_callback'        => array('tl_iao_projects', 'getSettingOptions'),
+			'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>false, 'chosen'=>true),
+			'sql'                     => "int(10) unsigned NOT NULL default '0'"
+		),
 		'title' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_projects']['title'],
