@@ -22,10 +22,7 @@ $GLOBALS['TL_DCA']['tl_iao_projects'] = array
 		'ctable'                      => array('tl_iao_offer','tl_iao_invoice','tl_iao_credit'),
 		'switchToEdit'                => false,
 		'enableVersioning'            => true,
-		'onload_callback' => array
-		(
-			// array('tl_iao_projects', 'checkPermission'),
-		),
+
 		'sql' => array
 		(
 			'keys' => array
@@ -337,14 +334,6 @@ class tl_iao_projects  extends \iao\iaoBackend
 		$this->import('BackendUser', 'User');
 		$this->settings = $this->getSettings(1);
 		// print_r($this->settings->iao_costumer_group);
-	}
-
-	/**
-	* add all iao-Settings in array
-	*/
-	public function setIaoSettings(DataContainer $dc)
-	{
-			$this->settings = ($dc->id) ? $this->getSettings($dc->id) : array();			 
 	}
 
 	/**
