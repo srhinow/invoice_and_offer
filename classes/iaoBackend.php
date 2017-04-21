@@ -117,6 +117,8 @@ abstract class iaoBackend extends \Backend
 	 */
 	public function getMemberOptions($dc)
 	{
+		//fallback
+		$setId = ($dc->activeRecord->setting_id)?:1;
 		$settings = $this->getSettings($dc->activeRecord->setting_id);
 		$varValue= array();
 

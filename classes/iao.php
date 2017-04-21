@@ -39,6 +39,7 @@ class iao extends Backend
 
 		if($dbObj->numRows > 0)
 		{
+			
 			//hole alle Feldbezeichnungen
 			$fields = $this->Database->listFields('tl_iao_settings');
 
@@ -48,8 +49,10 @@ class iao extends Backend
 			foreach($fields as $k => $field)
 			{
 				if(in_array($field['name'], $bl_fields)) continue;
+				
 				$GLOBALS['TL_CONFIG'][$field['name']] = $dbObj->$field['name'];
 			}
+			// print_r($GLOBALS['TL_CONFIG']);
 		}
 	}
 
