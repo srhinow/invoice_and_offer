@@ -29,6 +29,11 @@ $GLOBALS['TL_DCA']['tl_iao_invoice'] = array
 			array('tl_iao_invoice', 'checkPermission'),
 			array('tl_iao_invoice','upgradeInvoices')
 		),
+		'oncreate_callback' => array
+		(
+			array('tl_iao_invoice', 'preFillFields'),
+			array('tl_iao_invoice', 'setMemmberfieldsFromProject'),
+		),
 		'sql' => array
 		(
 			'keys' => array
@@ -213,7 +218,7 @@ $GLOBALS['TL_DCA']['tl_iao_invoice'] = array
 			'exclude'                 => true,
 			'inputType'               => 'text',
 			'eval'                    => array('doNotCopy'=>true,'rgxp'=>'date', 'datepicker'=>$this->getDatePickerString(), 'tl_class'=>'w50 wizard'),
-			'save_callback' => array
+			'load_callback' => array
 			(
 				array('tl_iao_invoice', 'generateExecuteDate')
 			),
@@ -225,7 +230,7 @@ $GLOBALS['TL_DCA']['tl_iao_invoice'] = array
 			'exclude'                 => true,
 			'inputType'               => 'text',
 			'eval'                    => array('doNotCopy'=>true,'rgxp'=>'date', 'datepicker'=>$this->getDatePickerString(), 'tl_class'=>'w50 wizard'),
-			'save_callback' => array
+			'load_callback' => array
 			(
 				array('tl_iao_invoice', 'generateExpiryDate')
 			),
@@ -248,7 +253,7 @@ $GLOBALS['TL_DCA']['tl_iao_invoice'] = array
 			'eval'                    => array('doNotCopy'=>true, 'tl_class'=>'w50'),
 			'save_callback' => array
 			(
-				array('tl_iao_invoice', 'generateInvoiceNumber')
+				array('tl_iao_invoice', 'setFieldInvoiceNumber')
 			),
 			'sql'					  => "int(10) unsigned NOT NULL default '0'"
 		),
@@ -261,7 +266,7 @@ $GLOBALS['TL_DCA']['tl_iao_invoice'] = array
 			'eval'                    => array('doNotCopy'=>true, 'spaceToUnderscore'=>true, 'maxlength'=>128, 'tl_class'=>'w50'),
 			'save_callback' => array
 			(
-				array('tl_iao_invoice', 'createInvoiceNumberStr')
+				array('tl_iao_invoice', 'setFieldInvoiceNumberStr')
 			),
 			'sql'					  => "varchar(255) NOT NULL default ''"
 		),
@@ -591,6 +596,7 @@ class tl_iao_invoice extends \iao\iaoBackend
 	{
 		parent::__construct();
 		$this->import('BackendUser', 'User');
+		$this->import('iao');
 	}
 
 
@@ -722,7 +728,57 @@ class tl_iao_invoice extends \iao\iaoBackend
 			break;
 		}
 	}
+	/**
+	* prefill eny Fields by new dataset
+	*/
+	public function preFillFields($table, $id, $set, $obj)
+	{
+		$objProject = iaoProjectsModel::findProjectByIdOrAlias($set['pid']);
+		$settingId = ($objProject !== null) ? $objProject->setting_id : 1;
+		$settings = $this->getSettings($settingId);
+		$invoiceId = $this->generateInvoiceNumber(0, $settings);
+		$invoiceIdStr = $this->generateInvoiceNumberStr('', $invoiceId, $settings);
+		$set = array
+		(
+			'invoice_id' => $invoiceId,
+			'invoice_id_str' => $invoiceIdStr
+		);
 
+		$this->Database->prepare('UPDATE `tl_iao_invoice` %s WHERE `id`=?')
+						->set($set)
+						->limit(1)
+						->execute($id);
+	}
+
+	/**
+	* if GET-Param projonly then fill member and address-field
+	*/
+	public function setMemmberfieldsFromProject($table, $id, $set, $obj)
+	{
+		if(\Input::get('onlyproj') == 1 && (int) $set['pid'] > 0)
+		{
+			$objProject = iaoProjectsModel::findProjectByIdOrAlias($set['pid']);
+
+			if($objProject !== null)
+			{
+				$objMember = \MemberModel::findById($objProject->member);
+
+				$text = '<p>'.$objMember->company.'<br />'.($objMember->gender!='' ? $GLOBALS['TL_LANG']['tl_iao_invoice']['gender'][$objMember->gender].' ':'').($objMember->title ? $objMember->title.' ':'').$objMember->firstname.' '.$objMember->lastname.'<br />'.$objMember->street.'</p>';
+				$text .='<p>'.$objMember->postal.' '.$objMember->city.'</p>';
+
+				$set = array
+				(
+					'member' => $objProject->member,
+					'address_text' => $text
+				);
+
+				$this->Database->prepare('UPDATE `tl_iao_invoice` %s WHERE `id`=?')
+								->set($set)
+								->limit(1)
+								->execute($id);
+			}
+		}
+	}
 	/**
 	 * fill date-Field if this empty
 	 * @param mixed
@@ -785,10 +841,8 @@ class tl_iao_invoice extends \iao\iaoBackend
 		{
 			if(strlen($varValue)<=0) return $varValue;
 
-			$objMember = $this->Database->prepare('SELECT * FROM `tl_member` WHERE `id`=?')
-						->limit(1)
-						->execute($varValue);
-
+			$objModel = \MemberModel::findById($varValue);
+			
 			$text = '<p>'.$objMember->company.'<br />'.($objMember->gender!='' ? $GLOBALS['TL_LANG']['tl_iao_invoice']['gender'][$objMember->gender].' ':'').($objMember->title ? $objMember->title.' ':'').$objMember->firstname.' '.$objMember->lastname.'<br />'.$objMember->street.'</p>';
 			$text .='<p>'.$objMember->postal.' '.$objMember->city.'</p>';
 
@@ -1029,35 +1083,44 @@ class tl_iao_invoice extends \iao\iaoBackend
 		$href = 'contao/main.php?do=iao_invoice&amp;key=pdf&amp;id='.$row['id'];
 		return '<a href="'.$href.'" title="'.specialchars($title).'">'.$this->generateImage($icon, $label).'</a> ';
 	}
-
-
-	public function createInvoiceNumberStr($varValue, DataContainer $dc)
+	
+	public function setFieldInvoiceNumberStr($varValue, DataContainer $dc)
 	{
 		$settings = $this->getSettings($dc->activeRecord->setting_id);
+		return $this->generateInvoiceNumberStr($varValue, $dc->activeRecord->invoice_id, $settings);
+	}
 
-		if(!$varValue)
+	public function generateInvoiceNumberStr($varValue, $invoiceId, $settings)
+	{
+
+		if(strlen($varValue) < 1)
 		{
 			$tstamp = $dc->activeRecord->date ? $dc->activeRecord->date : time();
 
 			$format = $settings['iao_invoice_number_format'];
 			$format =  str_replace('{date}',date('Ymd',$tstamp),$format);
-			$format =  str_replace('{nr}',$dc->activeRecord->invoice_id,$format);
+			$format =  str_replace('{nr}',$invoiceId, $format);
 			$varValue = $format;
 		}
 		return $varValue;
 	}
-
+	
+	public function setFieldInvoiceNumber($varValue, DataContainer $dc)
+	{
+		$settings = $this->getSettings($dc->activeRecord->setting_id);
+		return $this->generateInvoiceNumber($varValue, $settings);
+	}
+	
 	/**
 	 * Autogenerate an article alias if it has not been set yet
 	 * @param mixed
 	 * @param object
 	 * @return string
 	 */
-	public function generateInvoiceNumber($varValue, DataContainer $dc)
+	public function generateInvoiceNumber($varValue, $settings)
 	{
 		$autoNr = false;
 		$varValue = (int) $varValue;
-		$settings = $this->getSettings($dc->activeRecord->setting_id);
 
 		// Generate invoice_id if there is none
 		if($varValue == 0)
