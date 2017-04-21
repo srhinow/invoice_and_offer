@@ -759,8 +759,7 @@ class tl_iao_agreements extends Backend
 				(
 					'beginn_date' => $new_beginn,
 					'end_date' => strtotime($periode.' -1 day', $new_beginn),
-					'new_generate' => '',
-					'email_date' => ''
+					'new_generate' => ''
 				);
 				$this->Database->prepare('UPDATE `tl_iao_agreements` %s WHERE `id`=?')
 							->set($set)
