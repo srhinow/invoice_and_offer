@@ -273,8 +273,8 @@ $GLOBALS['TL_DCA']['tl_iao_agreements'] = array
 		    'exclude'                 => true,
 		    'flag'                    => 11,
 		    'inputType'               => 'text',
-		    'default'		  		=> &$GLOBALS['TL_LANG']['tl_iao_agreements']['email_subject_default'],
-		    'eval'                    => array('mandatory'=>true, 'maxlength'=>255, 'tl_class'=>'clr long')
+		    // 'default'		  		=> &$GLOBALS['TL_LANG']['tl_iao_agreements']['email_subject_default'],
+		    'eval'                    => array('mandatory'=>false, 'maxlength'=>255, 'tl_class'=>'clr long')
 	    ),
 	    'email_text' => array
 	    (
