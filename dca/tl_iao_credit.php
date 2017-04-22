@@ -26,8 +26,12 @@ $GLOBALS['TL_DCA']['tl_iao_credit'] = array
 		'onload_callback' => array
 		(
 			array('tl_iao_credit', 'generateCreditPDF'),
-			array('tl_iao_credit','setIaoSettings'),
 			array('tl_iao_credit', 'checkPermission'),
+		),
+		'oncreate_callback' => array
+		(
+			array('tl_iao_credit', 'preFillFields'),
+			array('tl_iao_credit', 'setMemmberfieldsFromProject'),
 		),
 		'sql' => array
 		(
@@ -197,7 +201,7 @@ $GLOBALS['TL_DCA']['tl_iao_credit'] = array
 			'exclude'                 => true,
 			'inputType'               => 'text',
 			'eval'                    => array('rgxp'=>'date', 'doNotCopy'=>true, 'datepicker'=>$this->getDatePickerString(), 'tl_class'=>'w50 wizard'),
-			'save_callback' => array
+			'load_callback' => array
 			(
 				array('tl_iao_credit', 'generateExpiryDate')
 			),
@@ -529,6 +533,59 @@ class tl_iao_credit  extends \iao\iaoBackend
 		}
 	}
 
+	/**
+	* prefill eny Fields by new dataset
+	*/
+	public function preFillFields($table, $id, $set, $obj)
+	{
+		$objProject = iaoProjectsModel::findProjectByIdOrAlias($set['pid']);
+		$settingId = ($objProject !== null) ? $objProject->setting_id : 1;
+		$settings = $this->getSettings($settingId);
+		$creditId = $this->generateCreditNumber(0, $settings);
+		$creditIdStr = $this->createCreditNumberStr('', $creditId, time(), $settings);
+
+		$set = array
+		(
+			'credit_id' => $creditId,
+			'credit_id_str' => $creditIdStr
+		);
+
+		$this->Database->prepare('UPDATE `tl_iao_credit` %s WHERE `id`=?')
+						->set($set)
+						->limit(1)
+						->execute($id);
+	}
+
+	/**
+	* if GET-Param projonly then fill member and address-field
+	*/
+	public function setMemmberfieldsFromProject($table, $id, $set, $obj)
+	{
+		if(\Input::get('onlyproj') == 1 && (int) $set['pid'] > 0)
+		{
+			$objProject = iaoProjectsModel::findProjectByIdOrAlias($set['pid']);
+
+			if($objProject !== null)
+			{
+				$objMember = \MemberModel::findById($objProject->member);
+
+				$text = '<p>'.$objMember->company.'<br />'.($objMember->gender!='' ? $GLOBALS['TL_LANG']['tl_iao_invoice']['gender'][$objMember->gender].' ':'').($objMember->title ? $objMember->title.' ':'').$objMember->firstname.' '.$objMember->lastname.'<br />'.$objMember->street.'</p>';
+				$text .='<p>'.$objMember->postal.' '.$objMember->city.'</p>';
+
+				$set = array
+				(
+					'member' => $objProject->member,
+					'address_text' => $text
+				);
+
+				$this->Database->prepare('UPDATE `tl_iao_credit` %s WHERE `id`=?')
+								->set($set)
+								->limit(1)
+								->execute($id);
+			}
+		}
+	}
+
     /**
 	 * fill date-Field if this empty
 	 * @param mixed
@@ -744,20 +801,53 @@ class tl_iao_credit  extends \iao\iaoBackend
 		return '<a href="'.$href.'" title="'.specialchars($title).'">'.$this->generateImage($icon, $label).'</a> ';
 	}
 
-	public function createCreditNumberStr($varValue, DataContainer $dc)
+	/**
+	* fill field invoice_id_str if it's empty
+	* @param string
+	* @param object
+	* @return string
+	*/
+	public function setFieldCreditNumberStr($varValue, DataContainer $dc)
 	{
 		$settings = $this->getSettings($dc->activeRecord->setting_id);
+		$tstamp = ($dc->activeRecord->date) ?: time();
 
-		if(!$varValue)
+		return $this->createCreditNumberStr($varValue, $dc->activeRecord->credit_id, $tstamp, $settings);
+	}
+
+	/**
+	 * generate a Credit-number-string if not set
+	 * @param string
+	 * @param integer
+	 * @param integer
+	 * @param array
+	 * @return string
+	 */
+	public function createCreditNumberStr($varValue, $creditId, $tstamp, $settings)
+	{
+
+		if(strlen($varValue) < 1)
 		{
-			$tstamp = $dc->activeRecord->tstamp ? $dc->activeRecord->tstamp : time();
 			$format = $settings['iao_credit_number_format'];
-			$format =  str_replace('{date}',date('Ymd',$tstamp),$format);
-			$format =  str_replace('{nr}',$dc->activeRecord->credit_id,$format);
+			$format =  str_replace('{date}',date('Ymd', $tstamp), $format);
+			$format =  str_replace('{nr}', $creditId, $format);
 			$varValue = $format;
 		}
 		return $varValue;
 	}
+
+	/**
+	* fill field invoice_id if it's empty
+	* @param string
+	* @param object
+	* @return string
+	*/
+	public function setFieldInvoiceNumber($varValue, DataContainer $dc)
+	{
+		$settings = $this->getSettings($dc->activeRecord->setting_id);
+		return $this->generateCreditNumber($varValue, $settings);
+	}
+	
 
 	/**
 	 * Autogenerate an article alias if it has not been set yet
@@ -765,11 +855,10 @@ class tl_iao_credit  extends \iao\iaoBackend
 	 * @param object
 	 * @return string
 	 */
-	public function generateCreditNumber($varValue, DataContainer $dc)
+	public function generateCreditNumber($varValue, $settings)
 	{
 		$autoNr = false;
 		$varValue = (int) $varValue;
-		$settings = $this->getSettings($dc->activeRecord->setting_id);
 
 		// Generate credit_id if there is none
 		if($varValue == 0)
