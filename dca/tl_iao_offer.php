@@ -29,6 +29,11 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 			array('tl_iao_offer', 'checkPermission'),
 			array('tl_iao_offer', 'updateExpiryToTstmp')
 		),
+		'oncreate_callback' => array
+		(
+			array('tl_iao_offer', 'preFillFields'),
+			array('tl_iao_offer', 'setMemmberfieldsFromProject'),
+		),
 		'sql' => array
 		(
 			'keys' => array
@@ -217,8 +222,8 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_offer']['expiry_date'],
 			'exclude'                 => true,
 			'inputType'               => 'text',
-			'eval'                    => array('rgxp'=>'datim', 'doNotCopy'=>true, 'datepicker'=>$this->getDatePickerString(), 'tl_class'=>'w50 wizard'),
-			'save_callback' => array
+			'eval'                    => array('rgxp'=>'date', 'doNotCopy'=>true, 'datepicker'=>$this->getDatePickerString(), 'tl_class'=>'w50 wizard'),
+			'load_callback' => array
 			(
 				array('tl_iao_offer', 'generateExpiryDate')
 			),
@@ -233,7 +238,7 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 			'eval'                    => array('rgxp'=>'alnum', 'doNotCopy'=>true, 'spaceToUnderscore'=>true, 'maxlength'=>128, 'tl_class'=>'w50'),
 			'save_callback' => array
 			(
-				array('tl_iao_offer', 'generateOfferNumber')
+				array('tl_iao_offer', 'setFieldOfferNumber')
 			),
 			'sql'					  => "int(10) unsigned NOT NULL default '0'"
 		),
@@ -246,7 +251,7 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 			'eval'                    => array('doNotCopy'=>true, 'spaceToUnderscore'=>true, 'maxlength'=>128, 'tl_class'=>'w50'),
 			'save_callback' => array
 			(
-				array('tl_iao_offer', 'createOfferNumberStr')
+				array('tl_iao_offer', 'setFieldOfferNumberStr')
 			),
 			'sql'					  => "varchar(255) NOT NULL default ''"
 		),
@@ -438,6 +443,7 @@ class tl_iao_offer extends \iao\iaoBackend
 	{
 		parent::__construct();
 		$this->import('BackendUser', 'User');
+		$this->import('iao');
 	}
 
 
@@ -571,6 +577,59 @@ class tl_iao_offer extends \iao\iaoBackend
 		}
 	}
 
+	/**
+	* prefill eny Fields by new dataset
+	*/
+	public function preFillFields($table, $id, $set, $obj)
+	{
+		$objProject = iaoProjectsModel::findProjectByIdOrAlias($set['pid']);
+		$settingId = ($objProject !== null) ? $objProject->setting_id : 1;
+		$settings = $this->getSettings($settingId);
+
+		$offerId = $this->generateOfferNumber(0, $settings);
+		$offerIdStr = $this->generateOfferNumberStr('', $offerId, time(), $settings);
+		
+		$set = array
+		(
+			'offer_id' => $offerId,
+			'offer_id_str' => $offerIdStr
+		);
+
+		$this->Database->prepare('UPDATE `tl_iao_offer` %s WHERE `id`=?')
+						->set($set)
+						->limit(1)
+						->execute($id);
+	}
+
+	/**
+	* if GET-Param projonly then fill member and address-field
+	*/
+	public function setMemmberfieldsFromProject($table, $id, $set, $obj)
+	{
+		if(\Input::get('onlyproj') == 1 && (int) $set['pid'] > 0)
+		{
+			$objProject = iaoProjectsModel::findProjectByIdOrAlias($set['pid']);
+
+			if($objProject !== null)
+			{
+				$objMember = \MemberModel::findById($objProject->member);
+
+				$text = '<p>'.$objMember->company.'<br />'.($objMember->gender!='' ? $GLOBALS['TL_LANG']['tl_iao_invoice']['gender'][$objMember->gender].' ':'').($objMember->title ? $objMember->title.' ':'').$objMember->firstname.' '.$objMember->lastname.'<br />'.$objMember->street.'</p>';
+				$text .='<p>'.$objMember->postal.' '.$objMember->city.'</p>';
+
+				$set = array
+				(
+					'member' => $objProject->member,
+					'address_text' => $text
+				);
+
+				$this->Database->prepare('UPDATE `tl_iao_offer` %s WHERE `id`=?')
+								->set($set)
+								->limit(1)
+								->execute($id);
+			}
+		}
+	}
 
 	/**
 	 * fill date-Field if this empty
@@ -794,7 +853,6 @@ class tl_iao_offer extends \iao\iaoBackend
 
 				while($posten->next())
 				{
-
 					//Insert Invoice-Entry
 					$postenset = array
 					(
@@ -966,46 +1024,70 @@ class tl_iao_offer extends \iao\iaoBackend
 	}
 
 	/**
-	 * create an offer-number-string and replace placeholder
-	 * @param mixed
-	 * @param object
-	 * @return string
-	 */
-	public function createOfferNumberStr($varValue, DataContainer $dc)
+	* fill field offer_id_str if it's empty
+	* @param string
+	* @param object
+	* @return string
+	*/
+	public function setFieldOfferNumberStr($varValue, DataContainer $dc)
 	{
 		$settings = $this->getSettings($dc->activeRecord->setting_id);
+		$tstamp = ($dc->activeRecord->tstamp)?: time();
 
-		if(!$varValue)
+		return $this->generateOfferNumberStr($varValue, $dc->activeRecord->invoice_id, $tstamp, $settings);
+	}
+
+	/**
+	 * create an offer-number-string and replace placeholder
+	 * @param string
+	 * @param integer
+	 * @param integer
+	 * @param array
+	 * @return string
+	 */
+	public function generateOfferNumberStr($varValue, $offerId, $tstamp, $settings)
+	{
+
+		if(strlen($varValue) < 1)
 		{
-			$tstamp = $dc->activeRecord->tstamp ? $dc->activeRecord->tstamp : time();
-
 			$format = 		$settings['iao_offer_number_format'];
 			$format =  str_replace('{date}',date('Ymd',$tstamp), $format);
-			$format =  str_replace('{nr}',$dc->activeRecord->offer_id, $format);
+			$format =  str_replace('{nr}',$offerId, $format);
 			$varValue = $format;
 		}
 		return $varValue;
 	}
 
 	/**
+	* fill field offer_id if it's empty
+	* @param string
+	* @param object
+	* @return string
+	*/
+	public function setFieldOfferNumber($varValue, DataContainer $dc)
+	{
+		$settings = $this->getSettings($dc->activeRecord->setting_id);
+		return $this->generateOfferNumber($varValue, $settings);
+	}
+	
+	/**
 	 * generate a offer-number if not set
 	 * @param mixed
 	 * @param object
 	 * @return string
 	 */
-	public function generateOfferNumber($varValue, DataContainer $dc)
+	public function generateOfferNumber($varValue, $settings)
 	{
 		$autoNr = false;
 		$varValue = (int) $varValue;
-		$settings = $this->getSettings($dc->activeRecord->setting_id);
 
 		// Generate offer_id if there is none
 		if($varValue == 0)
 		{
 			$autoNr = true;
 			$objNr = $this->Database->prepare("SELECT `offer_id` FROM `tl_iao_offer` ORDER BY `offer_id` DESC")
-							->limit(1)
-							->execute();
+									->limit(1)
+									->execute();
 
 			if($objNr->numRows < 1 || $objNr->offer_id == 0)  $varValue = $settings['iao_offer_startnumber'];
 			else  $varValue =  $objNr->offer_id +1;
@@ -1013,8 +1095,8 @@ class tl_iao_offer extends \iao\iaoBackend
 		else
 		{
 			$objNr = $this->Database->prepare("SELECT `offer_id` FROM `tl_iao_offer` WHERE `id`=? OR `offer_id`=?")
-							->limit(1)
-							->execute($dc->id,$varValue);
+									->limit(1)
+									->execute($dc->id,$varValue);
 
 			// Check whether the OfferNumber exists
 			if ($objNr->numRows > 1 )
@@ -1028,7 +1110,6 @@ class tl_iao_offer extends \iao\iaoBackend
 			}
 		}
 		return $varValue;
-
 	}
 
 
