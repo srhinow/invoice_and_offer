@@ -728,6 +728,7 @@ class tl_iao_invoice extends \iao\iaoBackend
 			break;
 		}
 	}
+
 	/**
 	* prefill eny Fields by new dataset
 	*/
@@ -744,7 +745,7 @@ class tl_iao_invoice extends \iao\iaoBackend
 			'invoice_id_str' => $invoiceIdStr
 		);
 
-		$this->Database->prepare('UPDATE `tl_iao_invoice` %s WHERE `id`=?')
+		$this->Database->prepare('UPDATE `tl_iao_offer` %s WHERE `id`=?')
 						->set($set)
 						->limit(1)
 						->execute($id);
@@ -772,13 +773,14 @@ class tl_iao_invoice extends \iao\iaoBackend
 					'address_text' => $text
 				);
 
-				$this->Database->prepare('UPDATE `tl_iao_invoice` %s WHERE `id`=?')
+				$this->Database->prepare('UPDATE `tl_iao_offer` %s WHERE `id`=?')
 								->set($set)
 								->limit(1)
 								->execute($id);
 			}
 		}
 	}
+
 	/**
 	 * fill date-Field if this empty
 	 * @param mixed
@@ -1083,20 +1085,33 @@ class tl_iao_invoice extends \iao\iaoBackend
 		$href = 'contao/main.php?do=iao_invoice&amp;key=pdf&amp;id='.$row['id'];
 		return '<a href="'.$href.'" title="'.specialchars($title).'">'.$this->generateImage($icon, $label).'</a> ';
 	}
-	
+
+	/**
+	* fill field invoice_id_str if it's empty
+	* @param string
+	* @param object
+	* @return string
+	*/
 	public function setFieldInvoiceNumberStr($varValue, DataContainer $dc)
 	{
 		$settings = $this->getSettings($dc->activeRecord->setting_id);
-		return $this->generateInvoiceNumberStr($varValue, $dc->activeRecord->invoice_id, $settings);
+		$tstamp = ($dc->activeRecord->date) ?: time();
+
+		return $this->generateInvoiceNumberStr($varValue, $dc->activeRecord->invoice_id, $tstamp, $settings);
 	}
 
-	public function generateInvoiceNumberStr($varValue, $invoiceId, $settings)
+	/**
+	 * generate a Invoice-number-string if not set
+	 * @param string
+	 * @param integer
+	 * @param integer
+	 * @param array
+	 * @return string
+	 */
+	public function generateInvoiceNumberStr($varValue, $invoiceId, $tstamp, $settings)
 	{
-
 		if(strlen($varValue) < 1)
 		{
-			$tstamp = $dc->activeRecord->date ? $dc->activeRecord->date : time();
-
 			$format = $settings['iao_invoice_number_format'];
 			$format =  str_replace('{date}',date('Ymd',$tstamp),$format);
 			$format =  str_replace('{nr}',$invoiceId, $format);
@@ -1104,7 +1119,13 @@ class tl_iao_invoice extends \iao\iaoBackend
 		}
 		return $varValue;
 	}
-	
+
+	/**
+	* fill field invoice_id if it's empty
+	* @param string
+	* @param object
+	* @return string
+	*/
 	public function setFieldInvoiceNumber($varValue, DataContainer $dc)
 	{
 		$settings = $this->getSettings($dc->activeRecord->setting_id);
@@ -1112,9 +1133,9 @@ class tl_iao_invoice extends \iao\iaoBackend
 	}
 	
 	/**
-	 * Autogenerate an article alias if it has not been set yet
-	 * @param mixed
-	 * @param object
+	 * generate a invoice-number if not set
+	 * @param integer
+	 * @param array
 	 * @return string
 	 */
 	public function generateInvoiceNumber($varValue, $settings)
@@ -1127,8 +1148,8 @@ class tl_iao_invoice extends \iao\iaoBackend
 		{
 			$autoNr = true;
 			$objNr = $this->Database->prepare("SELECT `invoice_id` FROM `tl_iao_invoice` ORDER BY `invoice_id` DESC")
-					->limit(1)
-					->execute();
+									->limit(1)
+									->execute();
 
 			if($objNr->numRows < 1 || $objNr->invoice_id == 0)  $varValue = $settings['iao_invoice_startnumber'];
 			else  $varValue =  $objNr->invoice_id +1;
@@ -1136,8 +1157,8 @@ class tl_iao_invoice extends \iao\iaoBackend
 	    else
 	    {
 			$objNr = $this->Database->prepare("SELECT `invoice_id` FROM `tl_iao_invoice` WHERE `id`=? OR `invoice_id`=?")
-					    ->limit(1)
-					    ->execute($dc->id, $varValue);
+									->limit(1)
+									->execute($dc->id, $varValue);
 
 			// Check whether the InvoiceNumber exists
 			if ($objNr->numRows > 1 )
