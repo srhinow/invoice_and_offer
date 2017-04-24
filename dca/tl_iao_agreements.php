@@ -25,6 +25,10 @@ $GLOBALS['TL_DCA']['tl_iao_agreements'] = array
 		(
 			array('tl_iao_agreements','IAOSettings')
 		),
+		'onsubmit_callback'	    => array
+		(
+		    array('tl_iao_agreements','saveNettoAndBrutto')
+		),
 		'sql' => array
 		(
 			'keys' => array
@@ -47,7 +51,7 @@ $GLOBALS['TL_DCA']['tl_iao_agreements'] = array
 		),
 		'label' => array
 		(
-			'fields'                  => array('title','beginn_date','end_date'),
+			'fields'                  => array('title','beginn_date','end_date','price_brutto'),
 			'format'                  => '%s (aktuelle Laufzeit: %s - %s)',
 			'label_callback'          => array('tl_iao_agreements', 'listEntries'),
 		),
@@ -104,7 +108,15 @@ $GLOBALS['TL_DCA']['tl_iao_agreements'] = array
 	'palettes' => array
 	(
 		'__selector__'                => array('sendEmail'),
-		'default'                     => '{settings_legend},setting_id,pid;{title_legend},title;{agreement_legend:hide},agreement_pdf_file;{address_legend},member,address_text;{other_legend},price;{status_legend},agreement_date,periode,beginn_date,end_date,status,terminated_date,new_generate;{email_legend},sendEmail;{invoice_generate_legend},before_template,after_template,posten_template;{notice_legend:hide},notice'
+		'default'                     => '{settings_legend},setting_id,pid;
+										  {title_legend},title;
+										  {agreement_legend:hide},agreement_pdf_file;
+										  {address_legend},member,address_text;
+										  {other_legend},price,vat,vat_incl,count,amountStr;
+										  {status_legend},agreement_date,periode,beginn_date,end_date,status,terminated_date,new_generate;
+										  {email_legend},sendEmail;
+										  {invoice_generate_legend},before_template,after_template,posten_template;
+										  {notice_legend:hide},notice'
 	),
 	// Subpalettes
 	'subpalettes' => array
@@ -224,13 +236,65 @@ $GLOBALS['TL_DCA']['tl_iao_agreements'] = array
 			'eval'                    => array('rgxp'=>'date', 'datepicker'=>$this->getDatePickerString(), 'tl_class'=>'w50 wizard'),
 			'sql'                     => "varchar(255) NOT NULL default ''"
 		),
-		'price' =>  array
+		'price' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_agreements']['price'],
 			'exclude'                 => true,
+			'search'                  => true,
+			'sorting'                 => true,
+			'flag'                    => 1,
 			'inputType'               => 'text',
-			'eval'                    => array('mandatory'=>true, 'tl_class'=>'w50 wizard'),
-			'sql'                     => "varchar(64) NOT NULL default '0'"
+			'eval'                    => array('mandatory'=>true, 'maxlength'=>255, 'tl_class'=>'clr'),
+			'sql'					  => "varchar(64) NOT NULL default '0'"
+		),
+		'price_netto' => array
+		(
+			'sql'					  => "varchar(64) NOT NULL default '0'"
+		),
+		'price_brutto' => array
+		(
+			'sql'					  => "varchar(64) NOT NULL default '0'"
+		),
+		'vat' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_agreements']['vat'],
+			'filter'                  => true,
+			'flag'                    => 1,
+			'inputType'               => 'select',
+			'options_callback'        => array('tl_iao_agreements', 'getTaxRatesOptions'),
+			'eval'                    => array('tl_class'=>'w50'),
+			'sql'					  => "int(10) unsigned NOT NULL default '19'"
+		),
+		'vat_incl' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_agreements']['vat_incl'],
+			'filter'                  => true,
+			'flag'                    => 1,
+			'inputType'               => 'select',
+			'options'                 => &$GLOBALS['TL_LANG']['tl_iao_agreements']['vat_incl_percents'],
+			'eval'                    => array('tl_class'=>'w50'),
+			'sql'					  => "int(10) unsigned NOT NULL default '1'"
+		),
+		'count' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_agreements']['count'],
+			'exclude'                 => true,
+			'flag'                    => 1,
+			'inputType'               => 'text',
+			'default'				  => '1',
+			'eval'                    => array('mandatory'=>true, 'maxlength'=>255, 'tl_class'=>'w50'),
+			'sql'					  => "varchar(64) NOT NULL default '0'"
+		),
+		'amountStr' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_agreements']['amountStr'],
+			'exclude'                 => true,
+			'filter'                  => true,
+			'flag'                    => 1,
+			'inputType'               => 'select',
+			'options_callback'        => array('tl_iao_agreements', 'getItemUnitsOptions'),
+            'eval'                    => array('tl_class'=>'w50','submitOnChange'=>false),
+			'sql'					  => "varchar(64) NOT NULL default ''"
 		),
 		'member' => array
 		(
@@ -533,7 +597,7 @@ class tl_iao_agreements extends \iao\iaoBackend
 		<div class="cte_type agreement_status' . $arrRow['status'] . '"><strong>' . $arrRow['title'].'</strong></div>
 		<div>Vertragszeit: '.date($GLOBALS['TL_CONFIG']['dateFormat'], $arrRow['beginn_date']).' - '.date($GLOBALS['TL_CONFIG']['dateFormat'], $arrRow['end_date']).'</div>';
 		if($arrRow['status'] == 2) $return .= '<div>gekündigt am: '.date($GLOBALS['TL_CONFIG']['dateFormat'], $arrRow['terminated_date']).'</div>';
-		if($arrRow['price'] != '') $return .= '<div>Betrag: '.$arrRow['price'].' '.$GLOBALS['TL_CONFIG']['currency_symbol'].'</div>';
+		if($arrRow['price'] != '') $return .= '<div>Betrag: '.$this->getPriceStr($arrRow['price_brutto']).'</div>';
 		$return .= '</div>' . "\n    ";
 
 		return $return;
@@ -717,6 +781,42 @@ class tl_iao_agreements extends \iao\iaoBackend
 		return '<a href="'.$link.'" title="'.specialchars($title).'">'.$this->generateImage($icon, $label).'</a> ';
 	}
 
+	/**
+	 * save the price_netto and price_brutto from actuell item
+	 * @param mixed
+	 * @param object
+	 * @return string
+	 */
+	public function saveNettoAndBrutto(DataContainer $dc)
+	{
+		// Return if there is no active record (override all)
+		if (!$dc->activeRecord)
+		{
+			return;
+		}
+
+	    $englprice = str_replace(',','.',$dc->activeRecord->price);
+
+		$Netto = $nettoSum = $Brutto = $bruttoSum = 0;
+
+		if($dc->activeRecord->vat_incl == 1)
+		{
+			$Netto = $englprice;
+			$Brutto = $this->getBruttoPrice($englprice,$dc->activeRecord->vat);
+		}
+		else
+		{
+			$Netto = $this->getNettoPrice($englprice,$dc->activeRecord->vat);
+			$Brutto = $englprice;
+		}
+		
+	    $nettoSum = round($Netto,2) * $dc->activeRecord->count;
+	    $bruttoSum = round($Brutto,2) * $dc->activeRecord->count;
+	    
+		$this->Database->prepare('UPDATE `tl_iao_agreements` SET `price_netto`=?, `price_brutto`=? WHERE `id`=?')
+			->limit(1)
+			->execute($nettoSum, $bruttoSum, $dc->id);
+	}
 
 	/**
 	 * Return the "toggle visibility" button

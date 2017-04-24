@@ -40,7 +40,11 @@ $GLOBALS['TL_LANG']['tl_iao_agreements']['before_template'] = array('Text vor de
 $GLOBALS['TL_LANG']['tl_iao_agreements']['after_template'] = array('Text nach den Posten','Eine Auswahl an Rechnungsvorlagen');
 $GLOBALS['TL_LANG']['tl_iao_agreements']['posten_template'] = array('Posten-Template','Eine Auswahl an Rechnungsposten');
 $GLOBALS['TL_LANG']['tl_iao_agreements']['notice'] = array('Notiz','');
-$GLOBALS['TL_LANG']['tl_iao_agreements']['price'] = array('Preis (&euro;)','den Bruttopreis für die Listenansicht');
+$GLOBALS['TL_LANG']['tl_iao_agreements']['price'] = array('Preis','geben Sie hier den Preis an.');
+$GLOBALS['TL_LANG']['tl_iao_agreements']['vat_incl'] = array('Preis-Angabe mit oder ohne MwSt.','(brutto / netto)');
+$GLOBALS['TL_LANG']['tl_iao_agreements']['count'] = array('Anzahl','die Anzahl wird mit dem Preis multipliziert');
+$GLOBALS['TL_LANG']['tl_iao_agreements']['amountStr'] = array('Art der Anzahl','');
+$GLOBALS['TL_LANG']['tl_iao_agreements']['vat'] = array('MwSt.','Art der MwSt. zu diesem Posten.');
 
 $GLOBALS['TL_LANG']['tl_iao_agreements']['execute_date'] = array('Ausgeführt am','Dieses Angabe wird vom Finanzamt vorgeschrieben um die Vorsteuer zu ziehen.');
 $GLOBALS['TL_LANG']['tl_iao_agreements']['expiry_date'] = array('Begleichen bis','Das Datum nachdem die Mahnungsstufen anfangen.');
@@ -75,3 +79,4 @@ $GLOBALS['TL_LANG']['tl_iao_agreements']['notice_legend'] = 'Notiz anlegen';
  * Select-fiels options
  */
 $GLOBALS['TL_LANG']['tl_iao_agreements']['status_options'] = array('1'=>'aktiv','2'=>'gekündigt');
+$GLOBALS['TL_LANG']['tl_iao_agreements']['vat_incl_percents'] = array(1 => 'netto', 2 => 'brutto');
