@@ -1,4 +1,8 @@
 <?php
+/**
+ * Run in a custom namespace, so the class can be replaced
+ */
+namespace iao;
 
 /**
  * for Contao Open Source CMS
