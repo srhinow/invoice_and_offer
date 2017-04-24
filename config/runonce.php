@@ -16,12 +16,17 @@ class firstProject extends Controller
 	public function run()
 	{
 		//Projekt anlegen wenn keins existiert
-		$testProjObj = $this->Database->prepare('SELECT * FROM `tl_iao_projects`')->execute();
-		if($testInvoicePidObj->numRows < 1)
+		$testProjObj = $this->Database->prepare('SELECT * FROM `tl_iao_projects`')->limit(1)->execute();
+		if($testProjObj->numRows < 1)
 		{
 			$projSet = array('title'=>'--undefined');
 			$this->Database->prepare('INSERT INTO `tl_iao_projects` %s')->set($projSet)->execute();
 			$insertProjId = $this->Database->insert_id();
+		}
+		//ansonsten das erste Projekt nehmen was existiert
+		else
+		{
+			$insertProjId = $testProjObj->id;
 		}
 
 		//Angebote mit default Projekt befüllen wenn keins zugewiesen
@@ -68,6 +73,16 @@ class firstProject extends Controller
 			}
 		}
 
+		//Verträge mit default Projekt befüllen wenn keins zugewiesen
+		$testReminderPidObj = $this->Database->prepare('SELECT * FROM `tl_iao_reminder` WHERE `pid`=?')->execute('');
+		if($testReminderPidObj->numRows > 0)
+		{
+			if( (int) $insertProjId > 0)
+			{
+				$set = array('pid' => $insertProjId);
+				$this->Database->prepare('UPDATE `tl_iao_agreements` %s WHERE `pid`=?')->set($set)->execute('');
+			}
+		}
 	}
 }
 
