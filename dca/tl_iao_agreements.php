@@ -18,6 +18,7 @@ $GLOBALS['TL_DCA']['tl_iao_agreements'] = array
 	'config' => array
 	(
 		'dataContainer'               => 'Table',
+		'ptable'                      => 'tl_iao_projects',
 		'switchToEdit'                => true,
 		'enableVersioning'            => false,
 		'onload_callback' => array
@@ -29,6 +30,7 @@ $GLOBALS['TL_DCA']['tl_iao_agreements'] = array
 			'keys' => array
 			(
 				'id' => 'primary',
+				'pid' => 'index'
 			)
 		)
 	),
@@ -69,19 +71,18 @@ $GLOBALS['TL_DCA']['tl_iao_agreements'] = array
 				'icon'                => 'edit.gif',
 				'attributes'          => 'class="contextmenu"'
 			),
-			'editheader' => array
-			(
-				'label'               => &$GLOBALS['TL_LANG']['tl_iao_agreements']['editheader'],
-				'href'                => 'act=edit',
-				'icon'                => 'header.gif',
-				'button_callback'     => array('tl_iao_agreements', 'editHeader'),
-				'attributes'          => 'class="edit-header"'
-			),
 			'copy' => array
 			(
 				'label'               => &$GLOBALS['TL_LANG']['tl_iao_agreements']['copy'],
 				'href'                => 'act=copy',
 				'icon'                => 'copy.gif'
+			),
+			'invoice' => array
+			(
+				'label'               => &$GLOBALS['TL_LANG']['tl_iao_agreements']['invoice'],
+				'href'                => 'key=addInvoice',
+				'icon'                => 'system/modules/invoice_and_offer/html/icons/kontact_todo.png',
+				'button_callback'     => array('tl_iao_agreements', 'addInvoice')
 			),
 			'delete' => array
 			(
@@ -95,15 +96,7 @@ $GLOBALS['TL_DCA']['tl_iao_agreements'] = array
 				'label'               => &$GLOBALS['TL_LANG']['tl_iao_agreements']['show'],
 				'href'                => 'act=show',
 				'icon'                => 'show.gif'
-			),
-			'pdf' => array
-			(
-				'label'               => &$GLOBALS['TL_LANG']['tl_iao_invoice']['pdf'],
-				'href'                => 'key=pdf',
-				'icon'                => 'iconPDF.gif',
-				'button_callback'     => array('tl_iao_agreements', 'showPDF')
 			)
-
 		)
 	),
 
@@ -111,7 +104,7 @@ $GLOBALS['TL_DCA']['tl_iao_agreements'] = array
 	'palettes' => array
 	(
 		'__selector__'                => array('sendEmail'),
-		'default'                     => 'title,agreement_pdf_file;{address_legend},member,address_text;{other_legend},price;{status_legend},agreement_date,periode,beginn_date,end_date,status,terminated_date,new_generate;{email_legend},sendEmail;{notice_legend:hide},notice'
+		'default'                     => '{settings_legend},setting_id,pid;{title_legend},title;{agreement_legend:hide},agreement_pdf_file;{address_legend},member,address_text;{other_legend},price;{status_legend},agreement_date,periode,beginn_date,end_date,status,terminated_date,new_generate;{email_legend},sendEmail;{notice_legend:hide},notice'
 	),
 	// Subpalettes
 	'subpalettes' => array
@@ -127,10 +120,34 @@ $GLOBALS['TL_DCA']['tl_iao_agreements'] = array
 		(
 			'sql'                     => "int(10) unsigned NOT NULL auto_increment"
 		),
+		'pid' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_agreements']['pid'],
+			'foreignKey'              => 'tl_iao_projects.title',
+			'filter'                  => true,
+			'sorting'                 => true,
+			'flag'                    => 11,
+			'inputType'               => 'select',
+			'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>false, 'chosen'=>true),
+			'sql'                     => "int(10) unsigned NOT NULL default '1'",
+			'relation'                => array('type'=>'belongsTo', 'load'=>'eager')
+		),
+		'setting_id' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_agreements']['setting_id'],
+			'exclude'                 => true,
+			'filter'                  => true,
+			'sorting'                 => true,
+			'flag'                    => 11,
+			'inputType'               => 'select',
+			'options_callback'        => array('tl_iao_agreements', 'getSettingOptions'),
+			'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>false, 'chosen'=>true),
+			'sql'                     => "int(10) unsigned NOT NULL default '0'"
+		),
 		'tstamp' => array
 		(
 			'sql'                     => "int(10) unsigned NOT NULL default '0'"
-		),	
+		),
 		'title' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_agreements']['title'],
@@ -329,7 +346,7 @@ $GLOBALS['TL_DCA']['tl_iao_agreements'] = array
 /**
  * Class tl_iao_agreements
  */
-class tl_iao_agreements extends Backend
+class tl_iao_agreements extends \iao\iaoBackend
 {
 
 	/**
@@ -585,6 +602,97 @@ class tl_iao_agreements extends Backend
 		return ($this->User->isAdmin || count(preg_grep('/^tl_iao_agreements::/', $this->User->alexf)) > 0) ? '<a href="'.$this->addToUrl($href.'&amp;id='.$row['id']).'" title="'.specialchars($title).'"'.$attributes.'>'.$this->generateImage($icon, $label).'</a> ' : '';
 	}
 
+
+	/**
+	 * Generate a button and return it as string
+	 * @param array
+	 * @param string
+	 * @param string
+	 * @param string
+	 * @param string
+	 * @return string
+	 */
+    public function addInvoice($row, $href, $label, $title, $icon)
+    {
+		if (!$this->User->isAdmin)
+		{
+			return '';
+		}
+
+		if (\Input::get('key') == 'addInvoice' && \Input::get('id') == $row['id'])
+		{
+			
+
+			//Insert Invoice-Entry
+			$set = array
+			(
+				'pid' => (\Input::get('projId')) ? : '',
+				'tstamp' => time(),
+				'invoice_tstamp' => time(),
+				'title' => $row['title'],
+				'address_text' => $row['address_text'],
+				'member' => $row['member'],
+				'price_netto' => $row['price_netto'],
+				'price_brutto' => $row['price_brutto'],
+				'noVat' => $row['noVat'],
+				'notice' => $row['notice'],
+		    );
+
+			$result = $this->Database->prepare('INSERT INTO `tl_iao_invoice` %s')
+							->set($set)
+							->execute();
+
+			$newInvoiceID = $result->insertId;
+
+			//Insert Postions for this Entry
+			if($newInvoiceID)
+			{
+				$posten = $this->Database->prepare('SELECT * FROM `tl_iao_offer_items` WHERE `pid`=? ')
+								->execute($row['id']);
+
+				while($posten->next())
+				{
+					//Insert Invoice-Entry
+					$postenset = array
+					(
+						'pid' => $newInvoiceID,
+						'tstamp' => $posten->tstamp,
+						'type' => $posten->type,
+						'headline' => $posten->headline,
+						'headline_to_pdf' => $posten->headline_to_pdf,
+						'sorting' => $posten->sorting,
+						'date' => $posten->date,
+						'time' => $posten->time,
+						'text' => $posten->text,
+						'count' => $posten->count,
+						'amountStr' => $posten->amountStr,
+						'operator' => $posten->operator,
+						'price' => $posten->price,
+						'price_netto' => $posten->price_netto,
+						'price_brutto' => $posten->price_brutto,
+						'published' => $posten->published,
+						'vat' => $posten->vat,
+						'vat_incl' => $posten->vat_incl
+					);
+
+					$newposten = $this->Database->prepare('INSERT INTO `tl_iao_invoice_items` %s')
+									->set($postenset)
+									->execute();
+				}
+
+				// Update the database
+				$this->Database->prepare("UPDATE tl_iao_offer SET status='2' WHERE id=?")
+								->execute($row['id']);
+
+				$this->redirect($this->addToUrl('do=iao_invoice&table=tl_iao_invoice&id='.$newInvoiceID.'&act=edit') );
+		    }
+		}
+		
+		$link = (\Input::get('onlyproj') == 1) ? 'do=iao_offer&amp;id='.$row['id'].'&amp;projId='.\Input::get('id') : 'do=iao_offer&amp;id='.$row['id'].'';
+		$link = $this->addToUrl($href.'&amp;'.$link);
+		$link = str_replace('table=tl_iao_offer&amp;','',$link);
+		return '<a href="'.$link.'" title="'.specialchars($title).'">'.$this->generateImage($icon, $label).'</a> ';
+	}
 
 
 	/**

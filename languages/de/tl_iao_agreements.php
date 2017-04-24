@@ -15,13 +15,9 @@
  * permanent text corrections which are update-safe.
  */
 
-$GLOBALS['TL_LANG']['tl_iao_agreements']['new'] = array('Neuer Vertrag','Einen neuen Vertrag anlegen');
-$GLOBALS['TL_LANG']['tl_iao_agreements']['edit'] = array('Vertrag bearbeiten','Vertrag ID %s bearbeiten');
-$GLOBALS['TL_LANG']['tl_iao_agreements']['copy'] = array('Vertrag duplizieren','Vertrag ID %s duplizieren');
-$GLOBALS['TL_LANG']['tl_iao_agreements']['delete'] = array('Vertrag löschen','Vertrag ID %s löschen');
-$GLOBALS['TL_LANG']['tl_iao_agreements']['deleteConfirm'] = 'Soll die Vertrag ID %s wirklich gelöscht werden?!';
-$GLOBALS['TL_LANG']['tl_iao_agreements']['show'] = array('Details anzeigen','Details der Vertrag ID %s anzeigen');
 
+$GLOBALS['TL_LANG']['tl_iao_agreements']['setting_id']	=	array('Konfiguration','');
+$GLOBALS['TL_LANG']['tl_iao_agreements']['pid']	=	array('Projekt','das entsprechende Projekt auswählen.');
 $GLOBALS['TL_LANG']['tl_iao_agreements']['title'] = array('Bezeichnung','Bezeichnung des Elementes');
 $GLOBALS['TL_LANG']['tl_iao_agreements']['agreement_pdf_file'] = array('Vertrag','Vertrag als PDF-Datei zuweisen.');
 $GLOBALS['TL_LANG']['tl_iao_agreements']['member'] = array('Kunde','Adresse aus gespeicherten Kunden in nachstehendes Feld befüllen');
@@ -47,12 +43,24 @@ $GLOBALS['TL_LANG']['tl_iao_agreements']['execute_date'] = array('Ausgeführt am
 $GLOBALS['TL_LANG']['tl_iao_agreements']['expiry_date'] = array('Begleichen bis','Das Datum nachdem die Mahnungsstufen anfangen.');
 $GLOBALS['TL_LANG']['tl_iao_agreements']['invoice_pdf_file'] = array('Mahnungsdatei','Wenn hier eine Datei angegeben wurde wird diese statt einer generierten ausgegeben. Unter normalen Umständen sollte dieses Feld leer bleiben. Es ist hauptsächlich für Importe gedacht.');
 $GLOBALS['TL_LANG']['tl_iao_agreements']['paid_on_date'] = array('Bezahlt am','Das Datum an dem die Zahlung auf dem Konto eingegangen ist.');
-
+$GLOBALS['TL_LANG']['tl_iao_agreements']['invoice'] = array('Für den Servicevertrag die aktuelle Rechnung generieren.','Servicevertrag ID %s als Rechnung anlegen');
 $GLOBALS['TL_LANG']['tl_iao_agreements']['toggle'] = 'Vertrag als aktiv/ nicht aktiv markieren';
+
+/**
+* Buttons
+*/
+$GLOBALS['TL_LANG']['tl_iao_agreements']['new'] = array('Neuer Vertrag','Einen neuen Vertrag anlegen');
+$GLOBALS['TL_LANG']['tl_iao_agreements']['edit'] = array('Vertrag bearbeiten','Vertrag ID %s bearbeiten');
+$GLOBALS['TL_LANG']['tl_iao_agreements']['copy'] = array('Vertrag duplizieren','Vertrag ID %s duplizieren');
+$GLOBALS['TL_LANG']['tl_iao_agreements']['delete'] = array('Vertrag löschen','Vertrag ID %s löschen');
+$GLOBALS['TL_LANG']['tl_iao_agreements']['deleteConfirm'] = 'Soll die Vertrag ID %s wirklich gelöscht werden?!';
+$GLOBALS['TL_LANG']['tl_iao_agreements']['show'] = array('Details anzeigen','Details der Vertrag ID %s anzeigen');
 
 /**
  * Legend
  */
+$GLOBALS['TL_LANG']['tl_iao_agreements']['settings_legend']	=	'Konfiguration-Zuweisung';
+$GLOBALS['TL_LANG']['tl_iao_agreements']['title_legend'] = 'Titel Einstellung';
 $GLOBALS['TL_LANG']['tl_iao_agreements']['address_legend'] = 'Adress-Angaben';
 $GLOBALS['TL_LANG']['tl_iao_agreements']['status_legend'] = 'Status-Einstellungen';
 $GLOBALS['TL_LANG']['tl_iao_agreements']['email_legend'] = 'Email-Einstellungen';
