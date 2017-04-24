@@ -1,8 +1,12 @@
 <?php
+/**
+ * Run in a custom namespace, so the class can be replaced
+ */
+namespace iao;
 
 /**
  *
- * @copyright  Sven Rhinow 2011-2014
+ * @copyright  Sven Rhinow 2011-2017
  * @author     sr-tag Sven Rhinow Webentwicklung <http://www.sr-tag.de>
  * @package    invoice_and_offer
  * @license    LGPL
@@ -92,10 +96,34 @@ class iao extends \Backend
 		return ($netto / 100) * ($vat + 100);
 	}
 
-	public function getPriceStr($price,$currencyStr = 'iao_currency')
+	/**
+	 * Get formatet price-string
+	 * @param float
+	 * @param string
+	 * @return string
+	 */
+	public function getPriceStr($price, $currencyStr = 'iao_currency')
 	{
-		// if((float)$price < 0) return ;
-		return number_format((float)$price,2,',','.').' '.$GLOBALS['TL_CONFIG'][$currencyStr];
+		return number_format((float)$price, 2, ',', '.').' '.$GLOBALS['TL_CONFIG'][$currencyStr];
+	}
+
+	/**
+	* replace ##-Placeholder 
+	* @param string
+	* @param object
+	* @return text
+	*/
+	public function replacePlaceholder($text,$dcObj)
+	{
+		if(stristr($text,'##project##'))
+		{
+			$projObj = $this->Database->prepare('SELECT * FROM `tl_iao_projects` WHERE `id`=?')->limit(1)->execute($dcObj->activeRecord->pid);
+
+			if($projObj->numRows > 0) $text = str_replace('##project##', $projObj->title, $text);
+		}
+		$text = str_replace('##datum##', date('d.m.Y'), $text);
+
+		return $text;
 	}
 
     /**
@@ -128,7 +156,7 @@ class iao extends \Backend
 		$strBuffer = '';
 		$arrCache = array();
 
-		for($_rit=0; $_rit<count($tags); $_rit=$_rit+2)
+		for($_rit = 0; $_rit < count($tags); $_rit = $_rit + 2)
 		{
 			$strBuffer .= $tags[$_rit];
 			$strTag = $tags[$_rit+1];
@@ -288,11 +316,11 @@ class iao extends \Backend
 		if((int) $id < 1 || strlen($type) < 1) return;
 
 		$dataObj = $this->Database->prepare('SELECT * FROM `tl_iao_'.$type.'` WHERE `id`=?')->limit(1)->execute($id);
-
 		if($dataObj->numRows < 1) return;
-
 		$row = $dataObj->row();
-		// print_r($row);
+
+		$settings = $this->getSettings($row['setting_id']);
+
 		//wenn eine feste Rechnung als PDF zugewiesen wurde
 		if(strlen($row[$type.'_pdf_file']) > 0 )
 		{
@@ -303,7 +331,7 @@ class iao extends \Backend
 				header("Content-type: application/pdf");
 				header('Expires: Sat, 26 Jul 1997 05:00:00 GMT'); // Date in the past
 				header('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT');
-	 			header('Content-Length: '.strlen($row['invoice_pdf_file']));
+	 			header('Content-Length: '.strlen($row[$type.'_pdf_file']));
 				header('Content-Disposition: inline; filename="'.basename($objPdf->path).'";');
 
 				// The PDF source is in original.pdf
@@ -312,10 +340,10 @@ class iao extends \Backend
 		    }
 		}
 
-		$pdfname = 'Rechnung-'.$row[$type.'_id_str'];
+		$pdfname = $GLOBALS['TL_LANG']['tl_iao']['types'][$type].'-'.$row[$type.'_id_str'];
 
 		// Calculating dimensions
-		$margins = unserialize($this->settings['iao_pdf_margins']);         // Margins as an array
+		$margins = unserialize($settings['iao_pdf_margins']);         // Margins as an array
 		switch( $margins['unit'] )
 		{
 			case 'cm':      $factor = 10.0;   break;
@@ -334,12 +362,17 @@ class iao extends \Backend
 		$l['w_page'] = 'page';
 
 		// Create new PDF document with FPDI extension
-		require_once(TL_ROOT . '/system/modules/invoice_and_offer/classes/iaoPDF.php');
+		require_once(dirname(__FILE__).'/iaoPDF.php');
+
+	    $objPdfTemplate = 	\FilesModel::findByUuid($settings['iao_'.$type.'_pdf']);
+		if(strlen($objPdfTemplate->path) < 1 || !file_exists(TL_ROOT . '/' . $objPdfTemplate->path) ) return;  // template file not found
+
 
 		$pdf = new \iaoPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true);
 		$pdf->setSourceFile( TL_ROOT . '/' .$objPdfTemplate->path);          // Set PDF template
 
 		// Set document information
+		$pdf->iaoSettings = $settings;
 		$pdf->SetCreator(PDF_CREATOR);
 		$pdf->SetTitle($pdfname);
 		$pdf->SetSubject($pdfname);
@@ -367,7 +400,7 @@ class iao extends \Backend
 		$pdf->AddPage();
 
 	    // Include CSS (TCPDF 5.1.000 an newer)
-	    $file = \FilesModel::findByUuid($this->settings['iao_pdf_css']);
+	    $file = \FilesModel::findByUuid($settings['iao_pdf_css']);
 
 	    if(strlen($file->path) > 0 && file_exists(TL_ROOT . '/' . $file->path) )
 	    {
@@ -376,7 +409,7 @@ class iao extends \Backend
 		}
 
 		// write the address-data
-		$row['address_text'] = $this->changeIAOTags($row['address_text'],'invoice',$row['id']);
+		$row['address_text'] = $this->changeIAOTags($row['address_text'],$type,$row['id']);
 		$row['address_text'] = $this->changeTags($row['address_text']);
 		$pdf->drawAddress($row['address_text']);
 
@@ -404,14 +437,14 @@ class iao extends \Backend
 
 		//Posten-Tabelle
 		$header = array('Menge','Beschreibung','Einzelpreis','Gesamt');
-		$fields = $this->getPosten($row['id']);
+		$fields = $this->getPosten($row['id'], $type);
 
 		$pdf->drawPostenTable($header, $fields, $row['noVat']);
 
-		//Text vor der Posten-Tabelle
+		//Text nach der Posten-Tabelle
 		if(strip_tags($row['after_text']))
 		{
-			$row['after_text'] = $this->changeIAOTags($row['after_text'],'invoice',$row['id']);
+			$row['after_text'] = $this->changeIAOTags($row['after_text'], $type, $row['id']);
 			$row['after_text'] = $this->changeTags($row['after_text']);
 			$pdf->drawTextAfter($row['after_text']);
 		}
@@ -422,6 +455,79 @@ class iao extends \Backend
 
 		// Stop script execution
 		exit();
+	}
+
+	public function getPosten($id, $type='')
+	{
+		$posten = array();
+
+		//wenn type oder id fehlen abbrechen
+		if((int) $id < 1 || strlen($type) < 1) return $posten;
+
+		$this->loadLanguageFile('tl_iao_'.$type.'_items');
+
+		$resultObj = $this->Database->prepare('SELECT * FROM `tl_iao_'.$type.'_items` WHERE `pid`=? AND `published`= ? ORDER BY `sorting`')
+		->execute($id,1);
+
+
+		if($resultObj->numRows <= 0) return $posten;
+
+		while($resultObj->next())
+		{
+			$resultObj->price = str_replace(',','.',$resultObj->price);
+
+			$einzelpreis = ($resultObj->vat_incl == 1) ? $this->getBruttoPrice($resultObj->price,$resultObj->vat) : $resultObj->price;
+			
+			if($resultObj->headline_to_pdf == 1) $resultObj->text = substr_replace($resultObj->text, '<p><strong>'.$resultObj->headline.'</strong><br>', 0, 3);
+			
+			$resultObj->text = $this->changeTags($resultObj->text);
+
+			// get units from DB-Table
+			$unitObj = $this->Database->prepare('SELECT * FROM `tl_iao_item_units` WHERE `value`=?')
+										->limit(1)
+										->execute($resultObj->amountStr);
+
+			$formatCount = stripos($resultObj->count, '.') ? number_format($resultObj->count,1,',','.') : $resultObj->count;
+
+			$posten['fields'][] = array
+			(
+				$formatCount.' '.(((float)$resultObj->count <= 1) ? $unitObj->singular : $unitObj->majority),
+				$resultObj->text,
+				number_format($einzelpreis,2,',','.'),
+				number_format($resultObj->price_brutto,2,',','.')
+			);
+			$posten['pagebreak_after'][] = $resultObj->pagebreak_after;
+			$posten['type'][] = $resultObj->type;
+
+			$posten['discount'] = false;
+
+			if($resultObj->operator == '-')
+			{
+				$posten['summe']['price'] -= $resultObj->operator = $resultObj->price;
+				$posten['summe']['netto'] -= $resultObj->price_netto;
+				$posten['summe']['brutto'] -= $resultObj->price_brutto;
+			}
+			else
+			{
+				$posten['summe']['price'] += $resultObj->operator = $resultObj->price;
+				$posten['summe']['netto'] += $resultObj->price_netto;
+				$posten['summe']['brutto'] += $resultObj->price_brutto;
+			}
+
+			$parentObj = $this->Database->prepare('SELECT * FROM `tl_iao_invoice` WHERE `id`=?')
+					->limit(1)
+					->execute($id);
+			
+			if($parentObj->noVat != 1)
+			{
+				$posten['summe']['mwst'][$resultObj->vat] +=  $resultObj->price_brutto - $resultObj->price_netto;
+			}
+		}
+
+	    $posten['summe']['netto_format'] =  number_format($posten['summe']['netto'],2,',','.');
+	    $posten['summe']['brutto_format'] =  number_format($posten['summe']['brutto'],2,',','.');
+
+	    return $posten;
 	}
 
     /**
@@ -449,26 +555,6 @@ class iao extends \Backend
 
 			return $sum;
 		}
-    }
-
-	/**
-	 * get the next periode-date
-	 * @param object
-	 * @return integer
-	 */
-	public function  getPeriodeDate($reminderObj)
-	{
-		$lastReminderObj = $this->Database->prepare('SELECT * FROM `tl_iao_reminder` WHERE `invoice_id`=? AND `id`!=? ORDER BY `id` DESC')
-											->limit(1)
-											->execute($reminderObj->invoice_id,$reminderObj->id);
-
-		$lastPeriodeDate = ($lastReminderObj->periode_date) ? $lastReminderObj->periode_date : time();
-		$time = ($reminderObj->periode_date == 0) ? $lastPeriodeDate : $reminderObj->periode_date;
-		$step = (!strlen($reminderObj->step)) ? 1 : $reminderObj->step;
-		$dur = (int) ($GLOBALS['TL_CONFIG']['iao_reminder_'.$step.'_duration']) > 0 ? (int) $GLOBALS['TL_CONFIG']['iao_reminder_'.$step.'_duration'] : 14;
-		$nextDate = ($this->noWE($time,$dur) > time()) ? $this->noWE($time,$dur) : $this->noWE(time(),$dur);
-
-        return $nextDate;
     }
 
 	/**
