@@ -279,7 +279,6 @@ $GLOBALS['TL_DCA']['tl_iao_invoice'] = array
 			'eval'                    => array('fieldType'=>'radio', 'tl_class'=>'clr','extensions'=>'pdf','files'=>true, 'filesOnly'=>true, 'mandatory'=>false),
 			'sql'					  => "varchar(255) NOT NULL default ''"
 		),
-
 		'member' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_invoice']['member'],
