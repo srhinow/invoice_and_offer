@@ -104,7 +104,7 @@ $GLOBALS['TL_DCA']['tl_iao_agreements'] = array
 	'palettes' => array
 	(
 		'__selector__'                => array('sendEmail'),
-		'default'                     => '{settings_legend},setting_id,pid;{title_legend},title;{agreement_legend:hide},agreement_pdf_file;{address_legend},member,address_text;{other_legend},price;{status_legend},agreement_date,periode,beginn_date,end_date,status,terminated_date,new_generate;{email_legend},sendEmail;{notice_legend:hide},notice'
+		'default'                     => '{settings_legend},setting_id,pid;{title_legend},title;{agreement_legend:hide},agreement_pdf_file;{address_legend},member,address_text;{other_legend},price;{status_legend},agreement_date,periode,beginn_date,end_date,status,terminated_date,new_generate;{email_legend},sendEmail;{invoice_generate_legend},before_template,after_template,posten_template;{notice_legend:hide},notice'
 	),
 	// Subpalettes
 	'subpalettes' => array
@@ -277,7 +277,7 @@ $GLOBALS['TL_DCA']['tl_iao_agreements'] = array
 			'exclude'                 => true,
 			'inputType'               => 'fileTree',
 			'eval'                    => array('fieldType'=>'radio', 'files'=>true, 'filesOnly'=>true, 'mandatory'=>false,'extensions'=>'pdf'),
-			'sql'                     => "varchar(255) NOT NULL default ''"
+			'sql'                     => "binary(16) NULL"
 		),
 		'sendEmail' => array
 		(
@@ -331,6 +331,30 @@ $GLOBALS['TL_DCA']['tl_iao_agreements'] = array
 		    'eval'                    => array('mandatory'=>true, 'decodeEntities'=>true),
 		    'sql'                     => "text NULL"
 	    ),
+		'before_template' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_agreements']['before_template'],
+			'inputType'               => 'select',
+			'options_callback'        => array('tl_iao_agreements', 'getBeforeTemplate'),
+			'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>true,'submitOnChange'=>false, 'chosen'=>true),
+			'sql'					  => "int(10) unsigned NOT NULL default '0'"
+		),
+		'after_template' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_agreements']['after_template'],
+			'inputType'               => 'select',
+			'options_callback'        => array('tl_iao_agreements', 'getAfterTemplate'),
+			'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>true, 'submitOnChange'=>false, 'chosen'=>true),
+			'sql'					  => "int(10) unsigned NOT NULL default '0'"
+		),
+   		'posten_template' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_agreements']['posten_template'],
+			'inputType'               => 'select',
+			'options_callback'        => array('tl_iao_agreements', 'getPostenTemplate'),
+			'eval'                    => array('tl_class'=>'w50', 'includeBlankOption'=>true, 'submitOnChange'=>false, 'chosen'=>true),
+			'sql'					  => "int(10) unsigned NOT NULL default '0'"
+		),
 		'notice' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_agreements']['notice'],
@@ -811,7 +835,7 @@ class tl_iao_agreements extends \iao\iaoBackend
 		// wenn der Wert nicht manuell verändert wurde die Periode berechnen
 		return ($varValue == $dc->activeRecord->end_date) ? strtotime($periode.' -1 day', $beginn_date) : $varValue ;
 	}
-		/**
+	/**
 	 * Generate a "PDF" button and return it as string
 	 * @param array
 	 * @param string
@@ -876,4 +900,65 @@ class tl_iao_agreements extends \iao\iaoBackend
 		}
 		return '';
 	}
+
+	/**
+	 * get all invoice-posten-templates
+	 * @param object
+	 * @throws Exception
+	 */
+	public function getPostenTemplate(DataContainer $dc)
+	{
+		$varValue= array();
+
+		$all = $this->Database->prepare('SELECT `id`,`headline` FROM `tl_iao_templates_items` WHERE `position`=?')
+				->execute('invoice');
+
+		while($all->next())
+		{
+			$varValue[$all->id] = $all->headline;
+		}
+		return $varValue;
+	}
+
+	/**
+	 * get all invoice before template
+	 * @param object
+	 * @throws Exception
+	 */
+	public function getBeforeTemplate(DataContainer $dc)
+	{
+		$varValue= array();
+
+		$all = $this->Database->prepare('SELECT `id`,`title` FROM `tl_iao_templates` WHERE `position`=?')
+				->execute('invoice_before_text');
+
+		while($all->next())
+		{
+			$varValue[$all->id] = $all->title;
+		}
+
+	    return $varValue;
+	}
+
+	/**
+	 * get all invoice after template
+	 * @param object
+	 * @throws Exception
+	 */
+	public function getAfterTemplate(DataContainer $dc)
+	{
+		$varValue= array();
+
+		$all = $this->Database->prepare('SELECT `id`,`title` FROM `tl_iao_templates` WHERE `position`=?')
+				->execute('invoice_after_text');
+
+		while($all->next())
+		{
+			$varValue[$all->id] = $all->title;
+		}
+
+	    return $varValue;
+	}
+
+
 }
