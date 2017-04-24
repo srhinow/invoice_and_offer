@@ -531,8 +531,21 @@ $GLOBALS['TL_DCA']['tl_iao_settings'] = array
 /**
  * Class tl_iao_settings
  */
-class tl_iao_settings extends Backend
+class tl_iao_settings extends \iao\iaoBackend
 {
+
+	protected $settings = array();
+
+	/**
+	 * Import the back end user object
+	 */
+	public function __construct()
+	{
+		parent::__construct();
+		$this->import('BackendUser', 'User');
+	}
+
+
 	/**
 	 * Return the link picker wizard
 	 * @param object
