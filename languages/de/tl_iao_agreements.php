@@ -36,6 +36,9 @@ $GLOBALS['TL_LANG']['tl_iao_agreements']['email_from'] = array('Email-Sender',''
 $GLOBALS['TL_LANG']['tl_iao_agreements']['email_to'] = array('Email-Empfänger','');
 $GLOBALS['TL_LANG']['tl_iao_agreements']['email_subject'] = array('Email-Betreff','');
 $GLOBALS['TL_LANG']['tl_iao_agreements']['email_text'] = array('Email-Text','');
+$GLOBALS['TL_LANG']['tl_iao_agreements']['before_template'] = array('Text vor den Posten','Eine Auswahl an Rechnungsvorlagen');
+$GLOBALS['TL_LANG']['tl_iao_agreements']['after_template'] = array('Text nach den Posten','Eine Auswahl an Rechnungsvorlagen');
+$GLOBALS['TL_LANG']['tl_iao_agreements']['posten_template'] = array('Posten-Template','Eine Auswahl an Rechnungsposten');
 $GLOBALS['TL_LANG']['tl_iao_agreements']['notice'] = array('Notiz','');
 $GLOBALS['TL_LANG']['tl_iao_agreements']['price'] = array('Preis (&euro;)','den Bruttopreis für die Listenansicht');
 
@@ -59,6 +62,7 @@ $GLOBALS['TL_LANG']['tl_iao_agreements']['show'] = array('Details anzeigen','Det
 /**
  * Legend
  */
+$GLOBALS['TL_LANG']['tl_iao_agreements']['invoice_generate_legend']	=	'Einstellungen für die Genrierung der Rechnungen';
 $GLOBALS['TL_LANG']['tl_iao_agreements']['settings_legend']	=	'Konfiguration-Zuweisung';
 $GLOBALS['TL_LANG']['tl_iao_agreements']['title_legend'] = 'Titel Einstellung';
 $GLOBALS['TL_LANG']['tl_iao_agreements']['address_legend'] = 'Adress-Angaben';
