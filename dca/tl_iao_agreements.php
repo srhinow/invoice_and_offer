@@ -207,7 +207,6 @@ $GLOBALS['TL_DCA']['tl_iao_agreements'] = array
 		'new_generate' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_agreements']['new_generate'],
-			'filter'                  => true,
 			'flag'                    => 1,
 			'inputType'               => 'checkbox',
 			'eval'                    => array('tl_class'=>'clr'),
