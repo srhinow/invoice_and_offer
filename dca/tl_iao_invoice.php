@@ -737,47 +737,17 @@ class tl_iao_invoice extends \iao\iaoBackend
 		$settingId = ($objProject !== null) ? $objProject->setting_id : 1;
 		$settings = $this->getSettings($settingId);
 		$invoiceId = $this->generateInvoiceNumber(0, $settings);
-		$invoiceIdStr = $this->generateInvoiceNumberStr('', $invoiceId, $settings);
+		$invoiceIdStr = $this->generateInvoiceNumberStr('', $invoiceId, time(), $settings);
 		$set = array
 		(
 			'invoice_id' => $invoiceId,
 			'invoice_id_str' => $invoiceIdStr
 		);
 
-		$this->Database->prepare('UPDATE `tl_iao_offer` %s WHERE `id`=?')
+		$this->Database->prepare('UPDATE '.$table.' %s WHERE `id`=?')
 						->set($set)
 						->limit(1)
 						->execute($id);
-	}
-
-	/**
-	* if GET-Param projonly then fill member and address-field
-	*/
-	public function setMemmberfieldsFromProject($table, $id, $set, $obj)
-	{
-		if(\Input::get('onlyproj') == 1 && (int) $set['pid'] > 0)
-		{
-			$objProject = iaoProjectsModel::findProjectByIdOrAlias($set['pid']);
-
-			if($objProject !== null)
-			{
-				$objMember = \MemberModel::findById($objProject->member);
-
-				$text = '<p>'.$objMember->company.'<br />'.($objMember->gender!='' ? $GLOBALS['TL_LANG']['tl_iao_invoice']['gender'][$objMember->gender].' ':'').($objMember->title ? $objMember->title.' ':'').$objMember->firstname.' '.$objMember->lastname.'<br />'.$objMember->street.'</p>';
-				$text .='<p>'.$objMember->postal.' '.$objMember->city.'</p>';
-
-				$set = array
-				(
-					'member' => $objProject->member,
-					'address_text' => $text
-				);
-
-				$this->Database->prepare('UPDATE `tl_iao_offer` %s WHERE `id`=?')
-								->set($set)
-								->limit(1)
-								->execute($id);
-			}
-		}
 	}
 
 	/**
