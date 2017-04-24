@@ -88,18 +88,19 @@ $GLOBALS['TL_DCA']['tl_iao_agreements'] = array
 				'icon'                => 'system/modules/invoice_and_offer/html/icons/kontact_todo.png',
 				'button_callback'     => array('tl_iao_agreements', 'addInvoice')
 			),
+			'pdf' => array
+			(
+				'label'               => &$GLOBALS['TL_LANG']['tl_iao_agreements']['pdf'],
+				'href'                => 'key=pdf',
+				'icon'                => 'iconPDF.gif',
+				'button_callback'     => array('tl_iao_agreements', 'showPDF')
+			),
 			'delete' => array
 			(
 				'label'               => &$GLOBALS['TL_LANG']['tl_iao_agreements']['delete'],
 				'href'                => 'act=delete',
 				'icon'                => 'delete.gif',
 				'attributes'          => 'onclick="if (!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\')) return false; Backend.getScrollOffset();"',
-			),
-			'show' => array
-			(
-				'label'               => &$GLOBALS['TL_LANG']['tl_iao_agreements']['show'],
-				'href'                => 'act=show',
-				'icon'                => 'show.gif'
 			)
 		)
 	),
@@ -809,7 +810,7 @@ class tl_iao_agreements extends \iao\iaoBackend
 			$Netto = $this->getNettoPrice($englprice,$dc->activeRecord->vat);
 			$Brutto = $englprice;
 		}
-		
+
 	    $nettoSum = round($Netto,2) * $dc->activeRecord->count;
 	    $bruttoSum = round($Brutto,2) * $dc->activeRecord->count;
 	    
@@ -945,14 +946,18 @@ class tl_iao_agreements extends \iao\iaoBackend
 	 */
 	public function showPDF($row, $href, $label, $title, $icon)
 	{
-		if (!$this->User->isAdmin)
+		if (!$this->User->isAdmin || strlen($row['agreement_pdf_file']) < 1 )
 		{
 			return '';
 		}
 
-		$pdfFile = TL_ROOT . '/' . $row['agreement_pdf_file'];
+		// Wenn keine PDF-Vorlage dann kein PDF-Link
+	    $objPdf = 	\FilesModel::findByUuid($row['agreement_pdf_file']);
+		if(strlen($objPdf->path) < 1 || !file_exists(TL_ROOT . '/' . $objPdf->path) ) return;  // template file not found
 
-		if ($this->Input->get('key') == 'pdf' && $this->Input->get('id') == $row['id'])
+		$pdfFile = TL_ROOT . '/' . $objPdf->path;
+
+		if (\Input::get('key') == 'pdf' && \Input::get('id') == $row['id'])
 		{
 
 			if(!empty($row['agreement_pdf_file']) && file_exists($pdfFile))

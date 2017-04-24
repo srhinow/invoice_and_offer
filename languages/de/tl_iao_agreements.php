@@ -67,6 +67,7 @@ $GLOBALS['TL_LANG']['tl_iao_agreements']['show'] = array('Details anzeigen','Det
  * Legend
  */
 $GLOBALS['TL_LANG']['tl_iao_agreements']['invoice_generate_legend']	=	'Einstellungen für die Genrierung der Rechnungen';
+$GLOBALS['TL_LANG']['tl_iao_agreements']['agreement_legend']	=	'Vertrag-Einstellungen';
 $GLOBALS['TL_LANG']['tl_iao_agreements']['settings_legend']	=	'Konfiguration-Zuweisung';
 $GLOBALS['TL_LANG']['tl_iao_agreements']['title_legend'] = 'Titel Einstellung';
 $GLOBALS['TL_LANG']['tl_iao_agreements']['address_legend'] = 'Adress-Angaben';
