@@ -709,12 +709,13 @@ class tl_iao_agreements extends \iao\iaoBackend
 
 		if (\Input::get('key') == 'addInvoice' && \Input::get('id') == $row['id'])
 		{
-			
+			$beforeTemplObj = $this->getTemplateObject('tl_iao_templates',$row['before_template']);
+			$afterTemplObj = $this->getTemplateObject('tl_iao_templates',$row['after_template']);
 
 			//Insert Invoice-Entry
 			$set = array
 			(
-				'pid' => (\Input::get('projId')) ? : '',
+				'pid' => $row['pid'],
 				'tstamp' => time(),
 				'invoice_tstamp' => time(),
 				'title' => $row['title'],
@@ -722,8 +723,12 @@ class tl_iao_agreements extends \iao\iaoBackend
 				'member' => $row['member'],
 				'price_netto' => $row['price_netto'],
 				'price_brutto' => $row['price_brutto'],
-				'noVat' => $row['noVat'],
-				'notice' => $row['notice'],
+				'before_template' => $row['before_template'],
+				'before_text' => $this->changeIAOTags($beforeTemplObj->text,'',$row['pid']),
+				'after_template' => $row['after_template'],
+				'after_text' => $this->changeIAOTags($afterTemplObj->text,'',$row['pid']),
+				'agreement_id' => $row['id'],
+
 		    );
 
 			$result = $this->Database->prepare('INSERT INTO `tl_iao_invoice` %s')
@@ -735,50 +740,50 @@ class tl_iao_agreements extends \iao\iaoBackend
 			//Insert Postions for this Entry
 			if($newInvoiceID)
 			{
-				$posten = $this->Database->prepare('SELECT * FROM `tl_iao_offer_items` WHERE `pid`=? ')
-								->execute($row['id']);
+				//Posten-Template holen
+				$postenTemplObj = $this->getTemplateObject('tl_iao_templates_items',$row['posten_template']);
 
-				while($posten->next())
+				if($postenTemplObj->numRows > 0)
 				{
-					//Insert Invoice-Entry
-					$postenset = array
-					(
-						'pid' => $newInvoiceID,
-						'tstamp' => $posten->tstamp,
-						'type' => $posten->type,
-						'headline' => $posten->headline,
-						'headline_to_pdf' => $posten->headline_to_pdf,
-						'sorting' => $posten->sorting,
-						'date' => $posten->date,
-						'time' => $posten->time,
-						'text' => $posten->text,
-						'count' => $posten->count,
-						'amountStr' => $posten->amountStr,
-						'operator' => $posten->operator,
-						'price' => $posten->price,
-						'price_netto' => $posten->price_netto,
-						'price_brutto' => $posten->price_brutto,
-						'published' => $posten->published,
-						'vat' => $posten->vat,
-						'vat_incl' => $posten->vat_incl
-					);
+					$headline = $this->changeIAOTags($postenTemplObj->headline,'',$row['id']);
+					$date = $postenTemplObj->date;
+					$time = $postenTemplObj->time;
+					$text = $this->changeIAOTags($postenTemplObj->text,'',$row['id']);
+				}
+				//Insert Invoice-Entry
+				$postenset = array
+				(
+					'pid' => $newInvoiceID,
+					'tstamp' => time(),
+					'headline' => $headline,
+					'headline_to_pdf' => '1',
+					'date' => $date,
+					'time' => $time,
+					'text' => $text,
+					'count' => $row['count'],
+					'amountStr' => $row['amountStr'],
+					'price' => $row['price'],
+					'price_netto' => $row['price_netto'],
+					'price_brutto' => $row['price_brutto'],
+					'published' => '1',
+					'vat' => $row['vat'],
+					'vat_incl' => $row['vat_incl'],
+					'posten_template' => $row['posten_template']
+				);
 
-					$newposten = $this->Database->prepare('INSERT INTO `tl_iao_invoice_items` %s')
+				$newposten = $this->Database->prepare('INSERT INTO `tl_iao_invoice_items` %s')
 									->set($postenset)
 									->execute();
-				}
 
-				// Update the database
-				$this->Database->prepare("UPDATE tl_iao_offer SET status='2' WHERE id=?")
-								->execute($row['id']);
+				$this->redirect($this->addToUrl('do=iao_invoice&mode=2&table=tl_iao_invoice&s2e=1&id='.$newInvoiceID.'&act=edit') );
+			}
 
-				$this->redirect($this->addToUrl('do=iao_invoice&table=tl_iao_invoice&id='.$newInvoiceID.'&act=edit') );
-		    }
 		}
-		
-		$link = (\Input::get('onlyproj') == 1) ? 'do=iao_offer&amp;id='.$row['id'].'&amp;projId='.\Input::get('id') : 'do=iao_offer&amp;id='.$row['id'].'';
+
+		//Button erzeugen
+		$link = (\Input::get('onlyproj') == 1) ? 'do=iao_agreements&amp;id='.$row['id'].'&amp;projId='.\Input::get('id') : 'do=iao_agreements&amp;id='.$row['id'].'';
 		$link = $this->addToUrl($href.'&amp;'.$link);
-		$link = str_replace('table=tl_iao_offer&amp;','',$link);
+		$link = str_replace('table=tl_iao_agreements&amp;','',$link);
 		return '<a href="'.$link.'" title="'.specialchars($title).'">'.$this->generateImage($icon, $label).'</a> ';
 	}
 

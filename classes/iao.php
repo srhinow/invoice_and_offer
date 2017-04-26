@@ -254,6 +254,13 @@ class iao extends \Backend
 
 							$arrCache[$strTag] = $this->infoObj->$parts[1];
 						break;
+						case 'project':
+							$this->infoObj = $this->Database->prepare('SELECT `p`.* FROM `tl_iao_invoice` `i` LEFT JOIN `tl_iao_projects` `p` ON `p`.`id` = `i`.`pid` WHERE `i`.`id`=?')
+															->limit(1)
+															->execute($id);
+
+							$arrCache[$strTag] = $this->infoObj->$parts[1];
+						break;
 					}
 				break;
 				case 'reminder':
@@ -291,6 +298,23 @@ class iao extends \Backend
 						break;
 					}
 				break;
+				case 'project':
+					$this->infoObj = $this->Database->prepare('SELECT * FROM `tl_iao_projects` WHERE `id`=?')
+									->limit(1)
+									->execute($id);
+
+					$arrCache[$strTag] = $this->infoObj->$parts[1];
+
+				break;
+				case 'agreement':
+					$this->infoObj = $this->Database->prepare('SELECT * FROM `tl_iao_agreements` WHERE `id`=?')
+									->limit(1)
+									->execute($id);
+
+					if($parts[2] == 'date_format') $arrCache[$strTag] = date( $GLOBALS['TL_CONFIG']['dateFormat'], $this->infoObj->$parts[1]);
+					else $arrCache[$strTag] = $this->infoObj->$parts[1];
+
+				break;
 				case 'iao':
 					switch(strtolower($parts[1]))
 					{
@@ -304,6 +328,19 @@ class iao extends \Backend
 		}
 		return $strBuffer;
 	}
+
+	public function getTemplateObject($table='tl_iao_templates', $id)
+	{
+		if((int) $id > 0 && strlen($table) > 0)
+		{
+			//Posten-Template holen
+			return $this->Database->prepare('SELECT * FROM '.$table.' WHERE id=?')
+											->limit(1)
+											->execute($id);
+		}
+		return false;
+	}
+
 	/**
 	* generiert von den verschiedenen Bereichen eine PDF und gibt diese an den Browser
 	* @param integer
@@ -409,7 +446,7 @@ class iao extends \Backend
 		}
 
 		// write the address-data
-		$row['address_text'] = $this->changeIAOTags($row['address_text'],$type,$row['id']);
+		$row['address_text'] = $this->changeIAOTags($row['address_text'], $type, $row['id']);
 		$row['address_text'] = $this->changeTags($row['address_text']);
 		$pdf->drawAddress($row['address_text']);
 
@@ -420,12 +457,18 @@ class iao extends \Backend
 		$pdf->drawDate(date($GLOBALS['TL_CONFIG']['dateFormat'],$row[$type.'_tstamp']));
 
 		//ausgeführt am
-		$newdate= $row['execute_date'];
-		$pdf->drawInvoiceExecuteDate(date($GLOBALS['TL_CONFIG']['dateFormat'],$newdate));
+		if($row['execute_date'])
+		{
+			$newdate= $row['execute_date'];
+			$pdf->drawInvoiceExecuteDate(date($GLOBALS['TL_CONFIG']['dateFormat'],$newdate));
+		}
 
 		//gueltig bis
-		$newdate= $row['expiry_date'];
-		$pdf->drawInvoiceDurationDate(date($GLOBALS['TL_CONFIG']['dateFormat'],$newdate));
+		if($row['expiry_date'])
+		{
+			$newdate= $row['expiry_date'];
+			$pdf->drawInvoiceDurationDate(date($GLOBALS['TL_CONFIG']['dateFormat'],$newdate));
+		}
 
 		//Text vor der Posten-Tabelle
 		if(strip_tags($row['before_text']))
@@ -496,6 +539,7 @@ class iao extends \Backend
 				number_format($einzelpreis,2,',','.'),
 				number_format($resultObj->price_brutto,2,',','.')
 			);
+
 			$posten['pagebreak_after'][] = $resultObj->pagebreak_after;
 			$posten['type'][] = $resultObj->type;
 
@@ -514,7 +558,7 @@ class iao extends \Backend
 				$posten['summe']['brutto'] += $resultObj->price_brutto;
 			}
 
-			$parentObj = $this->Database->prepare('SELECT * FROM `tl_iao_invoice` WHERE `id`=?')
+			$parentObj = $this->Database->prepare('SELECT * FROM `tl_iao_'.$type.'` WHERE `id`=?')
 					->limit(1)
 					->execute($id);
 			

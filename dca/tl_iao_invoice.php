@@ -733,6 +733,7 @@ class tl_iao_invoice extends \iao\iaoBackend
 	*/
 	public function preFillFields($table, $id, $set, $obj)
 	{
+
 		$objProject = iaoProjectsModel::findProjectByIdOrAlias($set['pid']);
 		$settingId = ($objProject !== null) ? $objProject->setting_id : 1;
 		$settings = $this->getSettings($settingId);
@@ -831,6 +832,7 @@ class tl_iao_invoice extends \iao\iaoBackend
 	 */
 	public function fillBeforeText($varValue, DataContainer $dc)
 	{
+
 		if(strip_tags($dc->activeRecord->before_text)=='')
 		{
 			if(strlen($varValue)<=0) return $varValue;
@@ -840,6 +842,8 @@ class tl_iao_invoice extends \iao\iaoBackend
 			->execute($varValue);
 
 			$objTemplate->text = $this->changeIAOTags($objTemplate->text,'invoice',$dc->id);
+			$objTemplate->text = $this->changeIAOTags($objTemplate->text,'agreement',$dc->id);
+			$objTemplate->text = $this->changeIAOTags($objTemplate->text,'project',$dc->id);
 
 			$text = $this->replacePlaceholder($objTemplate->text, $dc);
 
@@ -868,7 +872,9 @@ class tl_iao_invoice extends \iao\iaoBackend
 							->execute($varValue);
 
 			$objTemplate->text = $this->changeIAOTags($objTemplate->text,'invoice',$dc->id);
-
+			$objTemplate->text = $this->changeIAOTags($objTemplate->text,'agreement',$dc->id);
+			$objTemplate->text = $this->changeIAOTags($objTemplate->text,'project',$dc->id);
+			
 			$this->Database->prepare('UPDATE `tl_iao_invoice` SET `after_text`=? WHERE `id`=?')
 					->limit(1)
 					->execute($objTemplate->text,$dc->id);
@@ -1251,6 +1257,7 @@ class tl_iao_invoice extends \iao\iaoBackend
 	    }
 	    return $varValue;
 	}
+
 	/**
 	* zur Aktualisierung der Datensätze aus älterer Modul-Versionen
 	*/
@@ -1304,6 +1311,7 @@ class tl_iao_invoice extends \iao\iaoBackend
 			}
 		}
 	}
+
 	public function priceFormat($varValue, DataContainer $dc)
 	{
 		return $this->getPriceStr($varValue);
@@ -1313,6 +1321,7 @@ class tl_iao_invoice extends \iao\iaoBackend
 	{
 		return $dc->activeRecord->price_brutto;
 	}
+	
 	/**
 	* calculate and update fields
 	*/
