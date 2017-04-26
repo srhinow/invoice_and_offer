@@ -842,8 +842,6 @@ class tl_iao_invoice extends \iao\iaoBackend
 			->execute($varValue);
 
 			$objTemplate->text = $this->changeIAOTags($objTemplate->text,'invoice',$dc->id);
-			$objTemplate->text = $this->changeIAOTags($objTemplate->text,'agreement',$dc->id);
-			$objTemplate->text = $this->changeIAOTags($objTemplate->text,'project',$dc->id);
 
 			$text = $this->replacePlaceholder($objTemplate->text, $dc);
 
@@ -872,9 +870,7 @@ class tl_iao_invoice extends \iao\iaoBackend
 							->execute($varValue);
 
 			$objTemplate->text = $this->changeIAOTags($objTemplate->text,'invoice',$dc->id);
-			$objTemplate->text = $this->changeIAOTags($objTemplate->text,'agreement',$dc->id);
-			$objTemplate->text = $this->changeIAOTags($objTemplate->text,'project',$dc->id);
-			
+
 			$this->Database->prepare('UPDATE `tl_iao_invoice` SET `after_text`=? WHERE `id`=?')
 					->limit(1)
 					->execute($objTemplate->text,$dc->id);
@@ -1321,7 +1317,7 @@ class tl_iao_invoice extends \iao\iaoBackend
 	{
 		return $dc->activeRecord->price_brutto;
 	}
-	
+
 	/**
 	* calculate and update fields
 	*/
