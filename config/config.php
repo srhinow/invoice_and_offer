@@ -13,8 +13,14 @@
  * invoice_and_offer Version
  */
 @define('IAO_VERSION', '1.1');
-@define('IAO_BUILD', '4');
+@define('IAO_BUILD', '5');
 @define('IAO_PATH','system/modules/invoice_and_offer');
+
+
+/**
+ * DEFAULT IAO VALUES 
+*/
+$GLOBALS['IAO']['default_agreement_cycle'] = '+1 year';
 
 /**
  * back-end modules
@@ -77,8 +83,6 @@ $GLOBALS['BE_MOD']['iao'] = array
 		'icon'		=> IAO_PATH.'/html/icons/process.png',
 	)
 );
-
-$GLOBALS['IAO']['default_agreement_cycle'] = '+1 year';
 
 /**
  * Setup Modules
@@ -152,7 +156,7 @@ $GLOBALS['FE_MOD']['iao_fe'] = array
 /**
  * HOOKS
  */
-// $GLOBALS['TL_HOOKS']['replaceInsertTags'][] = array('mpMembers', 'changeIAOTags');
+$GLOBALS['TL_HOOKS']['replaceInsertTags'][] = array('iaoHooks', 'iaoReplaceInsertTags');
 
 /**
  * Cron jobs
