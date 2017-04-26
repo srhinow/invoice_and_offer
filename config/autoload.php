@@ -29,7 +29,15 @@ ClassLoader::addClasses(array
 	'iao_reminder'               => 'system/modules/invoice_and_offer/export_import/iao_reminder.php',
 
 	// Models
+	'iao\iaoOfferModel'          => 'system/modules/invoice_and_offer/models/iaoOfferModel.php',
+	'iao\iaoInvoiceModel'        => 'system/modules/invoice_and_offer/models/iaoInvoiceModel.php',
 	'iao\iaoProjectsModel'       => 'system/modules/invoice_and_offer/models/iaoProjectsModel.php',
+	'iao\iaoTemplatesModel'      => 'system/modules/invoice_and_offer/models/iaoTemplatesModel.php',
+	'iao\iaoCreditItemsModel'    => 'system/modules/invoice_and_offer/models/iaoCreditItemsModel.php',
+	'iao\iaoSettingsModel'       => 'system/modules/invoice_and_offer/models/iaoSettingsModel.php',
+	'iao\iaoOfferItemsModel'     => 'system/modules/invoice_and_offer/models/iaoOfferItemsModel.php',
+	'iao\IaoTemplatesItemsModel' => 'system/modules/invoice_and_offer/models/IaoTemplatesItemsModel.php',
+	'iao\iaoCreditModel'         => 'system/modules/invoice_and_offer/models/iaoCreditModel.php',
 
 	// Classes
 	'iaoCrons'                   => 'system/modules/invoice_and_offer/classes/iaoCrons.php',
