@@ -110,14 +110,14 @@ class iaoPDF extends \FPDI
 
 	public function drawTextBefore($text)
 	{
-		$this->SetFont('helvetica', '', 10);
+		$this->SetFont('helvetica', '', 9);
 		$y = $this->getY();
 		$this->writeHTMLCell(185, '', 13, $y+15, $text, 0, 1, false, false, 'J', true);
 	}
 
 	public function drawTextAfter($text)
 	{
-		$this->SetFont('helvetica', '', 10);
+		$this->SetFont('helvetica', '', 9);
 		$y = $this->getY();
 		$this->writeHTMLCell(185, '', 13, $y+5, $text, 0, 1,false, true, 'L', true);
 	}
@@ -139,7 +139,7 @@ class iaoPDF extends \FPDI
 	{
 		if(count($data['fields'])>0)
 		{
-			$this->SetFont('helvetica', '', 10);
+			$this->SetFont('helvetica', '', 9);
 
 			// Header
 			$w = array(25, 100, 25, 30);
