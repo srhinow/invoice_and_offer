@@ -583,7 +583,7 @@ class tl_iao_offer extends \iao\iaoBackend
 	public function preFillFields($table, $id, $set, $obj)
 	{
 		$objProject = iaoProjectsModel::findProjectByIdOrAlias($set['pid']);
-		$settingId = ($objProject !== null) ? $objProject->setting_id : 1;
+		$settingId = ($objProject !== null && $objProject->setting_id != 0) ? $objProject->setting_id : 1;
 		$settings = $this->getSettings($settingId);
 
 		$offerId = $this->generateOfferNumber(0, $settings);

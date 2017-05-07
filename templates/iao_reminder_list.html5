@@ -1,0 +1,37 @@
+<?php $this->loadLanguageFile('tl_iao_reminder');?>
+<div class="iao_list block<?= $this->class; ?>">
+<?php if ($this->headline): ?>
+    <<?= $this->hl; ?>><?= $this->headline; ?></<?= $this->hl; ?>>
+<?php endif; ?>
+<?php if(count($this->items)>0):?>
+	<div class="table-responsive">
+	<table class="invoice_list_table table table-striped table-hover">
+		<thead>
+			<tr>
+				<th class="title"><?= $GLOBALS['TL_LANG']['tl_iao_reminder']['fe_table_head']['step']; ?></th>
+				<th class="title"><?= $GLOBALS['TL_LANG']['tl_iao_reminder']['fe_table_head']['title']; ?></th>
+				<th class="date"><?= $GLOBALS['TL_LANG']['tl_iao_reminder']['fe_table_head']['invoice_expiry']; ?></th>
+				<th class="date"><?= $GLOBALS['TL_LANG']['tl_iao_reminder']['fe_table_head']['reminder_expiry']; ?></th>
+				<th class="price"><?= $GLOBALS['TL_LANG']['tl_iao_reminder']['fe_table_head']['price']; ?></th>
+				<th class="file"><?= $GLOBALS['TL_LANG']['tl_iao_reminder']['fe_table_head']['file']; ?></th>
+			</tr>
+		</thead>
+		<tbody>
+			<?php foreach($this->items as $item): ?>
+			<tr class="<?= $item['status_class'];?>">
+				<td class="step"><?= $GLOBALS['TL_LANG']['tl_iao_reminder']['steps'][$item['step']]; ?></td>
+				<td class="title" title="<?= $item['title'];?>"><a href="<?= $item['invoice_pdf_path'];?>" title="Rechnung als PDF anzeigen"><?= $item['invoice_id_str']; ?></a></td>
+				<td class="date"><?= $item['expiry_date'];?></td>
+				<td class="expiry"><?= $item['periode_date'];?></td>
+				<td class="price"><?= $item['sum'];?></td>
+				<td class="file"><a href="<?= $item['reminder_pdf_path'];?>"><i class="fa fa-download" aria-hidden="true"></i></a></td>
+			</tr>
+			<?php endforeach; ?>
+		</tbody>
+	</table>
+	</div>
+<?php else: ?>
+	<p><?=$this->messages; ?></p>
+<?php endif; ?>
+<?= $this->pagination; ?>
+</div>

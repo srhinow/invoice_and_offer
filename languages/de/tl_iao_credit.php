@@ -70,4 +70,8 @@ $GLOBALS['TL_LANG']['tl_iao_credit']['notice_legend']	=	'Notiz anlegen';
 /**
  * Select-fiels options
  */
-$GLOBALS['TL_LANG']['tl_iao_invoice']['status_options'] = array('1'=>'nicht angenommen','2'=>'angenommen');
+$GLOBALS['TL_LANG']['tl_iao_credit']['status_options'] = array('1'=>'nicht angenommen','2'=>'angenommen');
+
+
+// Meldungen
+$GLOBALS['TL_LANG']['tl_iao_credit']['no_entries_msg'] = 'Es sind keine Einträge für diesen Bereich vorhanden.';

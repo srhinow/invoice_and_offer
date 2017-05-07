@@ -24,6 +24,7 @@ $GLOBALS['TL_DCA']['tl_iao_reminder'] = array
 		'enableVersioning'            => false,
 		'onload_callback' => array
 		(
+			array('tl_iao_reminder', 'generateInvoicePDF'),
 			// array('tl_iao_reminder','setIaoSettings')
 		),
 		'onsubmit_callback'	=> array(
@@ -49,7 +50,7 @@ $GLOBALS['TL_DCA']['tl_iao_reminder'] = array
 		'sorting' => array
 		(
 			'mode'                    => 1,
-			'fields'                  => array('tstamp'),
+			'fields'                  => array('reminder_tstamp'),
 			'flag'                    => 8,
 			'panelLayout'             => 'filter;search,limit'
 		),
@@ -116,7 +117,7 @@ $GLOBALS['TL_DCA']['tl_iao_reminder'] = array
 				'label'               => &$GLOBALS['TL_LANG']['tl_iao_reminder']['pdf'],
 				'href'                => 'key=pdf',
 				'icon'                => 'iconPDF.gif',
-				'button_callback'     => array('tl_iao_reminder', 'showPDF')
+				'button_callback'     => array('tl_iao_reminder', 'showPDFButton')
 			)
 		)
 	),
@@ -125,7 +126,7 @@ $GLOBALS['TL_DCA']['tl_iao_reminder'] = array
 	'palettes' => array
 	(
 		'__selector__'                => array(),
-		'default'                     => '{settings_legend},setting_id,pid;{invoice_legend},invoice_id,title,address_text,unpaid,periode_date,step,tax,postage,sum,text,text_finish;{status_legend},published,status,paid_on_date;{notice_legend:hide},notice'
+		'default'                     => '{settings_legend},setting_id,pid;{invoice_legend},invoice_id,title,address_text,unpaid,reminder_tstamp,periode_date,step,tax,postage,sum,text,text_finish;{status_legend},published,status,paid_on_date;{notice_legend:hide},notice'
 	),
 
 	// Subpalettes
@@ -195,6 +196,18 @@ $GLOBALS['TL_DCA']['tl_iao_reminder'] = array
 			'eval'						=> array('tl_class'=>'clr'),
 			'input_field_callback'		=> array('tl_iao_reminder','getTextFinish'),
 			'sql'					  => "mediumtext NULL"
+		),
+		'reminder_tstamp' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_reminder']['reminder_tstamp'],
+			'exclude'                 => true,
+			'inputType'               => 'text',
+			'eval'                    => array('doNotCopy'=>true,'rgxp'=>'datim', 'datepicker'=>$this->getDatePickerString(), 'tl_class'=>'w50 wizard'),
+			'load_callback' => array
+			(
+				array('tl_iao_reminder', 'generateReminderTstamp')
+			),
+			'sql'                     => "int(10) unsigned NOT NULL default '0'"
 		),
 		'periode_date' =>  array
 		(
@@ -553,8 +566,8 @@ class tl_iao_reminder extends \iao\iaoBackend
 		$varValue= array();
 		$this->import('String');
 
-		$all = $this->Database->prepare('SELECT `i`.*, `m`.`company` FROM `tl_iao_invoice` as `i` LEFT JOIN `tl_member` as `m` ON `i`.`member` = `m`.`id` WHERE `status`=? ORDER BY `invoice_id_str` DESC')
-								->execute('1');
+		$all = $this->Database->prepare('SELECT `i`.*, `m`.`company` FROM `tl_iao_invoice` as `i` LEFT JOIN `tl_member` as `m` ON `i`.`member` = `m`.`id` ORDER BY `invoice_id_str` DESC')
+								->execute();
 
 		while($all->next())
 		{
@@ -660,6 +673,14 @@ class tl_iao_reminder extends \iao\iaoBackend
 		return ($this->User->isAdmin || count(preg_grep('/^tl_iao_reminder::/', $this->User->alexf)) > 0) ? '<a href="'.$this->addToUrl($href.'&amp;id='.$row['id']).'" title="'.specialchars($title).'"'.$attributes.'>'.$this->generateImage($icon, $label).'</a> ' : '';
 	}
 
+	/**
+	* wenn GET-Parameter passen dann wird eine PDF erzeugt
+	*
+	*/
+	public function generateInvoicePDF(DataContainer $dc)
+	{
+		if(\Input::get('key') == 'pdf' && (int) \Input::get('id') > 0) $this->generateReminderPDF((int) \Input::get('id'), 'reminder');
+	}
 
 	/**
 	 * Generate a "PDF" button and return it as string
@@ -786,6 +807,26 @@ class tl_iao_reminder extends \iao\iaoBackend
 		}
 		return '<a href="'.$this->addToUrl($href.'&amp;id='.$row['id']).'" title="'.specialchars($title).'">'.$this->generateImage($icon, $label).'</a> ';
 
+	}
+
+	/**
+	 * Generate a "PDF" button and return it as string
+	 * @param array
+	 * @param string
+	 * @param string
+	 * @param string
+	 * @param string
+	 * @return string
+	 */
+	public function showPDFButton($row, $href, $label, $title, $icon)
+	{
+		$settings = $this->getSettings($row['setting_id']);
+
+		// wenn kein Admin dann kein PDF-Link
+		if (!$this->User->isAdmin)	return;
+
+		$href = 'contao/main.php?do=iao_reminder&amp;key=pdf&amp;id='.$row['id'];
+		return '<a href="'.$href.'" title="'.specialchars($title).'">'.$this->generateImage($icon, $label).'</a> ';
 	}
 
 	/**

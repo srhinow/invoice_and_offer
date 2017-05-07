@@ -96,3 +96,16 @@ $GLOBALS['TL_LANG']['tl_iao_offer']['Offer_exported'] = 'Es wurden die Angebot-D
  * Select-fiels options
  */
 $GLOBALS['TL_LANG']['tl_iao_offer']['status_options'] = array('1'=>'nicht angenommen','2'=>'angenommen');
+
+
+/**
+* Frontend-Templates
+*/
+$GLOBALS['TL_LANG']['tl_iao_offer']['fe_table_head']['title'] = 'Titel/ Rechnungsnr.:';
+$GLOBALS['TL_LANG']['tl_iao_offer']['fe_table_head']['date'] = 'erstellt am:';
+$GLOBALS['TL_LANG']['tl_iao_offer']['fe_table_head']['price'] = 'Betrag:';
+$GLOBALS['TL_LANG']['tl_iao_offer']['fe_table_head']['expiry'] = 'offen:';
+$GLOBALS['TL_LANG']['tl_iao_offer']['fe_table_head']['file'] = 'PDF:';
+
+// Meldungen
+$GLOBALS['TL_LANG']['tl_iao_offer']['no_entries_msg'] = 'Es sind keine Einträge für diesen Bereich vorhanden.';

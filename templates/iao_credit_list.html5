@@ -1,4 +1,4 @@
-<?php $this->loadLanguageFile('tl_iao_invoice');?>
+<?php $this->loadLanguageFile('tl_iao_credit');?>
 <div class="iao_list block<?= $this->class; ?>">
 <?php if ($this->headline): ?>
     <<?= $this->hl; ?>><?= $this->headline; ?></<?= $this->hl; ?>>

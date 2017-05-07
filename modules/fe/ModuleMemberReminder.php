@@ -4,24 +4,24 @@
  * PHP version 5
  * @copyright  Sven Rhinow Webentwicklung 2017 <http://www.sr-tag.de>
  * @author     Sven Rhinow
- * @package    invoice_and_offer
+ * @package    invoice_and_reminder
  * @license	   LGPL
  * @filesource
  */
 
 
 /**
- * Class ModuleMemberInvoices
+ * Class ModuleMemberReminder
  *
- * Frontend module "IAO MEMBER INVOICES LIST"
+ * Frontend module "IAO MEMBER REMINDER LIST"
  */
-class ModuleMemberInvoices extends Module
+class ModuleMemberReminder extends Module
 {
 	/**
 	 * Template
 	 * @var string
 	 */
-	protected $strTemplate = 'iao_invoice_list';
+	protected $strTemplate = 'iao_reminder_list';
 
 
 	/**
@@ -41,7 +41,7 @@ class ModuleMemberInvoices extends Module
 		{
 			$objTemplate = new BackendTemplate('be_wildcard');
 
-			$objTemplate->wildcard = '### IAO MEMBER INVOICES LIST ###';
+			$objTemplate->wildcard = '### IAO MEMBER REMINDER LIST ###';
 
 			$objTemplate->title = $this->headline;
 			$objTemplate->id = $this->id;
@@ -69,10 +69,11 @@ class ModuleMemberInvoices extends Module
 	 */
 	protected function compile()
 	{
+
 		// Get the front end user object
 		$this->import('FrontendUser', 'User');
 		$this->import('iao');
-		$this->loadLanguageFile('tl_iao_invoice');
+		$this->loadLanguageFile('tl_iao_reminder');
 
 		//set settings
 		$this->iao->setIAOSettings();
@@ -87,14 +88,19 @@ class ModuleMemberInvoices extends Module
 			//wenn eine PDF angefragt wird
 			if(\Input::get('key') == 'pdf' && (int) \Input::get('id') > 0)
 			{
-				// ueberpruefen ob diese zum aktuellen Benutzer gehoert
-				$testObj = IaoInvoiceModel::findOnePublishedByMember(\Input::get('id'), $userId);
-
-				if($testObj !== NULL)
+				if((\Input::get('type')) == 'invoice')
 				{
 					$this->iao->generatePDF((int) \Input::get('id'), 'invoice');
-				}
 
+				} else {
+					// ueberpruefen ob diese zum aktuellen Benutzer gehoert
+					$testObj = IaoReminderModel::findOnePublishedByMember(\Input::get('id'), $userId);
+
+					if($testObj !== NULL)
+					{
+						$this->iao->generateReminderPDF((int) \Input::get('id'), 'reminder');
+					}
+				}
 			}
 
 			// Maximum number of items
@@ -104,7 +110,7 @@ class ModuleMemberInvoices extends Module
 			}
 
 			// Get the total number of items
-			$total = IaoInvoiceModel::countPublishedByMember($this->User->id);
+			$total = IaoReminderModel::countPublishedByMember($this->User->id, $this->reminder_status);
 
 			if($total > 0)
 			{
@@ -147,11 +153,12 @@ class ModuleMemberInvoices extends Module
 					$this->Template->pagination = $objPagination->generate("\n  ");
 				}
 
-				$itemObj = IaoInvoiceModel::findPublishedByMember($this->User->id, $this->status, $limit, $offset);
+				$itemObj = IaoReminderModel::findPublishedByMember($this->User->id, $this->reminder_status, $limit, $offset);
 
 			    $itemsArray = array();
-			    while($itemObj->next())
+			    if($itemObj !== null) while($itemObj->next())
 		    	{
+		    		$invoiceObj = IaoInvoiceModel::findOneById($itemObj->invoice_id);
 
 		    		if($itemObj->status == 1) $status_class = 'danger';
 		    		elseif($itemObj->status == 2) $status_class = 'success';
@@ -161,20 +168,22 @@ class ModuleMemberInvoices extends Module
 		    		$itemsArray[] = array
 		    		(
 		    			'title' => $itemObj->title,
-		    			'invoice_id_str' => $itemObj->invoice_id_str,
+		    			'invoice_id_str' => $invoiceObj->invoice_id_str,
 		    			'status' => $itemObj->status,
 		    			'status_class' => $status_class,
-		    			'date' => date($GLOBALS['TL_CONFIG']['dateFormat'],$itemObj->invoice_tstamp),
-		    			'price' => $this->iao->getPriceStr($itemObj->price_brutto,'iao_currency_symbol'),
-		    			'remaining' => $this->iao->getPriceStr($itemObj->remaining,'iao_currency_symbol'),
-		    			'file_path' => \Environment::get('request').'?key=pdf&id='.$itemObj->id
+		    			'step' => $itemObj->step,
+		    			'expiry_date' => date($GLOBALS['TL_CONFIG']['dateFormat'],$invoiceObj->expiry_date),
+		    			'sum' => $this->iao->getPriceStr($itemObj->sum,'iao_currency_symbol'),
+		    			'periode_date' => date($GLOBALS['TL_CONFIG']['dateFormat'],$itemObj->periode_date),
+		    			'invoice_pdf_path' => \Environment::get('request').'?type=invoice&key=pdf&id='.$itemObj->invoice_id,
+		    			'reminder_pdf_path' => \Environment::get('request').'?key=pdf&id='.$itemObj->id
 	    			);
 		    	}
-			}
+	    	}
 
 			$this->Template->headline = $this->headline;
 			$this->Template->items = $itemsArray;
-			$this->Template->messages = ($total > 0)? '' : $GLOBALS['TL_LANG']['tl_iao_invoice']['no_entries_msg']; // Backwards compatibility
+			$this->Template->messages = ($total > 0)? '' : $GLOBALS['TL_LANG']['tl_iao_reminder']['no_entries_msg'];
 		}
 
 	}

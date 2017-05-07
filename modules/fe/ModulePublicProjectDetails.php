@@ -74,7 +74,7 @@ class ModulePublicProjectDetails extends Module
 	    $conditions['in_reference'] = 1;
 
 		// Get the total number of items
-		$objProject = iaoProjectsModel::findProjectByIdOrAlias(\Input::get('project'));
+		$objProject = IaoProjectsModel::findProjectByIdOrAlias(\Input::get('project'));
 
 		// falsche Abfragen verhindern
 		$falseCondition = false;

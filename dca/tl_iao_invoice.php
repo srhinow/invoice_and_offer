@@ -407,33 +407,33 @@ $GLOBALS['TL_DCA']['tl_iao_invoice'] = array
 			'exclude'                 => true,
 			'inputType'               => 'multiColumnWizard',
 			'eval' => array(
-				'style'                 => 'width:100%;',
+				// 'style'                 => 'width:100%;',
 				'doNotCopy'=>true,
 				'columnFields' => array
 				(
 					'paydate' => array
 					(
 						'label'             => $GLOBALS['TL_LANG']['tl_iao_invoice']['paydate'],
-						'exclude'                 => true,
+						'exclude'           => true,
 						'inputType'         => 'text',
-						'default'				=> '',
-						'eval'              => array( 'tl_class'=>'wizard','style' => 'width:100px;'),
+						'default'			=> '',
+						'eval'              => array('rgxp'=>'datim', 'datepicker'=>$this->getDatePickerString(), 'tl_class'=>'wizard','style' => 'width:65%;'),
 					),
 					'payamount' => array
 					(
 						'label'             => $GLOBALS['TL_LANG']['tl_iao_invoice']['payamount'],
-						'exclude'                 => true,
+						'exclude'           => true,
 						'search'            => true,
 						'inputType'         => 'text',
-						'eval'              => array('style' => 'width:100px'),
+						'eval'              => array('style' => 'width:80%'),
 					),
 					'paynotice' => array
 					(
 						'label'             => $GLOBALS['TL_LANG']['tl_iao_invoice']['paynotice'],
-						'exclude'                 => true,
+						'exclude'           => true,
 						'search'            => true,
 						'inputType'         => 'text',
-						'eval'              => array('style' => 'width:350px;'),
+						// 'eval'              => array('style' => 'width:60%;'),
 					)
 				)
 			),
@@ -735,7 +735,7 @@ class tl_iao_invoice extends \iao\iaoBackend
 	{
 
 		$objProject = iaoProjectsModel::findProjectByIdOrAlias($set['pid']);
-		$settingId = ($objProject !== null) ? $objProject->setting_id : 1;
+		$settingId = ($objProject !== null && $objProject->setting_id != 0) ? $objProject->setting_id : 1;
 		$settings = $this->getSettings($settingId);
 		$invoiceId = $this->generateInvoiceNumber(0, $settings);
 		$invoiceIdStr = $this->generateInvoiceNumberStr('', $invoiceId, time(), $settings);
@@ -1081,6 +1081,7 @@ class tl_iao_invoice extends \iao\iaoBackend
 	 */
 	public function generateInvoiceNumberStr($varValue, $invoiceId, $tstamp, $settings)
 	{
+
 		if(strlen($varValue) < 1)
 		{
 			$format = $settings['iao_invoice_number_format'];

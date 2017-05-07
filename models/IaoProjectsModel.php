@@ -14,7 +14,7 @@ namespace iao;
  */
 
 
-class iaoProjectsModel extends \Model
+class IaoProjectsModel extends \Model
 {
 	/**
 	 * Table name

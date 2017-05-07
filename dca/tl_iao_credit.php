@@ -342,7 +342,7 @@ $GLOBALS['TL_DCA']['tl_iao_credit'] = array
 			'filter'                  => true,
 			'flag'                    => 1,
 			'inputType'               => 'select',
-			'options'				=>  &$GLOBALS['TL_LANG']['tl_iao_invoice']['status_options'],
+			'options'				=>  &$GLOBALS['TL_LANG']['tl_iao_credit']['status_options'],
             'eval'					=> array('doNotCopy'=>true),
 			'sql'					=> "char(1) NOT NULL default ''"
 		),
@@ -538,8 +538,8 @@ class tl_iao_credit  extends \iao\iaoBackend
 	*/
 	public function preFillFields($table, $id, $set, $obj)
 	{
-		$objProject = iaoProjectsModel::findProjectByIdOrAlias($set['pid']);
-		$settingId = ($objProject !== null) ? $objProject->setting_id : 1;
+		$objProject = IaoProjectsModel::findProjectByIdOrAlias($set['pid']);
+		$settingId = ($objProject !== null && $objProject->setting_id != 0) ? $objProject->setting_id : 1;
 		$settings = $this->getSettings($settingId);
 		$creditId = $this->generateCreditNumber(0, $settings);
 		$creditIdStr = $this->createCreditNumberStr('', $creditId, time(), $settings);

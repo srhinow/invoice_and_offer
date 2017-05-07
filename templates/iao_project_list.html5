@@ -1,0 +1,35 @@
+<?php $this->loadLanguageFile('tl_iao_agreements');?>
+<div class="iao_list block<?= $this->class; ?>">
+<?php if ($this->headline): ?>
+    <<?= $this->hl; ?>><?= $this->headline; ?></<?= $this->hl; ?>>
+<?php endif; ?>
+<?php if(count($this->items)>0):?>
+	<div class="table-responsive">
+	<table class="agreement_list_table table table-striped table-hover">
+		<thead>
+			<tr>
+				<th class="title"><?= $GLOBALS['TL_LANG']['tl_iao_agreements']['fe_table_head']['title']; ?></th>
+				<th class="date"><?= $GLOBALS['TL_LANG']['tl_iao_agreements']['fe_table_head']['beginn_date']; ?></th>
+				<th class="date"><?= $GLOBALS['TL_LANG']['tl_iao_agreements']['fe_table_head']['end_date']; ?></th>
+				<th class="price"><?= $GLOBALS['TL_LANG']['tl_iao_agreements']['fe_table_head']['price']; ?></th>
+				<th class="file"><?= $GLOBALS['TL_LANG']['tl_iao_agreements']['fe_table_head']['file']; ?></th>
+			</tr>
+		</thead>
+		<tbody>
+			<?php foreach($this->items as $item): ?>
+			<tr class="<?= $item['status_class'];?>">
+				<td class="title" title="<?= $item['title'];?>"><?= $item['title'];?></td>
+				<td class="date"><?= $item['beginn_date'];?></td>
+				<td class="date"><?= $item['end_date'];?></td>
+				<td class="price"><?= $item['price'];?></td>
+				<td class="file"><a href="<?= $item['agreement_pdf_path'];?>"><i class="fa fa-download" aria-hidden="true"></i></a></td>
+			</tr>
+			<?php endforeach; ?>
+		</tbody>
+	</table>
+	</div>
+<?php else: ?>
+	<p><?=$this->messages; ?></p>
+<?php endif; ?>
+<?= $this->pagination; ?>
+</div>

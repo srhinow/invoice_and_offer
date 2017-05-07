@@ -49,7 +49,7 @@ $GLOBALS['TL_LANG']['tl_iao_invoice']['invoice_tstamp'] = array('Rechnungsdatum 
 $GLOBALS['TL_LANG']['tl_iao_invoice']['invoice_id'] = array('Rechnungs-ID','Dieses Feld wird hauptsächlich zum hochzählen der nächsten Rechung benötigt.');
 $GLOBALS['TL_LANG']['tl_iao_invoice']['invoice_id_str'] = array('Rechnungs-ID-Name','Dieses Feld wird für den PDF-Namen und direkt auf der Rechnung ausgegeben.');
 $GLOBALS['TL_LANG']['tl_iao_invoice']['execute_date'] = array('Ausgeführt am','Dieses Angabe wird vom Finanzamt vorgeschrieben um die Vorsteuer zu ziehen.');
-$GLOBALS['TL_LANG']['tl_iao_invoice']['expiry_date'] = array('Begleichen bis','Das Datum nachdem die Mahnungsstufen anfangen.');
+$GLOBALS['TL_LANG']['tl_iao_invoice']['expiry_date'] = array('begleichen bis','Das Datum nachdem die Mahnungsstufen anfangen.');
 $GLOBALS['TL_LANG']['tl_iao_invoice']['invoice_pdf_file'] = array('Rechnungsdatei','Wenn hier eine Datei angegeben wurde wird diese statt einer generierten ausgegeben. Unter normalen Umständen sollte dieses Feld leer bleiben. Es ist hauptsächlich für Importe gedacht.');
 $GLOBALS['TL_LANG']['tl_iao_invoice']['paid_on_date'] = array('Bezahlt am','Das Datum an dem die Zahlung auf dem Konto eingegangen ist.');
 $GLOBALS['TL_LANG']['tl_iao_invoice']['paid_on_dates'] = array('Zahlungen','');
@@ -116,3 +116,17 @@ $GLOBALS['TL_LANG']['tl_iao_invoice']['Invoice_exported'] = 'Es wurden die Daten
  */
 $GLOBALS['TL_LANG']['tl_iao_invoice']['status_options'] = array('1'=>'nicht bezahlt','2'=>'bezahlt','3'=>'ruht (keine Mahnungen)','4'=>'Teil-/Ratenzahlung');
 $GLOBALS['TL_LANG']['tl_iao_invoice']['discount_operators'] = array('%'=>'% (Prozentwert Rabatt von der Summe)','-'=>'- (verminderter Wert von die Summe)','+'=>'+ (erhöhender Wert auf die Summe)');
+
+/**
+* Frontend-Templates
+*/
+$GLOBALS['TL_LANG']['tl_iao_invoice']['fe_table_head']['title'] = 'Titel/ Rechnungsnr.:';
+$GLOBALS['TL_LANG']['tl_iao_invoice']['fe_table_head']['date'] = 'erstellt am:';
+$GLOBALS['TL_LANG']['tl_iao_invoice']['fe_table_head']['price'] = 'Betrag:';
+$GLOBALS['TL_LANG']['tl_iao_invoice']['fe_table_head']['remaining'] = 'offen:';
+$GLOBALS['TL_LANG']['tl_iao_invoice']['fe_table_head']['file'] = 'PDF:';
+
+
+// Meldungen
+$GLOBALS['TL_LANG']['tl_iao_invoice']['no_entries_msg'] = 'Es sind keine Einträge für diesen Bereich vorhanden.';
+

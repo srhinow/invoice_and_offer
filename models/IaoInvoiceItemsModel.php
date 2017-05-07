@@ -30,7 +30,7 @@ namespace iao;
  */
 
 
-class iaoInvoiceItemsModel extends \Model
+class IaoInvoiceItemsModel extends \Model
 {
 	/**
 	 * Table name

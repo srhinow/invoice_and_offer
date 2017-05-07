@@ -77,7 +77,7 @@ class ModulePublicProjectList extends Module
 	    $searchWhereArr[] = "`in_reference` = 1";
 
 		// Get the total number of items
-		$intTotal = \iaoProjectsModel::countEntries($searchWhereArr);
+		$intTotal = IaoProjectsModel::countEntries($searchWhereArr);
 
 		// Filter anwenden um die Gesamtanzahl zuermitteln
 		if((int) $intTotal > 0)
@@ -129,11 +129,11 @@ class ModulePublicProjectList extends Module
 			// Get the items
 			if (isset($limit))
 			{
-				$itemsObj = \iaoProjectsModel::findProjects($limit, $offset, $searchWhereArr, array('order' => "finished_date DESC") );
+				$itemsObj = IaoProjectsModel::findProjects($limit, $offset, $searchWhereArr, array('order' => "finished_date DESC") );
 			}
 			else
 			{
-				$itemsObj = \iaoProjectsModel::findProjects(0, $offset, $searchWhereArr, array('order' => "finished_date DESC"));
+				$itemsObj = IaoProjectsModel::findProjects(0, $offset, $searchWhereArr, array('order' => "finished_date DESC"));
 			}
 
 		    $itemsArray = array();

@@ -12,7 +12,7 @@
 /**
  * invoice_and_offer Version
  */
-@define('IAO_VERSION', '1.1');
+@define('IAO_VERSION', '1.2');
 @define('IAO_BUILD', '5');
 @define('IAO_PATH','system/modules/invoice_and_offer');
 
@@ -30,7 +30,7 @@ $GLOBALS['BE_MOD']['iao'] = array
 (
 	'iao_projects' => array
 	(
-		'tables' => array('tl_iao_projects','tl_iao_invoice','tl_iao_invoice_items','tl_iao_offer','tl_iao_offer_items','tl_iao_credit','tl_iao_credit_items','tl_iao_reminder'),
+		'tables' => array('tl_iao_projects','tl_iao_agreements','tl_iao_invoice','tl_iao_invoice_items','tl_iao_offer','tl_iao_offer_items','tl_iao_credit','tl_iao_credit_items','tl_iao_reminder'),
 		'icon'   => IAO_PATH.'/html/icons/blackboard_steps.png',
 		'stylesheet' => IAO_PATH.'/html/be.css',
 	),
@@ -144,11 +144,11 @@ if ($_GET['do'] == 'iao_setup')
  */
 $GLOBALS['FE_MOD']['iao_fe'] = array
 (
+	'fe_iao_offer' => 'ModuleMemberOffers',
 	'fe_iao_invoice' => 'ModuleMemberInvoices',
-	'fe_iao_offer' => 'ModuleMemberOffer',
-	'fe_iao_credit' => 'ModuleMemberCredit',
+	'fe_iao_credit' => 'ModuleMemberCredits',
 	'fe_iao_reminder' => 'ModuleMemberReminder',
-	'fe_iao_agreements' => 'ModuleMemberAgreements',
+	'fe_iao_agreement' => 'ModuleMemberAgreements',
 	'fe_iao_public_project_list' => 'ModulePublicProjectList',
 	'fe_iao_public_project_details' => 'ModulePublicProjectDetails'
 );

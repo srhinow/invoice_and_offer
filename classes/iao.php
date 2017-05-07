@@ -340,9 +340,148 @@ class iao extends \Backend
 		}
 		return false;
 	}
+	/**
+	* generiert für die jeweilige Mahnungs-Stufe eine PDF und gibt diese an den Browser
+	* @param integer
+	* @param string
+	* @return mixed
+	*/
+	public function generateReminderPDF($id, $type = '')
+	{
+		//wenn type oder id fehlen abbrechen
+		if((int) $id < 1 || strlen($type) < 1) return;
+
+		$dataObj = $this->Database->prepare('SELECT * FROM `tl_iao_'.$type.'` WHERE `id`=?')->limit(1)->execute($id);
+		if($dataObj->numRows < 1) return;
+		$row = $dataObj->row();
+
+		$settings = $this->getSettings($row['setting_id']);
+
+		//template zuweisen
+		$templateFile = ($type == 'reminder') ? $settings['iao_'.$type.'_'.$row['step'].'_pdf'] : $settings['iao_'.$type.'_pdf'];
+
+		//wenn eine feste PDF zugewiesen wurde
+		if(strlen($row[$type.'_pdf_file']) > 0 )
+		{
+			$objPdf = 	\FilesModel::findByPk($row[$type.'_pdf_file']);
+			if(!empty($objPdf->path) && file_exists(TL_ROOT . '/' . $objPdf->path))
+			{
+
+				header("Content-type: application/pdf");
+				header('Expires: Sat, 26 Jul 1997 05:00:00 GMT'); // Date in the past
+				header('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT');
+	 			header('Content-Length: '.strlen($row[$type.'_pdf_file']));
+				header('Content-Disposition: inline; filename="'.basename($objPdf->path).'";');
+
+				// The PDF source is in original.pdf
+				readfile(TL_ROOT . '/' . $row[$type.'_pdf_file']);
+				exit();
+		    }
+		}
+		
+		// $invoiceObj = $this->Database->prepare('SELECT * FROM `tl_iao_invoice` WHERE `id`=?')->limit(1)->execute($row['invoice_id']);
+		$invoiceObj = IaoInvoiceModel::findById($row['invoice_id']);
+		$reminder_Str = $GLOBALS['TL_LANG']['tl_iao_reminder']['steps'][$row['step']].'-'.$invoiceObj->invoice_id_str.'-'.$row['id'];
+
+		$pdfname = $GLOBALS['TL_LANG']['tl_iao']['types'][$type].'-'.$row[$type.'_id_str'];
+
+		// Calculating dimensions
+		$margins = unserialize($settings['iao_pdf_margins']);         // Margins as an array
+		switch( $margins['unit'] )
+		{
+			case 'cm':      $factor = 10.0;   break;
+			default:        $factor = 1.0;
+	    }
+
+		$dim['top']    = !is_numeric($margins['top'])   ? PDF_MARGIN_TOP    : $margins['top'] * $factor;
+		$dim['right']  = !is_numeric($margins['right']) ? PDF_MARGIN_RIGHT  : $margins['right'] * $factor;
+		$dim['bottom'] = !is_numeric($margins['top'])   ? PDF_MARGIN_BOTTOM : $margins['bottom'] * $factor;
+		$dim['left']   = !is_numeric($margins['left'])  ? PDF_MARGIN_LEFT   : $margins['left'] * $factor;
+
+		// TCPDF configuration
+		$l['a_meta_dir'] = 'ltr';
+		$l['a_meta_charset'] = $GLOBALS['TL_CONFIG']['characterSet'];
+		$l['a_meta_language'] = $GLOBALS['TL_LANGUAGE'];
+		$l['w_page'] = 'page';
+
+		// Create new PDF document with FPDI extension
+		require_once(dirname(__FILE__).'/iaoPDF.php');
+
+	    $objPdfTemplate = 	\FilesModel::findByUuid($templateFile);
+		if(strlen($objPdfTemplate->path) < 1 || !file_exists(TL_ROOT . '/' . $objPdfTemplate->path) ) return;  // template file not found
+
+
+		$pdf = new \iaoPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true);
+		$pdf->setSourceFile( TL_ROOT . '/' .$objPdfTemplate->path);          // Set PDF template
+
+		// Set document information
+		$pdf->iaoSettings = $settings;
+		$pdf->SetCreator(PDF_CREATOR);
+		$pdf->SetTitle($reminder_Str);
+		$pdf->SetSubject($reminder_Str);
+		$pdf->SetKeywords($reminder_Str);
+
+		$pdf->SetDisplayMode('fullwidth', 'OneColumn', 'UseNone');
+		$pdf->SetHeaderData();
+
+		// Remove default header/footer
+		$pdf->setPrintHeader(false);
+
+		// Set margins
+		$pdf->SetMargins($dim['left'], $dim['top'], $dim['right']);
+
+		// Set auto page breaks
+		$pdf->SetAutoPageBreak(true, $dim['bottom']);
+
+		// Set image scale factor
+		$pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+
+		// Set some language-dependent strings
+		$pdf->setLanguageArray($l);
+
+		// Initialize document and add a page
+		$pdf->AddPage();
+
+	    // Include CSS (TCPDF 5.1.000 an newer)
+	    $file = \FilesModel::findByUuid($settings['iao_pdf_css']);
+
+	    if(strlen($file->path) > 0 && file_exists(TL_ROOT . '/' . $file->path) )
+	    {
+			$styles = "<style>\n" . file_get_contents(TL_ROOT . '/' . $file->path) . "\n</style>\n";
+			$pdf->writeHTML($styles, true, false, true, false, '');
+		}
+
+		// write the address-data
+		$row['address_text'] = $this->changeIAOTags($row['address_text'], $type, $row['id']);
+		$row['address_text'] = $this->changeTags($row['address_text']);
+		$pdf->drawAddress($row['address_text']);
+
+		//Mahnungsnummer
+		$pdf->drawDocumentNumber($reminder_Str);
+
+		//Datum
+		$pdf->drawDate(date($GLOBALS['TL_CONFIG']['dateFormat'],$row[$type.'_tstamp']));
+
+		//ausgeführt am
+		$newdate= $row['periode_date'];
+		$pdf->drawInvoiceDurationDate(date($GLOBALS['TL_CONFIG']['dateFormat'],$newdate));
+
+		//Text
+		if(strip_tags($row['text_finish']))
+		{
+			$pdf->drawTextBefore($row['text_finish']);
+		}
+
+		// Close and output PDF document
+		$pdf->lastPage();
+		$pdf->Output($reminder_Str. '.pdf', 'D');
+
+		// Stop script execution
+		exit();
+	}
 
 	/**
-	* generiert von den verschiedenen Bereichen eine PDF und gibt diese an den Browser
+	* generiert von den verschiedenen Bereiche (offer,invoice,credit) eine PDF und gibt diese an den Browser
 	* @param integer
 	* @param string
 	* @return mixed
@@ -358,7 +497,10 @@ class iao extends \Backend
 
 		$settings = $this->getSettings($row['setting_id']);
 
-		//wenn eine feste Rechnung als PDF zugewiesen wurde
+		//template zuweisen
+		$templateFile = ($type == 'reminder') ? $settings['iao_'.$type.'_'.$row['step'].'_pdf'] : $settings['iao_'.$type.'_pdf'];
+
+		//wenn eine feste PDF zugewiesen wurde
 		if(strlen($row[$type.'_pdf_file']) > 0 )
 		{
 			$objPdf = 	\FilesModel::findByPk($row[$type.'_pdf_file']);
@@ -401,7 +543,7 @@ class iao extends \Backend
 		// Create new PDF document with FPDI extension
 		require_once(dirname(__FILE__).'/iaoPDF.php');
 
-	    $objPdfTemplate = 	\FilesModel::findByUuid($settings['iao_'.$type.'_pdf']);
+	    $objPdfTemplate = 	\FilesModel::findByUuid($templateFile);
 		if(strlen($objPdfTemplate->path) < 1 || !file_exists(TL_ROOT . '/' . $objPdfTemplate->path) ) return;  // template file not found
 
 

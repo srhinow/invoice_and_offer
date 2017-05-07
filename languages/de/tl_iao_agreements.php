@@ -81,3 +81,17 @@ $GLOBALS['TL_LANG']['tl_iao_agreements']['notice_legend'] = 'Notiz anlegen';
  */
 $GLOBALS['TL_LANG']['tl_iao_agreements']['status_options'] = array('1'=>'aktiv','2'=>'gekündigt');
 $GLOBALS['TL_LANG']['tl_iao_agreements']['vat_incl_percents'] = array(1 => 'netto', 2 => 'brutto');
+
+/**
+* Frontend-Templates
+*/
+$GLOBALS['TL_LANG']['tl_iao_agreements']['fe_table_head']['title'] = 'Titel:';
+$GLOBALS['TL_LANG']['tl_iao_agreements']['fe_table_head']['beginn_date'] = 'Zyklusbeginn:';
+$GLOBALS['TL_LANG']['tl_iao_agreements']['fe_table_head']['end_date'] = 'Zyklusende:';
+$GLOBALS['TL_LANG']['tl_iao_agreements']['fe_table_head']['price'] = 'Betrag:';
+$GLOBALS['TL_LANG']['tl_iao_agreements']['fe_table_head']['file'] = 'Vertrag (pdf):';
+
+
+// Meldungen
+$GLOBALS['TL_LANG']['tl_iao_agreements']['no_entries_msg'] = 'Es sind keine Einträge für diesen Bereich vorhanden.';
+

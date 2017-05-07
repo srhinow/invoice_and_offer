@@ -4,24 +4,24 @@
  * PHP version 5
  * @copyright  Sven Rhinow Webentwicklung 2017 <http://www.sr-tag.de>
  * @author     Sven Rhinow
- * @package    invoice_and_offer
+ * @package    invoice_and_agreement
  * @license	   LGPL
  * @filesource
  */
 
 
 /**
- * Class ModuleMemberInvoices
+ * Class ModuleMemberAgreements
  *
- * Frontend module "IAO MEMBER INVOICES LIST"
+ * Frontend module "IAO MEMBER AGREEMENT LIST"
  */
-class ModuleMemberInvoices extends Module
+class ModuleMemberAgreements extends Module
 {
 	/**
 	 * Template
 	 * @var string
 	 */
-	protected $strTemplate = 'iao_invoice_list';
+	protected $strTemplate = 'iao_agreement_list';
 
 
 	/**
@@ -41,7 +41,7 @@ class ModuleMemberInvoices extends Module
 		{
 			$objTemplate = new BackendTemplate('be_wildcard');
 
-			$objTemplate->wildcard = '### IAO MEMBER INVOICES LIST ###';
+			$objTemplate->wildcard = '### IAO MEMBER AGREEMENT LIST ###';
 
 			$objTemplate->title = $this->headline;
 			$objTemplate->id = $this->id;
@@ -49,6 +49,27 @@ class ModuleMemberInvoices extends Module
 			$objTemplate->href = 'contao/main.php?do=modules&amp;act=edit&amp;id=' . $this->id;
 
 			return $objTemplate->parse();
+		}
+
+		//wenn eine feste PDF zugewiesen wurde
+		if(strlen(\Input::get('file')) > 0 )
+		{
+
+			$objPdf = 	\FilesModel::findByPath(\Input::get('file'));
+			// print_r($objPdf);
+			// exit();
+			if($objPdf !== null && file_exists(TL_ROOT . '/' . \Input::get('file')))
+			{
+				header("Content-type: application/pdf");
+				header('Expires: Sat, 26 Jul 1997 05:00:00 GMT'); // Date in the past
+				header('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT');
+	 			// header('Content-Length: '.strlen(TL_ROOT . '/' . $objPdf->path));
+				header('Content-Disposition: inline; filename="'.$objPdf->name.'";');
+
+				// The PDF source is in original.pdf
+				readfile(TL_ROOT . '/' . $objPdf->path);
+				exit();
+		    }
 		}
 
         // Fallback template
@@ -69,10 +90,11 @@ class ModuleMemberInvoices extends Module
 	 */
 	protected function compile()
 	{
+
 		// Get the front end user object
 		$this->import('FrontendUser', 'User');
 		$this->import('iao');
-		$this->loadLanguageFile('tl_iao_invoice');
+		$this->loadLanguageFile('tl_iao_agreement');
 
 		//set settings
 		$this->iao->setIAOSettings();
@@ -88,13 +110,12 @@ class ModuleMemberInvoices extends Module
 			if(\Input::get('key') == 'pdf' && (int) \Input::get('id') > 0)
 			{
 				// ueberpruefen ob diese zum aktuellen Benutzer gehoert
-				$testObj = IaoInvoiceModel::findOnePublishedByMember(\Input::get('id'), $userId);
+				$testObj = IaoAgreementsModel::findOnePublishedByMember(\Input::get('id'), $userId);
 
 				if($testObj !== NULL)
 				{
-					$this->iao->generatePDF((int) \Input::get('id'), 'invoice');
+					$this->iao->generateReminderPDF((int) \Input::get('id'), 'agreement');
 				}
-
 			}
 
 			// Maximum number of items
@@ -104,7 +125,7 @@ class ModuleMemberInvoices extends Module
 			}
 
 			// Get the total number of items
-			$total = IaoInvoiceModel::countPublishedByMember($this->User->id);
+			$total = IaoAgreementsModel::countPublishedByMember($this->User->id, $this->agreement_status);
 
 			if($total > 0)
 			{
@@ -147,34 +168,35 @@ class ModuleMemberInvoices extends Module
 					$this->Template->pagination = $objPagination->generate("\n  ");
 				}
 
-				$itemObj = IaoInvoiceModel::findPublishedByMember($this->User->id, $this->status, $limit, $offset);
+				$itemObj = IaoAgreementsModel::findPublishedByMember($this->User->id, $this->agreement_status, $limit, $offset);
 
 			    $itemsArray = array();
-			    while($itemObj->next())
+			    if($itemObj !== null) while($itemObj->next())
 		    	{
+		    		$invoiceObj = IaoInvoiceModel::findOneById($itemObj->invoice_id);
 
-		    		if($itemObj->status == 1) $status_class = 'danger';
-		    		elseif($itemObj->status == 2) $status_class = 'success';
-		    		elseif($itemObj->status == 3) $status_class = 'warning';
-		    		else $status_class = '';
-
+		    		// if($itemObj->status == 1) $status_class = 'danger';
+		    		// elseif($itemObj->status == 2) $status_class = 'success';
+		    		// elseif($itemObj->status == 3) $status_class = 'warning';
+		    		// else $status_class = '';
+		    		$agrFile = \FilesModel::findByPk($itemObj->agreement_pdf_file);
 		    		$itemsArray[] = array
 		    		(
 		    			'title' => $itemObj->title,
-		    			'invoice_id_str' => $itemObj->invoice_id_str,
 		    			'status' => $itemObj->status,
 		    			'status_class' => $status_class,
-		    			'date' => date($GLOBALS['TL_CONFIG']['dateFormat'],$itemObj->invoice_tstamp),
-		    			'price' => $this->iao->getPriceStr($itemObj->price_brutto,'iao_currency_symbol'),
-		    			'remaining' => $this->iao->getPriceStr($itemObj->remaining,'iao_currency_symbol'),
-		    			'file_path' => \Environment::get('request').'?key=pdf&id='.$itemObj->id
+		    			'periode' => $itemObj->periode,
+		    			'beginn_date' => date($GLOBALS['TL_CONFIG']['dateFormat'],$itemObj->beginn_date),
+		    			'end_date' => date($GLOBALS['TL_CONFIG']['dateFormat'],$itemObj->end_date),
+		    			'price' => $this->iao->getPriceStr($itemObj->price,'iao_currency_symbol'),
+		    			'agreement_pdf_path' => \Environment::get('request').'?file='.$agrFile->path
 	    			);
 		    	}
-			}
+	    	}
 
 			$this->Template->headline = $this->headline;
 			$this->Template->items = $itemsArray;
-			$this->Template->messages = ($total > 0)? '' : $GLOBALS['TL_LANG']['tl_iao_invoice']['no_entries_msg']; // Backwards compatibility
+			$this->Template->messages = ($total > 0)? '' : $GLOBALS['TL_LANG']['tl_iao_agreement']['no_entries_msg'];
 		}
 
 	}

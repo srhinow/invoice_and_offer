@@ -85,6 +85,12 @@ $GLOBALS['TL_DCA']['tl_iao_projects'] = array
 				'icon'   => IAO_PATH.'/html/icons/warning.png',
 
 			),
+			'agreements' => array
+			(
+				'label'  => &$GLOBALS['TL_LANG']['tl_iao_projects']['agreements'],
+				'href'   => 'table=tl_iao_agreements&onlyproj=1',
+				'icon'   => IAO_PATH.'/html/icons/clock_history_frame.png',
+			),
 			'edit' => array
 			(
 				'label'               => &$GLOBALS['TL_LANG']['tl_iao_projects']['edit'],

@@ -1,4 +1,4 @@
-<?php $this->loadLanguageFile('tl_iao_invoice');?>
+<?php $this->loadLanguageFile('tl_iao_offer');?>
 <div class="iao_list block<?= $this->class; ?>">
 <?php if ($this->headline): ?>
     <<?= $this->hl; ?>><?= $this->headline; ?></<?= $this->hl; ?>>
@@ -8,11 +8,11 @@
 	<table class="invoice_list_table table table-striped table-hover">
 		<thead>
 			<tr>
-				<th class="title"><?= $GLOBALS['TL_LANG']['tl_iao_invoice']['fe_table_head']['title']; ?></th>
-				<th class="date"><?= $GLOBALS['TL_LANG']['tl_iao_invoice']['fe_table_head']['date']; ?></th>
-				<th class="price"><?= $GLOBALS['TL_LANG']['tl_iao_invoice']['fe_table_head']['price']; ?></th>
-				<th class="remaining"><?= $GLOBALS['TL_LANG']['tl_iao_invoice']['fe_table_head']['remaining']; ?></th>
-				<th class="file"><?= $GLOBALS['TL_LANG']['tl_iao_invoice']['fe_table_head']['file']; ?></th>
+				<th class="title"><?= $GLOBALS['TL_LANG']['tl_iao_offer']['fe_table_head']['title']; ?></th>
+				<th class="date"><?= $GLOBALS['TL_LANG']['tl_iao_offer']['fe_table_head']['date']; ?></th>
+				<th class="expiry"><?= $GLOBALS['TL_LANG']['tl_iao_offer']['expiry_date'][0]; ?></th>
+				<th class="price"><?= $GLOBALS['TL_LANG']['tl_iao_offer']['fe_table_head']['price']; ?></th>
+				<th class="file"><?= $GLOBALS['TL_LANG']['tl_iao_offer']['fe_table_head']['file']; ?></th>
 			</tr>
 		</thead>
 		<tbody>
@@ -20,8 +20,8 @@
 			<tr class="<?= $item['status_class'];?>">
 				<td class="title" title="<?= $item['title'];?>"><?= $item['invoice_id_str']; ?></td>
 				<td class="date"><?= $item['date'];?></td>
+				<td class="expiry"><?= $item['expiry'];?></td>
 				<td class="price"><?= $item['price'];?></td>
-				<td class="remaining"><?= $item['remaining'];?></td>
 				<td class="file"><a href="<?= $item['file_path'];?>"><i class="fa fa-download" aria-hidden="true"></i></a></td>
 			</tr>
 			<?php endforeach; ?>

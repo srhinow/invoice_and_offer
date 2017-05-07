@@ -11,17 +11,17 @@
 
 
 /**
- * Class ModuleMemberInvoices
+ * Class ModuleMemberOffers
  *
- * Frontend module "IAO MEMBER INVOICES LIST"
+ * Frontend module "IAO MEMBER OFFER LIST"
  */
-class ModuleMemberInvoices extends Module
+class ModuleMemberOffers extends Module
 {
 	/**
 	 * Template
 	 * @var string
 	 */
-	protected $strTemplate = 'iao_invoice_list';
+	protected $strTemplate = 'iao_offer_list';
 
 
 	/**
@@ -41,7 +41,7 @@ class ModuleMemberInvoices extends Module
 		{
 			$objTemplate = new BackendTemplate('be_wildcard');
 
-			$objTemplate->wildcard = '### IAO MEMBER INVOICES LIST ###';
+			$objTemplate->wildcard = '### IAO MEMBER OFFER LIST ###';
 
 			$objTemplate->title = $this->headline;
 			$objTemplate->id = $this->id;
@@ -69,10 +69,11 @@ class ModuleMemberInvoices extends Module
 	 */
 	protected function compile()
 	{
+
 		// Get the front end user object
 		$this->import('FrontendUser', 'User');
 		$this->import('iao');
-		$this->loadLanguageFile('tl_iao_invoice');
+		$this->loadLanguageFile('tl_iao_offer');
 
 		//set settings
 		$this->iao->setIAOSettings();
@@ -88,11 +89,11 @@ class ModuleMemberInvoices extends Module
 			if(\Input::get('key') == 'pdf' && (int) \Input::get('id') > 0)
 			{
 				// ueberpruefen ob diese zum aktuellen Benutzer gehoert
-				$testObj = IaoInvoiceModel::findOnePublishedByMember(\Input::get('id'), $userId);
+				$testObj = IaoOfferModel::findOnePublishedByMember(\Input::get('id'), $userId);
 
 				if($testObj !== NULL)
 				{
-					$this->iao->generatePDF((int) \Input::get('id'), 'invoice');
+					$this->iao->generatePDF((int) \Input::get('id'), 'offer');
 				}
 
 			}
@@ -104,7 +105,7 @@ class ModuleMemberInvoices extends Module
 			}
 
 			// Get the total number of items
-			$total = IaoInvoiceModel::countPublishedByMember($this->User->id);
+			$total = IaoOfferModel::countPublishedByMember($this->User->id);
 
 			if($total > 0)
 			{
@@ -147,7 +148,7 @@ class ModuleMemberInvoices extends Module
 					$this->Template->pagination = $objPagination->generate("\n  ");
 				}
 
-				$itemObj = IaoInvoiceModel::findPublishedByMember($this->User->id, $this->status, $limit, $offset);
+				$itemObj = IaoOfferModel::findPublishedByMember($this->User->id, $this->status, $limit, $offset);
 
 			    $itemsArray = array();
 			    while($itemObj->next())
@@ -161,20 +162,20 @@ class ModuleMemberInvoices extends Module
 		    		$itemsArray[] = array
 		    		(
 		    			'title' => $itemObj->title,
-		    			'invoice_id_str' => $itemObj->invoice_id_str,
+		    			'invoice_id_str' => $itemObj->offer_id_str,
 		    			'status' => $itemObj->status,
 		    			'status_class' => $status_class,
-		    			'date' => date($GLOBALS['TL_CONFIG']['dateFormat'],$itemObj->invoice_tstamp),
+		    			'date' => date($GLOBALS['TL_CONFIG']['dateFormat'],$itemObj->offer_tstamp),
 		    			'price' => $this->iao->getPriceStr($itemObj->price_brutto,'iao_currency_symbol'),
-		    			'remaining' => $this->iao->getPriceStr($itemObj->remaining,'iao_currency_symbol'),
+		    			'expiry' => date($GLOBALS['TL_CONFIG']['dateFormat'],$itemObj->expiry_date),
 		    			'file_path' => \Environment::get('request').'?key=pdf&id='.$itemObj->id
 	    			);
 		    	}
-			}
+	    	}
 
 			$this->Template->headline = $this->headline;
 			$this->Template->items = $itemsArray;
-			$this->Template->messages = ($total > 0)? '' : $GLOBALS['TL_LANG']['tl_iao_invoice']['no_entries_msg']; // Backwards compatibility
+			$this->Template->messages = ($total > 0)? '' : $GLOBALS['TL_LANG']['tl_iao_offer']['no_entries_msg'];
 		}
 
 	}

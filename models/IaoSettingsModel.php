@@ -29,7 +29,7 @@ namespace iao;
  */
 
 
-class iaoSettingsModel extends \Model
+class IaoSettingsModel extends \Model
 {
 	/**
 	 * Table name

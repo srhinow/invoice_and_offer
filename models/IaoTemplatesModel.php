@@ -29,7 +29,7 @@ namespace iao;
  */
 
 
-class iaoTemplatesModel extends \Model
+class IaoTemplatesModel extends \Model
 {
 	/**
 	 * Table name
