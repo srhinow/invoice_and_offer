@@ -1,4 +1,4 @@
-<?php $this->loadLanguageFile('tl_iao_agreements');?>
+<?php $this->loadLanguageFile('tl_iao_projects');?>
 <div class="iao_list block<?= $this->class; ?>">
 <?php if ($this->headline): ?>
     <<?= $this->hl; ?>><?= $this->headline; ?></<?= $this->hl; ?>>
