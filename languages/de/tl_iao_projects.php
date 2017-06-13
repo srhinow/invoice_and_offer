@@ -49,3 +49,16 @@ $GLOBALS['TL_LANG']['tl_iao_projects']['show']	=	array('Details anzeigen','Detai
 $GLOBALS['TL_LANG']['tl_iao_projects']['settings_legend']	=	'Konfiguration-Zuweisung';
 $GLOBALS['TL_LANG']['tl_iao_projects']['project_legend']	=	'Projekt-Einstellungen';
 $GLOBALS['TL_LANG']['tl_iao_projects']['reference_legend']	=	'Referenz-Zuweisung';
+
+/**
+* Frontend-Templates
+*/
+$GLOBALS['TL_LANG']['tl_iao_projects']['fe_table_head']['title'] = 'Titel/ Rechnungsnr.:';
+$GLOBALS['TL_LANG']['tl_iao_projects']['fe_table_head']['date'] = 'erstellt am:';
+$GLOBALS['TL_LANG']['tl_iao_projects']['fe_table_head']['price'] = 'Betrag:';
+$GLOBALS['TL_LANG']['tl_iao_projects']['fe_table_head']['remaining'] = 'offen:';
+$GLOBALS['TL_LANG']['tl_iao_projects']['fe_table_head']['file'] = 'PDF:';
+
+
+// Meldungen
+$GLOBALS['TL_LANG']['tl_iao_projects']['no_entries_msg'] = 'Es sind keine Einträge für diesen Bereich vorhanden.';
