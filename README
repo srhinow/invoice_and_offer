@@ -1,7 +1,7 @@
 Author: Sven Rhinow
 Web: www.sr-tag.de
 License: LPGL
-Version: 1.2.0
+Version: 1.2.1
 
 icons: http://dryicons.com
 icons: cc3 http://www.fatcow.com/free-icons
@@ -9,6 +9,12 @@ icons: cc3 http://www.fatcow.com/free-icons
 deutsch
 -----------------------------
 Dieses Contao-Backend-Modul stellt die Möglichkeit bereit Angebote,Rechnungen, Gutschriften, Rückstände und Verträge zu verwalten.
+
+seit Version 1.2.1:
+- neue Rechnung,Angebote,Gutschriften werden aus einem Projekt aufgerufen, vorbefüllt
+- Frontend: Rechnung,Angebote,Gutschriften können als Liste angenommen=gruen, nicht angenommen= rot angezeigt werden
+  und die jeweilige PDF-Datei kann im Frontend aufgerufen werden.
+- Bugfixes
 
 seit Version 1.2.0:
 - die Angebote,Rechnungen,Gutschriften und Verträge werden jetzt zu Projekten zugeordnet
