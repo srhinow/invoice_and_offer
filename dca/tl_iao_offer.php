@@ -582,7 +582,7 @@ class tl_iao_offer extends \iao\iaoBackend
 	*/
 	public function preFillFields($table, $id, $set, $obj)
 	{
-		$objProject = iaoProjectsModel::findProjectByIdOrAlias($set['pid']);
+		$objProject = IaoProjectsModel::findProjectByIdOrAlias($set['pid']);
 		$settingId = ($objProject !== null && $objProject->setting_id != 0) ? $objProject->setting_id : 1;
 		$settings = $this->getSettings($settingId);
 
@@ -653,13 +653,11 @@ class tl_iao_offer extends \iao\iaoBackend
 	 */
 	public function fillAdressText($varValue, DataContainer $dc)
 	{
-		if(strip_tags($dc->activeRecord->address_text)=='')
+		if(trim(strip_tags($dc->activeRecord->address_text)) == '')
 		{
-			if(strlen($varValue)<=0) return $varValue;
+			if(strlen($varValue) <= 0) return $varValue;
 
-			$objMember = $this->Database->prepare('SELECT * FROM `tl_member` WHERE `id`=?')
-						->limit(1)
-						->execute($varValue);
+			$objMember = \MemberModel::findById($varValue);
 
 			$text = '<p>'.$objMember->company.'<br />'.($objMember->gender!='' ? $GLOBALS['TL_LANG']['tl_iao_offer']['gender'][$objMember->gender].' ':'').($objMember->title ? $objMember->title.' ':'').$objMember->firstname.' '.$objMember->lastname.'<br />'.$objMember->street.'</p>';
 			$text .='<p>'.$objMember->postal.' '.$objMember->city.'</p>';
