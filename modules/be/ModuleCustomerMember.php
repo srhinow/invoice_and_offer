@@ -50,7 +50,8 @@ class ModuleCustomerMember extends BackendModule
 
 		$GLOBALS['TL_DCA'][$this->table]['fields']['company']['flag'] = false;
 
-		return strlen($_GET['act'])==0 ? $this->objDc->showAll() : $this->objDc->$_GET['act']();
+		$act = \Input::get('act');
+		return (strlen($act) == 0 || $act == 'select') ? $this->objDc->showAll() : $this->objDc->{$act}();
 	}
 
 	/**
