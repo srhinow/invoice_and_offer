@@ -27,7 +27,8 @@ $GLOBALS['TL_DCA']['tl_iao_offer_items'] = array
 		'ptable'                      => 'tl_iao_offer',
 		'enableVersioning'            => true,
 		'onload_callback'		=> array(
-			array('tl_iao_offer_items','setIaoSettings')
+			array('tl_iao_offer_items','setIaoSettings'),
+			array('tl_iao_offer_items', 'checkPermission'),
 		),
 		'onsubmit_callback'	      => array
 		(
@@ -369,114 +370,7 @@ class tl_iao_offer_items extends \iao\iaoBackend
 	 */
 	public function checkPermission()
 	{
-		// HOOK: comments extension required
-		if (!in_array('comments', $this->Config->getActiveModules()))
-		{
-			$key = array_search('allowComments', $GLOBALS['TL_DCA']['tl_iao_offer_items']['list']['sorting']['headerFields']);
-			unset($GLOBALS['TL_DCA']['tl_iao_offer_items']['list']['sorting']['headerFields'][$key]);
-		}
-
-		if ($this->User->isAdmin)
-		{
-			return;
-		}
-
-		// Set root IDs
-		if (!is_array($this->User->calendars) || count($this->User->calendars) < 1)
-		{
-			$root = array(0);
-		}
-		else
-		{
-			$root = $this->User->calendars;
-		}
-
-		$id = strlen(\Input::get('id')) ? \Input::get('id') : CURRENT_ID;
-
-		// Check current action
-		switch (\Input::get('act'))
-		{
-			case 'paste':
-				// Allow
-			break;
-
-			case 'create':
-				if (!strlen(\Input::get('pid')) || !in_array(\Input::get('pid'), $root))
-				{
-					$this->log('Not enough permissions to create events in calendar ID "'.\Input::get('pid').'"', 'tl_iao_offer_items checkPermission', TL_ERROR);
-					$this->redirect('contao/main.php?act=error');
-				}
-			break;
-
-			case 'cut':
-			case 'copy':
-				if (!in_array(\Input::get('pid'), $root))
-				{
-					$this->log('Not enough permissions to '.\Input::get('act').' event ID "'.$id.'" to calendar ID "'.\Input::get('pid').'"', 'tl_iao_offer_items checkPermission', TL_ERROR);
-					$this->redirect('contao/main.php?act=error');
-				}
-				// NO BREAK STATEMENT HERE
-
-			case 'edit':
-			case 'show':
-			case 'delete':
-			case 'toggle':
-				$objCalendar = $this->Database->prepare("SELECT pid FROM tl_iao_offer_items WHERE id=?")
-									->limit(1)
-									->execute($id);
-
-				if ($objCalendar->numRows < 1)
-				{
-					$this->log('Invalid event ID "'.$id.'"', 'tl_iao_offer_items checkPermission', TL_ERROR);
-					$this->redirect('contao/main.php?act=error');
-				}
-
-				if (!in_array($objCalendar->pid, $root))
-				{
-					$this->log('Not enough permissions to '.\Input::get('act').' event ID "'.$id.'" of calendar ID "'.$objCalendar->pid.'"', 'tl_iao_offer_items checkPermission', TL_ERROR);
-					$this->redirect('contao/main.php?act=error');
-				}
-			break;
-
-			case 'select':
-			case 'editAll':
-			case 'deleteAll':
-			case 'overrideAll':
-			case 'cutAll':
-			case 'copyAll':
-				if (!in_array($id, $root))
-				{
-					$this->log('Not enough permissions to access calendar ID "'.$id.'"', 'tl_iao_offer_items checkPermission', TL_ERROR);
-					$this->redirect('contao/main.php?act=error');
-				}
-
-				$objCalendar = $this->Database->prepare("SELECT id FROM tl_iao_offer_items WHERE pid=?")
-									->execute($id);
-
-				if ($objCalendar->numRows < 1)
-				{
-					$this->log('Invalid calendar ID "'.$id.'"', 'tl_iao_offer_items checkPermission', TL_ERROR);
-					$this->redirect('contao/main.php?act=error');
-				}
-
-				$session = $this->Session->getData();
-				$session['CURRENT']['IDS'] = array_intersect($session['CURRENT']['IDS'], $objCalendar->fetchEach('id'));
-				$this->Session->setData($session);
-			break;
-
-			default:
-				if (strlen(\Input::get('act')))
-				{
-					$this->log('Invalid command "'.\Input::get('act').'"', 'tl_iao_offer_items checkPermission', TL_ERROR);
-					$this->redirect('contao/main.php?act=error');
-				}
-				elseif (!in_array($id, $root))
-				{
-					$this->log('Not enough permissions to access calendar ID "'.$id.'"', 'tl_iao_offer_items checkPermission', TL_ERROR);
-					$this->redirect('contao/main.php?act=error');
-				}
-			break;
-		}
+		$this->checkIaoModulePermission('tl_iao_offer_items');
 	}
 
 	/**

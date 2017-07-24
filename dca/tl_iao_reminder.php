@@ -17,15 +17,15 @@ $GLOBALS['TL_DCA']['tl_iao_reminder'] = array
 	// Config
 	'config' => array
 	(
-		'dataContainer'               => 'Table',
-		'ptable'                      => 'tl_iao_projects',
-		'doNotCopyRecords'		  => true,
-		'switchToEdit'                => true,
-		'enableVersioning'            => false,
-		'onload_callback' => array
+		'dataContainer'			=> 'Table',
+		'ptable'				=> 'tl_iao_projects',
+		'doNotCopyRecords'		=> true,
+		'switchToEdit'			=> true,
+		'enableVersioning'		=> false,
+		'onload_callback'		=> array
 		(
 			array('tl_iao_reminder', 'generateInvoicePDF'),
-			// array('tl_iao_reminder','setIaoSettings')
+			array('tl_iao_reminder', 'checkPermission'),
 		),
 		'onsubmit_callback'	=> array(
         	array('tl_iao_reminder','setTextFinish')
@@ -385,129 +385,7 @@ class tl_iao_reminder extends \iao\iaoBackend
 	 */
 	public function checkPermission()
 	{
-		// HOOK: comments extension required
-		if (!in_array('comments', $this->Config->getActiveModules()))
-		{
-			unset($GLOBALS['TL_DCA']['tl_iao_reminder']['fields']['allowComments']);
-		}
-
-		if ($this->User->isAdmin)
-		{
-			return;
-		}
-
-		// Set root IDs
-		if (!is_array($this->User->news) || count($this->User->news) < 1)
-		{
-			$root = array(0);
-		}
-		else
-		{
-			$root = $this->User->news;
-		}
-
-		$GLOBALS['TL_DCA']['tl_iao_reminder']['list']['sorting']['root'] = $root;
-
-		// Check permissions to add archives
-		if (!$this->User->hasAccess('create', 'newp'))
-		{
-			$GLOBALS['TL_DCA']['tl_iao_reminder']['config']['closed'] = true;
-		}
-
-		// Check current action
-		switch (\Input::get('act'))
-		{
-			case 'create':
-			case 'select':
-				// Allow
-			break;
-
-			case 'edit':
-				// Dynamically add the record to the user profile
-				if (!in_array(\Input::get('id'), $root))
-				{
-					$arrNew = $this->Session->get('new_records');
-
-					if (is_array($arrNew['tl_iao_reminder']) && in_array(\Input::get('id'), $arrNew['tl_iao_reminder']))
-					{
-						// Add permissions on user level
-						if ($this->User->inherit == 'custom' || !$this->User->groups[0])
-						{
-							$objUser = $this->Database->prepare("SELECT news, newp FROM tl_user WHERE id=?")
-														->limit(1)
-														->execute($this->User->id);
-
-							$arrNewp = deserialize($objUser->newp);
-
-							if (is_array($arrNewp) && in_array('create', $arrNewp))
-							{
-								$arrNews = deserialize($objUser->news);
-								$arrNews[] = \Input::get('id');
-
-								$this->Database->prepare("UPDATE tl_user SET news=? WHERE id=?")
-												->execute(serialize($arrNews), $this->User->id);
-							}
-						}
-
-						// Add permissions on group level
-						elseif ($this->User->groups[0] > 0)
-						{
-							$objGroup = $this->Database->prepare("SELECT news, newp FROM tl_user_group WHERE id=?")
-														->limit(1)
-														->execute($this->User->groups[0]);
-
-							$arrNewp = deserialize($objGroup->newp);
-
-							if (is_array($arrNewp) && in_array('create', $arrNewp))
-							{
-								$arrNews = deserialize($objGroup->news);
-								$arrNews[] = \Input::get('id');
-
-								$this->Database->prepare("UPDATE tl_user_group SET news=? WHERE id=?")
-												->execute(serialize($arrNews), $this->User->groups[0]);
-							}
-						}
-
-						// Add new element to the user object
-						$root[] = \Input::get('id');
-						$this->User->news = $root;
-					}
-				}
-				// No break;
-
-			case 'copy':
-			case 'delete':
-			case 'show':
-				if (!in_array(\Input::get('id'), $root) || (\Input::get('act') == 'delete' && !$this->User->hasAccess('delete', 'newp')))
-				{
-					$this->log('Not enough permissions to '.\Input::get('act').' news archive ID "'.\Input::get('id').'"', 'tl_iao_reminder checkPermission', TL_ERROR);
-					$this->redirect('contao/main.php?act=error');
-				}
-			break;
-
-			case 'editAll':
-			case 'deleteAll':
-			case 'overrideAll':
-				$session = $this->Session->getData();
-				if (\Input::get('act') == 'deleteAll' && !$this->User->hasAccess('delete', 'newp'))
-				{
-					$session['CURRENT']['IDS'] = array();
-				}
-				else
-				{
-					$session['CURRENT']['IDS'] = array_intersect($session['CURRENT']['IDS'], $root);
-				}
-				$this->Session->setData($session);
-			break;
-
-			default:
-				if (strlen(\Input::get('act')))
-				{
-					$this->log('Not enough permissions to '.\Input::get('act').' news archives', 'tl_iao_reminder checkPermission', TL_ERROR);
-					$this->redirect('contao/main.php?act=error');
-				}
-			break;
-		}
+		$this->checkIaoModulePermission('tl_iao_reminder');
 	}
 
 	/**
