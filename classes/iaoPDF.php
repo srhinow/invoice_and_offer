@@ -225,7 +225,7 @@ class iaoPDF extends \FPDI
 				$summe_tr .= '<br>'.$data['discount']['discount_title'].':';
 			}
 
-			$summe_tr .= '</td><td style="text-align:right;width:'.$w[4].'mm; ">'.number_format($data['summe']['netto'],2,',','.').' '.$this->iaoSettings['iao_currency'].'<br />';
+			$summe_tr .= '</td><td style="text-align:right;width:'.$w[4].'mm; ">'.$data['summe']['netto_format'].' '.$this->iaoSettings['iao_currency'].'<br />';
 	
 			if($noVat != 1)
 			{	
@@ -233,11 +233,12 @@ class iaoPDF extends \FPDI
 
 				foreach($data['summe']['mwst'] as $k => $v)
 				{
-					if((int) $k != 0) $summe_tr .= number_format($v,2,',','.').' '.$this->iaoSettings['iao_currency'].'<br />';
+
+				    if((int) $k != 0) $summe_tr .= number_format($v,2,',','.').' '.$this->iaoSettings['iao_currency'].'<br />';
 				}
 			}else $summe_tr .= '&nbsp;<br>';
 	
-			$summe_tr .= '<b>'.number_format($data['summe']['brutto'],2,',','.').' '.$this->iaoSettings['iao_currency'].'</b>';
+			$summe_tr .= '<b>'.$data['summe']['brutto_format'].' '.$this->iaoSettings['iao_currency'].'</b>';
 
 			if($data['discount'])
 			{
