@@ -21,46 +21,6 @@ namespace iao;
 class iao extends \Backend
 {
     /**
-     * set $GLOBAL['TL_CONFIG'] - invoice_and_offer - Settings
-     * Kompatibilität zu älteren Versionen
-     */
-    public function setIAOSettings($id = 1)
-    {
-        $this->import('Database');
-
-        if( (int) $id > 0)
-        {
-            $dbObj = $this->Database->prepare('SELECT * FROM `tl_iao_settings` WHERE `id`=?')
-                ->limit(1)
-                ->execute($id);
-        }
-        else
-        {
-            $dbObj = $this->Database->prepare('SELECT * FROM `tl_iao_settings` WHERE `fallback`=?')
-                ->limit(1)
-                ->execute(1);
-        }
-
-        if($dbObj->numRows > 0)
-        {
-
-            //hole alle Feldbezeichnungen
-            $fields = $this->Database->listFields('tl_iao_settings');
-
-            // diese Felder nicht als $GLOBAL['TL_CONFIG'] - Eintrag setzen (bl = Blacklist)
-            $bl_fields = array('id', 'tstamp', 'name', 'fallback');
-
-            foreach($fields as $k => $field)
-            {
-                if(in_array($field['name'], $bl_fields)) continue;
-
-                $GLOBALS['TL_CONFIG'][$field['name']] = $dbObj->$field['name'];
-            }
-            // print_r($GLOBALS['TL_CONFIG']);
-        }
-    }
-
-    /**
      * get current settings
      * @param integer
      */
