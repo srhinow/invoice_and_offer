@@ -19,6 +19,10 @@ $GLOBALS['TL_DCA']['tl_iao_settings'] = array
 	(
 		'dataContainer'               => 'Table',
 		'enableVersioning'            => true,
+		'onload_callback'		=> array
+		(
+			array('tl_iao_settings', 'checkPermission'),
+		),
 		'sql' => array
 		(
 			'keys' => array
@@ -543,6 +547,14 @@ class tl_iao_settings extends \iao\iaoBackend
 	{
 		parent::__construct();
 		$this->import('BackendUser', 'User');
+	}
+	
+	/**
+	 * Check permissions to edit table tl_iao_settings
+	 */
+	public function checkPermission()
+	{
+		$this->checkIaoSettingsPermission('tl_iao_settings');
 	}
 
 

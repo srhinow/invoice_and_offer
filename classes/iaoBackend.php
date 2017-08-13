@@ -9,17 +9,266 @@ namespace iao;
  * Class iaoBackend
  *
  * Parent class for iaoBackend modules.
- * @copyright  Sven Rhinow 2011-2015
+ * @copyright  Sven Rhinow 2011-2017
  * @author     sr-tag Sven Rhinow Webentwicklung <http://www.sr-tag.de>
  * @package    invoice_and_offer
  */
 abstract class iaoBackend extends \iao\iao
 {
+	/**
+	* check permissions for dca-modules
+	* @param string
+	*/
+	public function checkIaoModulePermission($table)
+	{
+		if ($this->User->isAdmin)
+		{
+			return;
+		}
+
+		// Set root IDs
+		if (!is_array($this->User->iaomodules) || count($this->User->iaomodules) < 1)
+		{
+			$root = array(0);
+		}
+		else
+		{
+			$root = $this->User->iaomodules;
+		}
+
+		$GLOBALS['TL_DCA'][$table]['list']['sorting']['root'] = $root;
+
+		// Check permissions to add archives
+		if (!$this->User->hasAccess('create', 'newp'))
+		{
+			$GLOBALS['TL_DCA'][$table]['config']['closed'] = true;
+		}
+
+		// Check current action
+		switch (\Input::get('act'))
+		{
+			case 'create':
+			case 'select':
+				// Allow
+			break;
+
+			case 'edit':
+				// Dynamically add the record to the user profile
+				if (!in_array(\Input::get('id'), $root))
+				{
+					$arrNew = $this->Session->get('new_records');
+
+					if (is_array($arrNew[$table]) && in_array(\Input::get('id'), $arrNew[$table]))
+					{
+						// Add permissions on user level
+						if ($this->User->inherit == 'custom' || !$this->User->groups[0])
+						{
+							$objUser = $this->Database->prepare("SELECT iaomodules, iaomodulep FROM tl_user WHERE id=?")
+							->limit(1)
+							->execute($this->User->id);
+
+							$arrModulep = deserialize($objUser->iaomodulep);
+
+							if (is_array($arrModulep) && in_array('create', $arrModulep))
+							{
+								$arrModules = deserialize($objUser->iaomodules);
+								$arrModules[] = \Input::get('id');
+
+								$this->Database->prepare("UPDATE tl_user SET iaomodules=? WHERE id=?")
+											   ->execute(serialize($arrModules), $this->User->id);
+							}
+						}
+
+						// Add permissions on group level
+						elseif ($this->User->groups[0] > 0)
+						{
+							$objGroup = $this->Database->prepare("SELECT iaomodules, iaomodulep FROM tl_user_group WHERE id=?")
+													   ->limit(1)
+													   ->execute($this->User->groups[0]);
+
+							$arrModulep = deserialize($objGroup->iaomodulep);
+
+							if (is_array($arrModulep) && in_array('create', $arrModulep))
+							{
+								$arrModules = deserialize($objGroup->iaomodules);
+								$arrModules[] = \Input::get('id');
+
+								$this->Database->prepare("UPDATE tl_user_group SET iaomodules=? WHERE id=?")
+											   ->execute(serialize($arrModules), $this->User->groups[0]);
+							}
+						}
+
+						// Add new element to the user object
+						$root[] = \Input::get('id');
+						$this->User->iaomodules = $root;
+					}
+				}
+				// No break;
+
+			case 'copy':
+			case 'delete':
+			case 'show':
+				if (!in_array(\Input::get('id'), $root) || (\Input::get('act') == 'delete' && !$this->User->hasAccess('delete', 'iaomodulep')))
+				{
+					$this->log('Not enough permissions to '.\Input::get('act').' iao module ID "'.\Input::get('id').'"', $table.' checkPermission', TL_ERROR);
+					$this->redirect('contao/main.php?act=error');
+				}
+			break;
+
+			case 'editAll':
+			case 'deleteAll':
+			case 'overrideAll':
+				$session = $this->Session->getData();
+				if (\Input::get('act') == 'deleteAll' && !$this->User->hasAccess('delete', 'iaomodulep'))
+				{
+					$session['CURRENT']['IDS'] = array();
+				}
+				else
+				{
+					$session['CURRENT']['IDS'] = array_intersect($session['CURRENT']['IDS'], $root);
+				}
+				$this->Session->setData($session);
+			break;
+
+			default:
+				if (strlen(\Input::get('act')))
+				{
+					$this->log('Not enough permissions to '.\Input::get('act').' iao modules', $table.' checkPermission', TL_ERROR);
+					$this->redirect('contao/main.php?act=error');
+				}
+			break;
+		}
+	}
+
+	/**
+	* check permissions for dca-settings
+	* @param string
+	*/
+	public function checkIaoSettingsPermission($table)
+	{
+		if ($this->User->isAdmin)
+		{
+			return;
+		}
+
+		// Set root IDs
+		if (!is_array($this->User->iaosettings) || count($this->User->iaosettings) < 1)
+		{
+			$root = array(0);
+		}
+		else
+		{
+			$root = $this->User->iaosettings;
+		}
+
+		$GLOBALS['TL_DCA'][$table]['list']['sorting']['root'] = $root;
+
+		// Check permissions to add archives
+		if (!$this->User->hasAccess('create', 'newp'))
+		{
+			$GLOBALS['TL_DCA'][$table]['config']['closed'] = true;
+		}
+
+		// Check current action
+		switch (\Input::get('act'))
+		{
+			case 'create':
+			case 'select':
+				// Allow
+			break;
+
+			case 'edit':
+				// Dynamically add the record to the user profile
+				if (!in_array(\Input::get('id'), $root))
+				{
+					$arrNew = $this->Session->get('new_records');
+
+					if (is_array($arrNew[$table]) && in_array(\Input::get('id'), $arrNew[$table]))
+					{
+						// Add permissions on user level
+						if ($this->User->inherit == 'custom' || !$this->User->groups[0])
+						{
+							$objUser = $this->Database->prepare("SELECT iaosettings, iaosettingp FROM tl_user WHERE id=?")
+							->limit(1)
+							->execute($this->User->id);
+
+							$arrModulep = deserialize($objUser->iaosettingp);
+
+							if (is_array($arrModulep) && in_array('create', $arrModulep))
+							{
+								$arrModules = deserialize($objUser->iaosettings);
+								$arrModules[] = \Input::get('id');
+
+								$this->Database->prepare("UPDATE tl_user SET iaosettings=? WHERE id=?")
+											   ->execute(serialize($arrModules), $this->User->id);
+							}
+						}
+
+						// Add permissions on group level
+						elseif ($this->User->groups[0] > 0)
+						{
+							$objGroup = $this->Database->prepare("SELECT iaosettings, iaosettingp FROM tl_user_group WHERE id=?")
+													   ->limit(1)
+													   ->execute($this->User->groups[0]);
+
+							$arrModulep = deserialize($objGroup->iaosettingp);
+
+							if (is_array($arrModulep) && in_array('create', $arrModulep))
+							{
+								$arrModules = deserialize($objGroup->iaosettings);
+								$arrModules[] = \Input::get('id');
+
+								$this->Database->prepare("UPDATE tl_user_group SET iaosettings=? WHERE id=?")
+											   ->execute(serialize($arrModules), $this->User->groups[0]);
+							}
+						}
+
+						// Add new element to the user object
+						$root[] = \Input::get('id');
+						$this->User->iaosettings = $root;
+					}
+				}
+				// No break;
+
+			case 'copy':
+			case 'delete':
+			case 'show':
+				if (!in_array(\Input::get('id'), $root) || (\Input::get('act') == 'delete' && !$this->User->hasAccess('delete', 'iaosettingp')))
+				{
+					$this->log('Not enough permissions to '.\Input::get('act').' iao module ID "'.\Input::get('id').'"', $table.' checkPermission', TL_ERROR);
+					$this->redirect('contao/main.php?act=error');
+				}
+			break;
+
+			case 'editAll':
+			case 'deleteAll':
+			case 'overrideAll':
+				$session = $this->Session->getData();
+				if (\Input::get('act') == 'deleteAll' && !$this->User->hasAccess('delete', 'iaosettingp'))
+				{
+					$session['CURRENT']['IDS'] = array();
+				}
+				else
+				{
+					$session['CURRENT']['IDS'] = array_intersect($session['CURRENT']['IDS'], $root);
+				}
+				$this->Session->setData($session);
+			break;
+
+			default:
+				if (strlen(\Input::get('act')))
+				{
+					$this->log('Not enough permissions to '.\Input::get('act').' iao modules', $table.' checkPermission', TL_ERROR);
+					$this->redirect('contao/main.php?act=error');
+				}
+			break;
+		}
+	}
 
 	/**
 	 * get options for tax rates
 	 * @param object
-	 * @throws Exception
+	 * @return array
 	 */
 	public function getTaxRatesOptions($dc)
 	{
@@ -38,7 +287,7 @@ abstract class iaoBackend extends \iao\iao
 	/**
 	 * get options for item units
 	 * @param object
-	 * @throws Exception
+	 * @return array
 	 */
 	public function getItemUnitsOptions($dc)
 	{
@@ -57,7 +306,7 @@ abstract class iaoBackend extends \iao\iao
 	/**
 	 * get all members to valid groups
 	 * @param object
-	 * @throws Exception
+	 * @return array
 	 */
 	public function getMemberOptions($dc)
 	{
@@ -80,9 +329,9 @@ abstract class iaoBackend extends \iao\iao
 	}
 
 	/**
-	 * get all settings
+	 * get all settings as select-option-values
 	 * @param object
-	 * @throws Exception
+	 * @return array
 	 */
 	public function getSettingOptions($dc)
 	{
@@ -99,9 +348,9 @@ abstract class iaoBackend extends \iao\iao
 	}
 
 	/**
-	 * get all settings
+	 * get all projects as select-option-values
 	 * @param object
-	 * @throws Exception
+	 * @return array
 	 */
 	public function getProjectOptions($dc)
 	{
@@ -120,7 +369,6 @@ abstract class iaoBackend extends \iao\iao
 	/**
 	 * fill Reminderfields
 	 * @param integer
-	 * @return integer
 	 */
 	public function fillReminderFields($invoiceID = 0, $reminderObj)
 	{
@@ -217,6 +465,10 @@ abstract class iaoBackend extends \iao\iao
 
 	/**
 	* if GET-Param projonly then fill member and address-field
+	* @param string
+	* @param integer
+	* @param array
+	* @param object
 	*/
 	public function setMemmberfieldsFromProject($table, $id, $set, $obj)
 	{

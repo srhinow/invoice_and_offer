@@ -166,4 +166,8 @@ $GLOBALS['TL_CRON']['daily'][] = array('iaoCrons', 'sendAgreementRemindEmail');
 /**
  * Permissions are access settings for user and groups (fields in tl_user and tl_user_group)
  */
-$GLOBALS['TL_PERMISSIONS'][] = 'iao_modules';
+$GLOBALS['TL_PERMISSIONS'][] = 'iaomodules';
+$GLOBALS['TL_PERMISSIONS'][] = 'iaomodulep';
+$GLOBALS['TL_PERMISSIONS'][] = 'iaosettings';
+$GLOBALS['TL_PERMISSIONS'][] = 'iaosettingp';
+

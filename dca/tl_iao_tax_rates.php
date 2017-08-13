@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @copyright  Sven Rhinow 2011-2013
+ * @copyright  Sven Rhinow 2011-2017
  * @author     sr-tag Sven Rhinow Webentwicklung <http://www.sr-tag.de>
  * @package    invoice_and_offer
  * @license    LGPL
@@ -19,6 +19,10 @@ $GLOBALS['TL_DCA']['tl_iao_tax_rates'] = array
 	(
 		'dataContainer'               => 'Table',
 		'enableVersioning'            => true,
+		'onload_callback'		=> array
+		(
+			array('tl_iao_tax_rates', 'checkPermission'),
+		),
 		'sql' => array
 		(
 			'keys' => array
@@ -142,3 +146,26 @@ $GLOBALS['TL_DCA']['tl_iao_tax_rates'] = array
 	)
 );
 
+/**
+ * Class tl_iao_tax_rates
+ */
+class tl_iao_tax_rates extends \iao\iaoBackend
+{
+
+	/**
+	 * Import the back end user object
+	 */
+	public function __construct()
+	{
+		parent::__construct();
+		$this->import('BackendUser', 'User');
+	}
+	
+	/**
+	 * Check permissions to edit table tl_iao_tax_rates
+	 */
+	public function checkPermission()
+	{
+		$this->checkIaoSettingsPermission('tl_iao_tax_rates');
+	}
+}
