@@ -348,7 +348,7 @@ class tl_iao_invoice_items extends \iao\iaoBackend
 							->limit(1)
 							->execute($id);
 
-			$this->settings = ($dbObj->numRows > 0) ? $this->getSettings($dbObj->setting_id) : array();			 
+			$this->settings = ($dbObj->numRows > 0) ? $this->getSettings($dbObj->setting_id) : array();
 		}
 	}
 
