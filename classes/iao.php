@@ -21,46 +21,6 @@ namespace iao;
 class iao extends \Backend
 {
     /**
-     * set $GLOBAL['TL_CONFIG'] - invoice_and_offer - Settings
-     * Kompatibilität zu älteren Versionen
-     */
-    public function setIAOSettings($id = 1)
-    {
-        $this->import('Database');
-
-        if( (int) $id > 0)
-        {
-            $dbObj = $this->Database->prepare('SELECT * FROM `tl_iao_settings` WHERE `id`=?')
-                ->limit(1)
-                ->execute($id);
-        }
-        else
-        {
-            $dbObj = $this->Database->prepare('SELECT * FROM `tl_iao_settings` WHERE `fallback`=?')
-                ->limit(1)
-                ->execute(1);
-        }
-
-        if($dbObj->numRows > 0)
-        {
-
-            //hole alle Feldbezeichnungen
-            $fields = $this->Database->listFields('tl_iao_settings');
-
-            // diese Felder nicht als $GLOBAL['TL_CONFIG'] - Eintrag setzen (bl = Blacklist)
-            $bl_fields = array('id', 'tstamp', 'name', 'fallback');
-
-            foreach($fields as $k => $field)
-            {
-                if(in_array($field['name'], $bl_fields)) continue;
-
-                $GLOBALS['TL_CONFIG'][$field['name']] = $dbObj->$field['name'];
-            }
-            // print_r($GLOBALS['TL_CONFIG']);
-        }
-    }
-
-    /**
      * get current settings
      * @param integer
      */
@@ -96,6 +56,16 @@ class iao extends \Backend
         return ($netto / 100) * ($vat + 100);
     }
 
+    /**
+     * get umastzsteuer-Betrag vom netto
+     * @param float
+     * @param integer
+     * @return float
+     */
+    public function getUmstAmount($netto,$vat)
+    {
+        return ($netto * $vat) / 100;
+    }
     /**
      * Get formatet price-string
      * @param float
@@ -134,7 +104,7 @@ class iao extends \Backend
     public function changeTags($text)
     {
         // replace [&] etc.
-        $text = $this->restoreBasicEntities($text);
+        $text = \StringUtil::restoreBasicEntities($text);
 
         // replace Inserttags
         $text = $this->replaceInsertTags($text);
@@ -682,7 +652,7 @@ class iao extends \Backend
                 $formatCount.' '.(((float)$resultObj->count <= 1) ? $unitObj->singular : $unitObj->majority),
                 $resultObj->text,
                 number_format($resultObj->price,2,',','.'),
-                number_format($resultObj->price_netto,2,',','.')
+                number_format(($resultObj->price * $resultObj->count),2,',','.')
             );
 
             $posten['pagebreak_after'][] = $resultObj->pagebreak_after;
@@ -690,31 +660,32 @@ class iao extends \Backend
 
             $posten['discount'] = false;
 
+            //aktuell berechnete netto-summe
+            $netto = $resultObj->price * $resultObj->count;
+
             if($resultObj->operator == '-')
             {
-                $posten['summe']['price'] -= $resultObj->operator = $resultObj->price;
-                $posten['summe']['netto'] -= $resultObj->price_netto;
-                $posten['summe']['brutto'] -= $resultObj->price_brutto;
+                $posten['summe']['price'] -= $resultObj->price;
+                $posten['summe']['netto'] -= $netto;
             }
             else
             {
-                $posten['summe']['price'] += $resultObj->operator = $resultObj->price;
-                $posten['summe']['netto'] += $resultObj->price_netto;
-                $posten['summe']['brutto'] += $resultObj->price_brutto;
+                $posten['summe']['price'] += $resultObj->price;
+                $posten['summe']['netto'] += $netto;
             }
-            print_r($posten['summe']);
-            exit();
+
             $parentObj = $this->Database->prepare('SELECT * FROM `tl_iao_'.$type.'` WHERE `id`=?')
                 ->limit(1)
                 ->execute($id);
 
             if($parentObj->noVat != 1)
             {
-                $posten['summe']['mwst'][$resultObj->vat] +=  $resultObj->price_brutto - $resultObj->price_netto;
+                $posten['summe']['mwst'][$resultObj->vat] += $this->getUmstAmount($netto,$resultObj->vat);
             }
         }
 
         $posten['summe']['netto_format'] =  number_format($posten['summe']['netto'],2,',','.');
+        $posten['summe']['brutto'] = $this->getBruttoPrice($posten['summe']['netto'],$resultObj->vat);
         $posten['summe']['brutto_format'] =  number_format($posten['summe']['brutto'],2,',','.');
 
         return $posten;
