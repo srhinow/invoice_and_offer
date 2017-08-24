@@ -412,9 +412,6 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 		'sendEmail' => array(
 				'sql' 					=> "varchar(64) NOT NULL default '0'"
 		),
-		'sendEmail' => array(
-				'sql' 					=> "varchar(64) NOT NULL default '0'"
-		),
 		'FromEmail' => array(
 				'sql' 					=> "varchar(64) NOT NULL default '0'"
 		),
@@ -456,11 +453,14 @@ class tl_iao_offer extends \iao\iaoBackend
 	}
 	
 	/**
-	* prefill eny Fields by new dataset
+     * prefill eny Fields by new dataset
+     * @param string
+     * @param integer
+     * @param array
 	*/
-	public function preFillFields($table, $id, $set, $obj)
+	public function preFillFields($table, $id, $set)
 	{
-		$objProject = IaoProjectsModel::findProjectByIdOrAlias($set['pid']);
+		$objProject = iao\IaoProjectsModel::findProjectByIdOrAlias($set['pid']);
 		$settingId = ($objProject !== null && $objProject->setting_id != 0) ? $objProject->setting_id : 1;
 		$settings = $this->getSettings($settingId);
 
@@ -771,102 +771,8 @@ class tl_iao_offer extends \iao\iaoBackend
 		if(strlen($objPdfTemplate->path) < 1 || !file_exists(TL_ROOT . '/' . $objPdfTemplate->path) ) return;  // template file not found
 
 		$href = 'contao/main.php?do=iao_offer&amp;key=pdf&amp;id='.$row['id'];
-		return '<a href="'.$href.'" title="'.specialchars($title).'">'.$this->generateImage($icon, $label).'</a> ';
+		return '<a href="'.$href.'" title="'.specialchars($title).'">'.\Image::getHtml($icon, $label).'</a> ';
 
-	}
-
-	public function getPosten($id)
-	{
-		$posten = array();
-
-		if(!$id) return $posten;
-
-		$this->loadLanguageFile('tl_iao_offer_items');
-
-		$resultObj = $this->Database->prepare('SELECT * FROM `tl_iao_offer_items` WHERE `pid`=? AND `published`= ?  ORDER BY `sorting`')
-									->execute($id,1);
-
-		if($resultObj->numRows <= 0) return $posten;
-
-
-		while($resultObj->next())
-		{
-			$resultObj->price = str_replace(',','.',$resultObj->price);
-
-			$einzelpreis = ($resultObj->vat_incl == 1) ? $this->getBruttoPrice($resultObj->price,$resultObj->vat) : $resultObj->price;
-
-			if($resultObj->headline_to_pdf == 1) $resultObj->text = substr_replace($resultObj->text, '<p><strong>'.$resultObj->headline.'</strong><br>', 0, 3);
-			
-			$resultObj->text = $this->changeTags($resultObj->text);
-
-			// get units from DB-Table
-			$unitObj = $this->Database->prepare('SELECT * FROM `tl_iao_item_units` WHERE `value`=?')
-										->limit(1)
-										->execute($resultObj->amountStr);
-
-			$formatCount = stripos($resultObj->count, '.') ? number_format($resultObj->count,1,',','.') : $resultObj->count;
-
-			$posten['fields'][] = array
-			(
-				$formatCount.' '.(((float)$resultObj->count <= 1) ? $unitObj->singular : $unitObj->majority),
-				$resultObj->text,
-				number_format($einzelpreis,2,',','.'),
-				number_format($resultObj->price_brutto,2,',','.')
-			);
-
-			$posten['pagebreak_after'][] = $resultObj->pagebreak_after;
-			$posten['type'][] = $resultObj->type;
-
-			if($resultObj->operator == '-')
-			{
-				$posten['summe']['price'] -= $resultObj->operator = $resultObj->price;
-				$posten['summe']['netto'] -= $resultObj->price_netto;
-				$posten['summe']['brutto'] -= $resultObj->price_brutto;
-			}
-			else
-			{
-				$posten['summe']['price'] += $resultObj->operator = $resultObj->price;
-				$posten['summe']['netto'] += $resultObj->price_netto;
-				$posten['summe']['brutto'] += $resultObj->price_brutto;
-			}
-
-			$parentObj = $this->Database->prepare('SELECT `noVat` FROM `tl_iao_offer` WHERE `id`=?')
-						->limit(1)
-						->execute($id);
-			
-			if($parentObj->noVat != 1)
-			{
-				$posten['summe']['mwst'][$resultObj->vat] +=  $resultObj->price_brutto - $resultObj->price_netto;
-			}
-
-		}
-
-		$posten['summe']['netto_format'] =  number_format($posten['summe']['netto'],2,',','.');
-		$posten['summe']['brutto_format'] =  number_format($posten['summe']['brutto'],2,',','.');
-		
-		return $posten;
-	}
-
-	/**
-	 * Get netto-price from brutto
-	 * @param float
-	 * @param integer
-	 * @return float
-	 */
-	public function getNettoPrice($brutto,$vat)
-	{
-		return ($brutto * 100) / ($vat + 100);
-	}
-
-	/**
-	 * Get brutto-price from netto
-	 * @param float
-	 * @param integer
-	 * @return float
-	 */
-	public function getBruttoPrice($netto,$vat)
-	{
-		return ($netto / 100) * ($vat + 100);
 	}
 
 	/**
@@ -942,7 +848,7 @@ class tl_iao_offer extends \iao\iaoBackend
 		{
 			$objNr = $this->Database->prepare("SELECT `offer_id` FROM `tl_iao_offer` WHERE `id`=? OR `offer_id`=?")
 									->limit(1)
-									->execute($dc->id,$varValue);
+									->execute(\Input::get('id'),$varValue);
 
 			// Check whether the OfferNumber exists
 			if ($objNr->numRows > 1 )
@@ -952,7 +858,7 @@ class tl_iao_offer extends \iao\iaoBackend
 					throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'], $varValue));
 				}
 
-				$varValue .= '-' . $dc->id;
+				$varValue .= '-' . \Input::get('id');
 			}
 		}
 		return $varValue;
@@ -1010,7 +916,7 @@ class tl_iao_offer extends \iao\iaoBackend
 			$icon = 'logout.gif';
 		}
 
-		return '<a href="'.$this->addToUrl($href).'" title="'.$GLOBALS['TL_LANG']['tl_iao_offer']['toggle'].'"'.$attributes.'>'.$this->generateImage($icon, $label).'</a> ';
+		return '<a href="'.$this->addToUrl($href).'" title="'.$GLOBALS['TL_LANG']['tl_iao_offer']['toggle'].'"'.$attributes.'>'.\Image::getHtml($icon, $label).'</a> ';
 	}
 
 	/**
@@ -1047,6 +953,7 @@ class tl_iao_offer extends \iao\iaoBackend
 		$this->Database->prepare("UPDATE tl_iao_offer SET status='" . ($blnVisible==1 ? '1' : '2') . "' WHERE id=?")
 						->execute($intId);
 
-		$this->createNewVersion('tl_iao_offer', $intId);
+		$objVersions = new \Versions('tl_iao_offer', $intId);
+        $objVersions->create();
 	}
 }

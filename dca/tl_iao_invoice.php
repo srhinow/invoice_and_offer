@@ -1009,7 +1009,7 @@ class tl_iao_invoice extends \iao\iaoBackend
 	    {
 			$objNr = $this->Database->prepare("SELECT `invoice_id` FROM `tl_iao_invoice` WHERE `id`=? OR `invoice_id`=?")
 									->limit(1)
-									->execute($dc->id, $varValue);
+									->execute(\Input::get('id'), $varValue);
 
 			// Check whether the InvoiceNumber exists
 			if ($objNr->numRows > 1 )
@@ -1019,7 +1019,7 @@ class tl_iao_invoice extends \iao\iaoBackend
 					throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'], $varValue));
 				}
 
-				$varValue .= '-' . $dc->id;
+				$varValue .= '-' . \Input::get('id');
 			}
 		}
 	    return $varValue;
