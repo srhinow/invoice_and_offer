@@ -649,22 +649,25 @@ class iao extends \Backend
 		//wenn type oder id fehlen abbrechen
 		if((int) $id < 1 || strlen($type) < 1) return $posten;
 
+		//hole zum jeweiligen Modul gehoerende Sprachdatei
 		$this->loadLanguageFile('tl_iao_'.$type.'_items');
 
+		//hole alle zum Elternelemente gehoerende Eintraege
 		$resultObj = $this->Database->prepare('SELECT * FROM `tl_iao_'.$type.'_items` WHERE `pid`=? AND `published`= ? ORDER BY `sorting`')
 		->execute($id,1);
 
-
+        // wenn keine vorhanden dann leeres array zurueck
 		if($resultObj->numRows <= 0) return $posten;
 
 		while($resultObj->next())
 		{
-			$resultObj->price = str_replace(',','.',$resultObj->price);
+			//zum rechnen evtl vorhandenes deutsches format in english umwandeln
+		    $resultObj->price = str_replace(',','.',$resultObj->price);
 
-			$einzelpreis = ($resultObj->vat_incl == 1) ? $this->getBruttoPrice($resultObj->price,$resultObj->vat) : $resultObj->price;
+			//$einzelpreis = ($resultObj->vat_incl == 1) ? $this->getBruttoPrice($resultObj->price,$resultObj->vat) : $resultObj->price;
 			
-			if($resultObj->headline_to_pdf == 1) $resultObj->text = substr_replace($resultObj->text, '<p><strong>'.$resultObj->headline.'</strong><br>', 0, 3);
-			
+			//Ueberschrift zum Postenausgabetext hinzufuegen
+            if($resultObj->headline_to_pdf == 1) $resultObj->text = substr_replace($resultObj->text, '<p><strong>'.$resultObj->headline.'</strong><br>', 0, 3);
 			$resultObj->text = $this->changeTags($resultObj->text);
 
 			// get units from DB-Table
@@ -678,8 +681,8 @@ class iao extends \Backend
 			(
 				$formatCount.' '.(((float)$resultObj->count <= 1) ? $unitObj->singular : $unitObj->majority),
 				$resultObj->text,
-				number_format($einzelpreis,2,',','.'),
-				number_format($resultObj->price_brutto,2,',','.')
+				number_format($resultObj->price,2,',','.'),
+				number_format($resultObj->price_netto,2,',','.')
 			);
 
 			$posten['pagebreak_after'][] = $resultObj->pagebreak_after;
@@ -699,7 +702,8 @@ class iao extends \Backend
 				$posten['summe']['netto'] += $resultObj->price_netto;
 				$posten['summe']['brutto'] += $resultObj->price_brutto;
 			}
-
+            print_r($posten['summe']);
+			exit();
 			$parentObj = $this->Database->prepare('SELECT * FROM `tl_iao_'.$type.'` WHERE `id`=?')
 					->limit(1)
 					->execute($id);
