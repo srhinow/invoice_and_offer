@@ -13,16 +13,16 @@
  */
 class ModuleCustomerMember extends BackendModule
 {
+    protected $settings = array();
 
-	/**
+        /**
 	 * Change the palette of the current table and switch to edit mode
 	 */
 	public function generate()
 	{
 		$this->import('BackendUser', 'User');
-
 		$this->import('iao');
-		$this->iao->setIAOSettings();
+		$this->settings = $this->iao->getSettings($GLOBALS['IAO']['default_settings_id']);
 
 		$GLOBALS['TL_DCA'][$this->table]['config']['onsubmit_callback'][] = array('tl_iao_member', 'setCustomerGroup');
 		$GLOBALS['TL_DCA'][$this->table]['palettes'] = array
@@ -37,7 +37,7 @@ class ModuleCustomerMember extends BackendModule
 			'fields'                => array('company'),
 			'flag'                  => 11,
 			'panelLayout'           => 'filter;sort,search,limit',
-			'filter'		  		=> array(array('iao_group=?',$GLOBALS['TL_CONFIG']['iao_costumer_group']))
+			'filter'		  		=> array(array('iao_group=?',$this->settings['iao_costumer_group']))
 		);
 		
 		$GLOBALS['TL_DCA'][$this->table]['list']['label'] = array

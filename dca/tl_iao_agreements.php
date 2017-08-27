@@ -437,6 +437,7 @@ $GLOBALS['TL_DCA']['tl_iao_agreements'] = array
  */
 class tl_iao_agreements extends \iao\iaoBackend
 {
+    protected $settings = array();
 
 	/**
 	 * Import the back end user object
@@ -448,12 +449,11 @@ class tl_iao_agreements extends \iao\iaoBackend
 	}
 
 	/**
-	* add all iao-Settings in $GLOBALS['TL_CONFIG'] 
+	* get all default iao-Settings
 	*/
 	public function IAOSettings(DataContainer $dc)
 	{
-		$this->import('iao');
-		$this->iao->setIAOSettings($dc->activeRecord->setting_id);
+	    $this->settings = $this->getSettings($GLOBALS['IAO']['default_settings_id']);
 	}
 
 	/**
@@ -541,10 +541,10 @@ class tl_iao_agreements extends \iao\iaoBackend
 	{
 		$varValue= array();
 
-		if(!$GLOBALS['TL_CONFIG']['iao_costumer_group'])  return $varValue;
+		if(!$this->settings['iao_costumer_group'])  return $varValue;
 
 		$member = $this->Database->prepare('SELECT `id`,`groups`,`firstname`,`lastname`,`company` FROM `tl_member` WHERE `iao_group`')
-								->execute($GLOBALS['TL_CONFIG']['iao_costumer_group']);
+								->execute($this->settings['iao_costumer_group']);
 
 		while($member->next())
 		{
