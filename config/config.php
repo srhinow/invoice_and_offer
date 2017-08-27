@@ -20,6 +20,7 @@
 /**
  * DEFAULT IAO VALUES 
 */
+$GLOBALS['IAO']['default_settings_id'] = 1;
 $GLOBALS['IAO']['default_agreement_cycle'] = '+1 year';
 
 /**
