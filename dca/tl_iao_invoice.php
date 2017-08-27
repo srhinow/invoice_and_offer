@@ -1182,7 +1182,7 @@ class tl_iao_invoice extends \iao\iaoBackend
 				}
 
 
-				$paid_on_date = ($allInvObj->price_brutto == $already) ? $lastPayDate : $allInvObj->paid_on_date;
+				//$paid_on_date = ($allInvObj->price_brutto == $already) ? $lastPayDate : $allInvObj->paid_on_date;
 
 			}
 		}
