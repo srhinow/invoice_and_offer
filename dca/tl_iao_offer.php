@@ -786,7 +786,7 @@ class tl_iao_offer extends \iao\iaoBackend
 		$settings = $this->getSettings($dc->activeRecord->setting_id);
 		$tstamp = ($dc->activeRecord->tstamp)?: time();
 
-		return $this->generateOfferNumberStr($varValue, $dc->activeRecord->invoice_id, $tstamp, $settings);
+		return $this->generateOfferNumberStr($varValue, $dc->activeRecord->offer_id, $tstamp, $settings);
 	}
 
 	/**
