@@ -58,7 +58,7 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['myid'] = array
 
 $GLOBALS['TL_DCA']['tl_member']['fields']['iao_group'] = array
 (
-	'sql'					=> "int(10) NOT NULL default ''"
+	'sql'					=> "int(10) unsigned NOT NULL default '0'"
 );
 
 /**

@@ -24,9 +24,9 @@ class iao extends \Backend
      * get current settings
      * @param integer
      */
-    public function getSettings($id)
+    public function getSettings($id = '')
     {
-        if(!$id)
+        if($id)
         {
             $dbObj = $this->Database->prepare('SELECT * FROM `tl_iao_settings` WHERE `id`=?')
                 ->limit(1)
