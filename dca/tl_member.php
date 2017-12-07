@@ -58,7 +58,7 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['myid'] = array
 
 $GLOBALS['TL_DCA']['tl_member']['fields']['iao_group'] = array
 (
-	'sql'					=> "varchar(255) NOT NULL default ''"
+	'sql'					=> "int(10) NOT NULL default ''"
 );
 
 /**
@@ -68,6 +68,9 @@ class tl_iao_member extends Backend
 {
 	public function setCustomerGroup(DataContainer $dc)
 	{
+        $this->import('iao');
+        $this->settings = $this->iao->getSettings($GLOBALS['IAO']['default_settings_id']);
+
 		// Return if there is no active record (override all)
 		if (!$dc->activeRecord || $dc->id == 0)
 		{
@@ -75,6 +78,6 @@ class tl_iao_member extends Backend
 		}
 
 		$this->Database->prepare("UPDATE tl_member SET iao_group=? WHERE id=?")
-						->execute($GLOBALS['TL_CONFIG']['iao_costumer_group'],$dc->id);
+						->execute($this->settings['iao_costumer_group'],$dc->id);
     }
 }
