@@ -69,7 +69,7 @@ class tl_iao_member extends Backend
 	public function setCustomerGroup(DataContainer $dc)
 	{
         $this->import('iao');
-        $this->settings = $this->iao->getSettings($GLOBALS['IAO']['default_settings_id']);
+        $this->settings = $this->iao->getSettings();
 
 		// Return if there is no active record (override all)
 		if (!$dc->activeRecord || $dc->id == 0)
