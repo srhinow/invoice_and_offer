@@ -214,9 +214,9 @@ class iaoPDF extends \FPDI
 
 				foreach($data['summe']['mwst'] as $k => $v)
 				{
-					 $summe_tr .= 'UmsatzSt. '.$k.'%:<br />';
+					 $summe_tr .= 'MwSt. '.$k.'%:<br />';
 				}
-			}else $summe_tr .= 'ohne Umsatzsteuer<br />';
+			}else $summe_tr .= 'ohne Mehrwertsteuer<br />';
 
 			$summe_tr .= '<b>Gesamt '.$this->iaoSettings['iao_currency_symbol'].':</b>';
 
