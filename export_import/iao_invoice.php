@@ -215,14 +215,14 @@ class iao_invoice extends Backend
 			if (is_dir(TL_ROOT . '/' . $csv_source))
 			{
 				$_SESSION['TL_ERROR'][] = sprintf($GLOBALS['TL_LANG']['ERR']['importFolder'], basename($csv_source));
-				continue;
+				exit;
 			}
 
 			// Skip invalid posten-entries
 			if (is_dir(TL_ROOT . '/' . $csv_posten_source))
 			{
 				$_SESSION['TL_ERROR'][] = sprintf($GLOBALS['TL_LANG']['ERR']['importFolder'], basename($csv_posten_source));
-				continue;
+				exit;
 			}
 
 			$objInvoiceFile = new File($csv_source);

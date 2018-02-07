@@ -216,14 +216,14 @@ class iao_offer extends Backend
 			if (is_dir(TL_ROOT . '/' . $csv_source))
 			{
 				$_SESSION['TL_ERROR'][] = sprintf($GLOBALS['TL_LANG']['ERR']['importFolder'], basename($csv_source));
-				continue;
+				exit;
 			}
 
 			// Skip invalid posten-entries
 			if (is_dir(TL_ROOT . '/' . $csv_posten_source))
 			{
 				$_SESSION['TL_ERROR'][] = sprintf($GLOBALS['TL_LANG']['ERR']['importFolder'], basename($csv_posten_source));
-				continue;
+				exit;
 			}
 
 			$objOfferFile = new File($csv_source);
