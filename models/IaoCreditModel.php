@@ -11,17 +11,17 @@ namespace iao;
  * @property integer $tstamp
  * @property string  $title
  *
- * @method static iao\IaoCreditModel|null findById($id, $opt=array())
- * @method static iao\IaoCreditModel|null findByIdOrAlias($val, $opt=array())
- * @method static iao\IaoCreditModel|null findOneBy($col, $val, $opt=array())
- * @method static iao\IaoCreditModel|null findOneByTstamp($val, $opt=array())
- * @method static iao\IaoCreditModel|null findOneByTitle($val, $opt=array())
+ * @method static IaoCreditModel|null findById($id, $opt=array())
+ * @method static IaoCreditModel|null findByIdOrAlias($val, $opt=array())
+ * @method static IaoCreditModel|null findOneBy($col, $val, $opt=array())
+ * @method static IaoCreditModel|null findOneByTstamp($val, $opt=array())
+ * @method static IaoCreditModel|null findOneByTitle($val, $opt=array())
 
  *
- * @method static \Model\Collection|iao\IaoCreditModel[]|iao\IaoCreditModel|null findByTstamp($val, $opt=array())
- * @method static \Model\Collection|iao\IaoCreditModel[]|iao\IaoCreditModel|null findByTitle($val, $opt=array())
- * @method static \Model\Collection|iao\IaoCreditModel[]|iao\IaoCreditModel|null findBy($col, $val, $opt=array())
- * @method static \Model\Collection|iao\IaoCreditModel[]|iao\IaoCreditModel|null findAll($opt=array())
+ * @method static \Model\Collection|IaoCreditModel[]|IaoCreditModel|null findByTstamp($val, $opt=array())
+ * @method static \Model\Collection|IaoCreditModel[]|IaoCreditModel|null findByTitle($val, $opt=array())
+ * @method static \Model\Collection|IaoCreditModel[]|IaoCreditModel|null findBy($col, $val, $opt=array())
+ * @method static \Model\Collection|IaoCreditModel[]|IaoCreditModel|null findAll($opt=array())
  *
  * @method static integer countById($id, $opt=array())
  *
@@ -46,7 +46,7 @@ class IaoCreditModel extends \Model
 	 * @param integer $intOffset   	An optional offset
 	 * @param array   $arrOptions  	An optional options array
 	 *
-	 * @return \Model\Collection|iao\iaoInvoiceModel[]|iao\iaoInvoiceModel|null A collection of models or null if there are no news
+	 * @return IaoCreditModel[]|IaoCreditModel|null A collection of models or null if there are no news
 	 */
 	public static function findOnePublishedByMember($id, $memberId, array $arrOptions=array())
 	{
@@ -78,7 +78,7 @@ class IaoCreditModel extends \Model
 	 * @param integer $intOffset   	An optional offset
 	 * @param array   $arrOptions  	An optional options array
 	 *
-	 * @return \Model\Collection|iao\iaoInvoiceModel[]|iao\iaoInvoiceModel|null A collection of models or null if there are no news
+	 * @return IaoCreditModel[]IaoCreditModel|null A collection of models or null if there are no news
 	 */
 	public static function findPublishedByMember($memberId, $status='', $intLimit=0, $intOffset=0, array $arrOptions=array())
 	{
@@ -155,7 +155,7 @@ class IaoCreditModel extends \Model
 	 * @param integer $intOffset   	An optional offset
 	 * @param array   $arrOptions  	An optional options array
 	 *
-	 * @return \Model\Collection|\NewsModel[]|\NewsModel|null A collection of models or null if there are no news
+	 * @return IaoCreditModel[]|IaoCreditModel|null A collection of models or null if there are no news
 	 */
 	public static function findPublishedByPid($pid, $status='', $intLimit=0, $intOffset=0, array $arrOptions=array())
 	{
@@ -198,9 +198,9 @@ class IaoCreditModel extends \Model
 	 *
 	 * @return integer The number of news items
 	 */
-	public static function countPublishedByPid($arrPids, $status='', array $arrOptions=array())
+	public static function countPublishedByPid($pid, $status='', array $arrOptions=array())
 	{
-		if (empty($arrPids))
+		if (empty($pid))
 		{
 			return null;
 		}

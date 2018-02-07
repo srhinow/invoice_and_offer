@@ -11,17 +11,17 @@ namespace iao;
  * @property integer $tstamp
  * @property string  $title
  *
- * @method static iao\IaoAgreementsModel|null findById($id, $opt=array())
- * @method static iao\IaoAgreementsModel|null findByIdOrAlias($val, $opt=array())
- * @method static iao\IaoAgreementsModel|null findOneBy($col, $val, $opt=array())
- * @method static iao\IaoAgreementsModel|null findOneByTstamp($val, $opt=array())
- * @method static iao\IaoAgreementsModel|null findOneByTitle($val, $opt=array())
+ * @method static IaoAgreementsModel|null findById($id, $opt=array())
+ * @method static IaoAgreementsModel|null findByIdOrAlias($val, $opt=array())
+ * @method static IaoAgreementsModel|null findOneBy($col, $val, $opt=array())
+ * @method static IaoAgreementsModel|null findOneByTstamp($val, $opt=array())
+ * @method static IaoAgreementsModel|null findOneByTitle($val, $opt=array())
 
  *
- * @method static \Model\Collection|iao\IaoAgreementsModel[]|iao\IaoAgreementsModel|null findByTstamp($val, $opt=array())
- * @method static \Model\Collection|iao\IaoAgreementsModel[]|iao\IaoAgreementsModel|null findByTitle($val, $opt=array())
- * @method static \Model\Collection|iao\IaoAgreementsModel[]|iao\IaoAgreementsModel|null findBy($col, $val, $opt=array())
- * @method static \Model\Collection|iao\IaoAgreementsModel[]|iao\IaoAgreementsModel|null findAll($opt=array())
+ * @method static \Model\Collection|IaoAgreementsModel[]|IaoAgreementsModel|null findByTstamp($val, $opt=array())
+ * @method static \Model\Collection|IaoAgreementsModel[]|IaoAgreementsModel|null findByTitle($val, $opt=array())
+ * @method static \Model\Collection|IaoAgreementsModel[]|IaoAgreementsModel|null findBy($col, $val, $opt=array())
+ * @method static \Model\Collection|IaoAgreementsModel[]|IaoAgreementsModel|null findAll($opt=array())
  *
  * @method static integer countById($id, $opt=array())
  *
@@ -46,7 +46,7 @@ class IaoAgreementsModel extends \Model
 	 * @param integer $intOffset   	An optional offset
 	 * @param array   $arrOptions  	An optional options array
 	 *
-	 * @return \Model\Collection|iao\iaoInvoiceModel[]|iao\iaoInvoiceModel|null A collection of models or null if there are no news
+	 * @return \Model\Collection|iaoInvoiceModel[]|iaoInvoiceModel|null A collection of models or null if there are no news
 	 */
 	public static function findOnePublishedByMember($id, $memberId, array $arrOptions=array())
 	{
@@ -75,7 +75,7 @@ class IaoAgreementsModel extends \Model
 	 * @param integer $intOffset   	An optional offset
 	 * @param array   $arrOptions  	An optional options array
 	 *
-	 * @return \Model\Collection|iao\iaoInvoiceModel[]|iao\iaoInvoiceModel|null A collection of models or null if there are no news
+	 * @return \Model\Collection|iaoInvoiceModel[]|iaoInvoiceModel|null A collection of models or null if there are no news
 	 */
 	public static function findPublishedByMember($memberId, $status='', $intLimit=0, $intOffset=0, array $arrOptions=array())
 	{

@@ -11,17 +11,17 @@ namespace iao;
  * @property integer $tstamp
  * @property string  $title
  *
- * @method static iao\IaoReminderModel|null findById($id, $opt=array())
- * @method static iao\IaoReminderModel|null findByIdOrAlias($val, $opt=array())
- * @method static iao\IaoReminderModel|null findOneBy($col, $val, $opt=array())
- * @method static iao\IaoReminderModel|null findOneByTstamp($val, $opt=array())
- * @method static iao\IaoReminderModel|null findOneByTitle($val, $opt=array())
+ * @method static IaoReminderModel|null findById($id, $opt=array())
+ * @method static IaoReminderModel|null findByIdOrAlias($val, $opt=array())
+ * @method static IaoReminderModel|null findOneBy($col, $val, $opt=array())
+ * @method static IaoReminderModel|null findOneByTstamp($val, $opt=array())
+ * @method static IaoReminderModel|null findOneByTitle($val, $opt=array())
 
  *
- * @method static \Model\Collection|iao\IaoReminderModel[]|iao\IaoReminderModel|null findByTstamp($val, $opt=array())
- * @method static \Model\Collection|iao\IaoReminderModel[]|iao\IaoReminderModel|null findByTitle($val, $opt=array())
- * @method static \Model\Collection|iao\IaoReminderModel[]|iao\IaoReminderModel|null findBy($col, $val, $opt=array())
- * @method static \Model\Collection|iao\IaoReminderModel[]|iao\IaoReminderModel|null findAll($opt=array())
+ * @method static \Model\Collection|IaoReminderModel[]|IaoReminderModel|null findByTstamp($val, $opt=array())
+ * @method static \Model\Collection|IaoReminderModel[]|IaoReminderModel|null findByTitle($val, $opt=array())
+ * @method static \Model\Collection|IaoReminderModel[]|IaoReminderModel|null findBy($col, $val, $opt=array())
+ * @method static \Model\Collection|IaoReminderModel[]|IaoReminderModel|null findAll($opt=array())
  *
  * @method static integer countById($id, $opt=array())
  *
@@ -46,7 +46,7 @@ class IaoReminderModel extends \Model
 	 * @param integer $intOffset   	An optional offset
 	 * @param array   $arrOptions  	An optional options array
 	 *
-	 * @return \Model\Collection|iao\iaoInvoiceModel[]|iao\iaoInvoiceModel|null A collection of models or null if there are no news
+	 * @return iaoInvoiceModel[]|iaoInvoiceModel|null A collection of models or null if there are no news
 	 */
 	public static function findOnePublishedByMember($id, $memberId, array $arrOptions=array())
 	{
@@ -78,7 +78,7 @@ class IaoReminderModel extends \Model
 	 * @param integer $intOffset   	An optional offset
 	 * @param array   $arrOptions  	An optional options array
 	 *
-	 * @return \Model\Collection|iao\iaoInvoiceModel[]|iao\iaoInvoiceModel|null A collection of models or null if there are no news
+	 * @return iaoInvoiceModel[]|iaoInvoiceModel|null A collection of models or null if there are no news
 	 */
 	public static function findPublishedByMember($memberId, $status='', $intLimit=0, $intOffset=0, array $arrOptions=array())
 	{

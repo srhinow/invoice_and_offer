@@ -11,18 +11,18 @@ namespace iao;
  * @property integer $tstamp
  * @property string  $title
  *
- * @method static iao\iaoCreditItemsModel|null findById($id, $opt=array())
- * @method static iao\iaoCreditItemsModel|null findByIdOrAlias($val, $opt=array())
- * @method static iao\iaoCreditItemsModel|null findByPk($id, $opt=array())
- * @method static iao\iaoCreditItemsModel|null findOneBy($col, $val, $opt=array())
- * @method static iao\iaoCreditItemsModel|null findOneByTstamp($val, $opt=array())
- * @method static iao\iaoCreditItemsModel|null findOneByTitle($val, $opt=array())
+ * @method static iaoCreditItemsModel|null findById($id, $opt=array())
+ * @method static iaoCreditItemsModel|null findByIdOrAlias($val, $opt=array())
+ * @method static iaoCreditItemsModel|null findByPk($id, $opt=array())
+ * @method static iaoCreditItemsModel|null findOneBy($col, $val, $opt=array())
+ * @method static iaoCreditItemsModel|null findOneByTstamp($val, $opt=array())
+ * @method static iaoCreditItemsModel|null findOneByTitle($val, $opt=array())
 
  *
- * @method static \Model\Collection|iao\iaoCreditItemsModel[]|iao\iaoCreditItemsModel|null findByTstamp($val, $opt=array())
- * @method static \Model\Collection|iao\iaoCreditItemsModel[]|iao\iaoCreditItemsModel|null findByTitle($val, $opt=array())
- * @method static \Model\Collection|iao\iaoCreditItemsModel[]|iao\iaoCreditItemsModel|null findBy($col, $val, $opt=array())
- * @method static \Model\Collection|iao\iaoCreditItemsModel[]|iao\iaoCreditItemsModel|null findAll($opt=array())
+ * @method static \Model\Collection|iaoCreditItemsModel[]|iaoCreditItemsModel|null findByTstamp($val, $opt=array())
+ * @method static \Model\Collection|iaoCreditItemsModel[]|iaoCreditItemsModel|null findByTitle($val, $opt=array())
+ * @method static \Model\Collection|iaoCreditItemsModel[]|iaoCreditItemsModel|null findBy($col, $val, $opt=array())
+ * @method static \Model\Collection|iaoCreditItemsModel[]|iaoCreditItemsModel|null findAll($opt=array())
  *
  * @method static integer countById($id, $opt=array())
  *

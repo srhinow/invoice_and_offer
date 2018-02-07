@@ -11,18 +11,18 @@ namespace iao;
  * @property integer $tstamp
  * @property string  $title
  *
- * @method static iao\iaoOfferItemsModel|null findById($id, $opt=array())
- * @method static iao\iaoOfferItemsModel|null findByIdOrAlias($val, $opt=array())
- * @method static iao\iaoOfferItemsModel|null findByPk($id, $opt=array())
- * @method static iao\iaoOfferItemsModel|null findOneBy($col, $val, $opt=array())
- * @method static iao\iaoOfferItemsModel|null findOneByTstamp($val, $opt=array())
- * @method static iao\iaoOfferItemsModel|null findOneByTitle($val, $opt=array())
+ * @method static iaoOfferItemsModel|null findById($id, $opt=array())
+ * @method static iaoOfferItemsModel|null findByIdOrAlias($val, $opt=array())
+ * @method static iaoOfferItemsModel|null findByPk($id, $opt=array())
+ * @method static iaoOfferItemsModel|null findOneBy($col, $val, $opt=array())
+ * @method static iaoOfferItemsModel|null findOneByTstamp($val, $opt=array())
+ * @method static iaoOfferItemsModel|null findOneByTitle($val, $opt=array())
 
  *
- * @method static \Model\Collection|iao\iaoOfferItemsModel[]|iao\iaoOfferItemsModel|null findByTstamp($val, $opt=array())
- * @method static \Model\Collection|iao\iaoOfferItemsModel[]|iao\iaoOfferItemsModel|null findByTitle($val, $opt=array())
- * @method static \Model\Collection|iao\iaoOfferItemsModel[]|iao\iaoOfferItemsModel|null findBy($col, $val, $opt=array())
- * @method static \Model\Collection|iao\iaoOfferItemsModel[]|iao\iaoOfferItemsModel|null findAll($opt=array())
+ * @method static \Model\Collection|iaoOfferItemsModel[]|iaoOfferItemsModel|null findByTstamp($val, $opt=array())
+ * @method static \Model\Collection|iaoOfferItemsModel[]|iaoOfferItemsModel|null findByTitle($val, $opt=array())
+ * @method static \Model\Collection|iaoOfferItemsModel[]|iaoOfferItemsModel|null findBy($col, $val, $opt=array())
+ * @method static \Model\Collection|iaoOfferItemsModel[]|iaoOfferItemsModel|null findAll($opt=array())
  *
  * @method static integer countById($id, $opt=array())
  *

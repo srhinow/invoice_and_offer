@@ -11,17 +11,17 @@ namespace iao;
  * @property integer $tstamp
  * @property string  $title
  *
- * @method static iao\IaoOfferModel|null findById($id, $opt=array())
- * @method static iao\IaoOfferModel|null findByIdOrAlias($val, $opt=array())
- * @method static iao\IaoOfferModel|null findOneBy($col, $val, $opt=array())
- * @method static iao\IaoOfferModel|null findOneByTstamp($val, $opt=array())
- * @method static iao\IaoOfferModel|null findOneByTitle($val, $opt=array())
+ * @method static IaoOfferModel|null findById($id, $opt=array())
+ * @method static IaoOfferModel|null findByIdOrAlias($val, $opt=array())
+ * @method static IaoOfferModel|null findOneBy($col, $val, $opt=array())
+ * @method static IaoOfferModel|null findOneByTstamp($val, $opt=array())
+ * @method static IaoOfferModel|null findOneByTitle($val, $opt=array())
 
  *
- * @method static \Model\Collection|iao\IaoOfferModel[]|iao\IaoOfferModel|null findByTstamp($val, $opt=array())
- * @method static \Model\Collection|iao\IaoOfferModel[]|iao\IaoOfferModel|null findByTitle($val, $opt=array())
- * @method static \Model\Collection|iao\IaoOfferModel[]|iao\IaoOfferModel|null findBy($col, $val, $opt=array())
- * @method static \Model\Collection|iao\IaoOfferModel[]|iao\IaoOfferModel|null findAll($opt=array())
+ * @method static \Model\Collection|IaoOfferModel[]|IaoOfferModel|null findByTstamp($val, $opt=array())
+ * @method static \Model\Collection|IaoOfferModel[]|IaoOfferModel|null findByTitle($val, $opt=array())
+ * @method static \Model\Collection|IaoOfferModel[]|IaoOfferModel|null findBy($col, $val, $opt=array())
+ * @method static \Model\Collection|IaoOfferModel[]|IaoOfferModel|null findAll($opt=array())
  *
  * @method static integer countById($id, $opt=array())
  *
@@ -46,7 +46,7 @@ class IaoOfferModel extends \Model
 	 * @param integer $intOffset   	An optional offset
 	 * @param array   $arrOptions  	An optional options array
 	 *
-	 * @return \Model\Collection|iao\iaoInvoiceModel[]|iao\iaoInvoiceModel|null A collection of models or null if there are no news
+	 * @return iaoInvoiceModel[]|iaoInvoiceModel|null A collection of models or null if there are no news
 	 */
 	public static function findOnePublishedByMember($id, $memberId, array $arrOptions=array())
 	{
@@ -78,7 +78,7 @@ class IaoOfferModel extends \Model
 	 * @param integer $intOffset   	An optional offset
 	 * @param array   $arrOptions  	An optional options array
 	 *
-	 * @return \Model\Collection|iao\iaoInvoiceModel[]|iao\iaoInvoiceModel|null A collection of models or null if there are no news
+	 * @return iaoInvoiceModel[]|iaoInvoiceModel|null A collection of models or null if there are no news
 	 */
 	public static function findPublishedByMember($memberId, $status='', $intLimit=0, $intOffset=0, array $arrOptions=array())
 	{
@@ -198,9 +198,9 @@ class IaoOfferModel extends \Model
 	 *
 	 * @return integer The number of news items
 	 */
-	public static function countPublishedByPid($arrPids, $status='', array $arrOptions=array())
+	public static function countPublishedByPid($pid, $status='', array $arrOptions=array())
 	{
-		if (empty($arrPids))
+		if (empty($pid))
 		{
 			return null;
 		}

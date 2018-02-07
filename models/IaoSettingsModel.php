@@ -11,17 +11,17 @@ namespace iao;
  * @property integer $tstamp
  * @property string  $title
  *
- * @method static iao\iaoSettingsModel|null findById($id, $opt=array())
- * @method static iao\iaoSettingsModel|null findByIdOrAlias($val, $opt=array())
- * @method static iao\iaoSettingsModel|null findOneBy($col, $val, $opt=array())
- * @method static iao\iaoSettingsModel|null findOneByTstamp($val, $opt=array())
- * @method static iao\iaoSettingsModel|null findOneByTitle($val, $opt=array())
+ * @method static iaoSettingsModel|null findById($id, $opt=array())
+ * @method static iaoSettingsModel|null findByIdOrAlias($val, $opt=array())
+ * @method static iaoSettingsModel|null findOneBy($col, $val, $opt=array())
+ * @method static iaoSettingsModel|null findOneByTstamp($val, $opt=array())
+ * @method static iaoSettingsModel|null findOneByTitle($val, $opt=array())
 
  *
- * @method static \Model\Collection|iao\iaoSettingsModel[]|iao\iaoSettingsModel|null findByTstamp($val, $opt=array())
- * @method static \Model\Collection|iao\iaoSettingsModel[]|iao\iaoSettingsModel|null findByTitle($val, $opt=array())
- * @method static \Model\Collection|iao\iaoSettingsModel[]|iao\iaoSettingsModel|null findBy($col, $val, $opt=array())
- * @method static \Model\Collection|iao\iaoSettingsModel[]|iao\iaoSettingsModel|null findAll($opt=array())
+ * @method static \Model\Collection|iaoSettingsModel[]|iaoSettingsModel|null findByTstamp($val, $opt=array())
+ * @method static \Model\Collection|iaoSettingsModel[]|iaoSettingsModel|null findByTitle($val, $opt=array())
+ * @method static \Model\Collection|iaoSettingsModel[]|iaoSettingsModel|null findBy($col, $val, $opt=array())
+ * @method static \Model\Collection|iaoSettingsModel[]|iaoSettingsModel|null findAll($opt=array())
  *
  * @method static integer countById($id, $opt=array())
  *
