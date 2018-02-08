@@ -14,17 +14,11 @@
 namespace iao;
 
 // Include library
-require_once(TL_ROOT . '/system/config/tcpdf.php');
-if(version_compare(VERSION.BUILD, '3.0.0','>='))
-{
-     require_once TL_ROOT . '/system/modules/core/vendor/tcpdf/tcpdf.php';
-     require_once(TL_ROOT . '/assets/fpdi/fpdi.php'); // FPDI plugin
-}else{	
-     require_once(TL_ROOT . '/plugins/tcpdf/tcpdf.php');
-     require_once(TL_ROOT . '/plugins/fpdi/fpdi.php'); // FPDI plugin
-}
+use setasign\Fpdi\TcpdfFpdi;
 
-class iaoPDF extends \FPDI
+require_once(TL_ROOT . '/system/config/tcpdf.php');
+
+class iaoPDF extends TcpdfFpdi
 {
 
 	/**
