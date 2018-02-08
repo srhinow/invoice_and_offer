@@ -1098,7 +1098,8 @@ class tl_iao_invoice extends \iao\iaoBackend
 			$this->redirect('contao/main.php?act=error');
 		}
 
-		$this->createInitialVersion('tl_iao_invoice', $intId);
+		$objVersions = new \Versions('tl_iao_invoice', $intId);
+        $objVersions->initialize();
 
 		// Trigger the save_callback
 		if (is_array($GLOBALS['TL_DCA']['tl_iao_invoice']['fields']['status']['save_callback']))
@@ -1114,7 +1115,7 @@ class tl_iao_invoice extends \iao\iaoBackend
 		$this->Database->prepare("UPDATE tl_iao_invoice SET status='" . ($blnVisible==1 ? '1' : '2') . "' WHERE id=?")
 					   ->execute($intId);
 
-		$this->createNewVersion('tl_iao_invoice', $intId);
+        $objVersions->create();
 	}
 
 	public function updateStatus($varValue, DataContainer $dc)
