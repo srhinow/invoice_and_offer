@@ -18,7 +18,7 @@
 /**
  * Back end modules
  */
- $GLOBALS['TL_LANG']['MOD']['iao']  = 'Rechnungen & Angebote';
+ $GLOBALS['TL_LANG']['MOD']['iao']  = 'kleines Büro';
  $GLOBALS['TL_LANG']['MOD']['iao_projects']	= array('Projekte', 'Verwalten Sie hier Ihre Projekte.');
  $GLOBALS['TL_LANG']['MOD']['iao_offer']	= array('alle Angebote', 'Verwalten Sie hier Ihre Angebote.');
  $GLOBALS['TL_LANG']['MOD']['iao_invoice']	= array('alle Rechnungen', 'Verwalten Sie hier Ihre Rechnungen.');
