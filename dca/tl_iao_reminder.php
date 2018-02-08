@@ -440,16 +440,14 @@ class tl_iao_reminder extends \iao\iaoBackend
 	public function getInvoices(DataContainer $dc)
 	{
 		$settings = $this->getSettings($dc->activeRecord->setting_id);
-
-		$varValue= array();
-		$this->import('String');
+        $varValue= array();
 
 		$all = $this->Database->prepare('SELECT `i`.*, `m`.`company` FROM `tl_iao_invoice` as `i` LEFT JOIN `tl_member` as `m` ON `i`.`member` = `m`.`id` ORDER BY `invoice_id_str` DESC')
 								->execute();
 
 		while($all->next())
 		{
-			$varValue[$all->id] = $all->invoice_id_str.' :: '.$this->String->substr($all->title,20).' ('.number_format($all->price_brutto,2,',','.').' '.$settings['currency_symbol'].')';
+			$varValue[$all->id] = $all->invoice_id_str.' :: '.StringUtil::substr($all->title,20).' ('.number_format($all->price_brutto,2,',','.').' '.$settings['currency_symbol'].')';
 		}
 
 		return $varValue;
