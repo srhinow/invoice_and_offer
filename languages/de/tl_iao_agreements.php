@@ -22,7 +22,7 @@ $GLOBALS['TL_LANG']['tl_iao_agreements']['title'] = array('Bezeichnung','Bezeich
 $GLOBALS['TL_LANG']['tl_iao_agreements']['agreement_pdf_file'] = array('Vertrag','Vertrag als PDF-Datei zuweisen.');
 $GLOBALS['TL_LANG']['tl_iao_agreements']['member'] = array('Kunde','Adresse aus gespeicherten Kunden in nachstehendes Feld befüllen');
 $GLOBALS['TL_LANG']['tl_iao_agreements']['address_text'] = array('Mahnungs-Adresse','Adresse die in der Mahnungs-PDF-Datei geschrieben wird.');
-$GLOBALS['TL_LANG']['tl_iao_agreements']['published'] = array('veröffnentlicht/ versendet.','');
+$GLOBALS['TL_LANG']['tl_iao_agreements']['published'] = array('veröffentlicht','');
 $GLOBALS['TL_LANG']['tl_iao_agreements']['status'] = array('Status dieses Vertrages','');
 $GLOBALS['TL_LANG']['tl_iao_agreements']['periode'] = array('Periode','geben Sie die Periode in Form von strtotime ein z.B. +1 year = 1 Jahr weiter, +2 months = weitere 2 Monate');
 $GLOBALS['TL_LANG']['tl_iao_agreements']['agreement_date'] = array('Vertrag seit','');
