@@ -447,7 +447,6 @@ class tl_iao_agreements extends \iao\iaoBackend
     {
         parent::__construct();
         $this->import('BackendUser', 'User');
-        $this->import('iao');
     }
 
 	/**
@@ -501,7 +500,7 @@ class tl_iao_agreements extends \iao\iaoBackend
 	 * fill date-Field if this empty
 	 * @param mixed
 	 * @param object
-	 * @return date
+	 * @return string
 	 */
 	public function  getPeriodeValue($varValue, DataContainer $dc)
 	{
@@ -560,7 +559,7 @@ class tl_iao_agreements extends \iao\iaoBackend
 	 */
     public function addInvoice($row, $href, $label, $title, $icon)
     {
-		if (!$this->User->isAdmin)
+        if (!$this->User->isAdmin)
 		{
 			return '';
 		}
@@ -569,6 +568,8 @@ class tl_iao_agreements extends \iao\iaoBackend
 		{
 			$beforeTemplObj = $this->getTemplateObject('tl_iao_templates',$row['before_template']);
 			$afterTemplObj = $this->getTemplateObject('tl_iao_templates',$row['after_template']);
+            $invoiceId = $this->generateInvoiceNumber(0,$this->settings);
+            $invoiceIdStr = $this->generateInvoiceNumberStr($invoiceId, time(), $this->settings);
 
 			//Insert Invoice-Entry
 			$set = array
@@ -576,6 +577,8 @@ class tl_iao_agreements extends \iao\iaoBackend
 				'pid' => $row['pid'],
 				'tstamp' => time(),
 				'invoice_tstamp' => time(),
+				'invoice_id' => $invoiceId,
+				'invoice_id_str' => $invoiceIdStr,
 				'title' => $row['title'],
 				'address_text' => $row['address_text'],
 				'member' => $row['member'],
@@ -593,10 +596,10 @@ class tl_iao_agreements extends \iao\iaoBackend
 							->set($set)
 							->execute();
 
-			$newInvoiceID = $result->insertId;
+			$newInvoiceID = (int) $result->insertId;
 
 			//Insert Postions for this Entry
-			if($newInvoiceID)
+			if($newInvoiceID > 0)
 			{
 				//Posten-Template holen
 				$postenTemplObj = $this->getTemplateObject('tl_iao_templates_items',$row['posten_template']);
@@ -608,6 +611,7 @@ class tl_iao_agreements extends \iao\iaoBackend
 					$time = $postenTemplObj->time;
 					$text = $this->changeIAOTags($postenTemplObj->text,'',$row['id']);
 				}
+
 				//Insert Invoice-Entry
 				$postenset = array
 				(
@@ -676,7 +680,7 @@ class tl_iao_agreements extends \iao\iaoBackend
 
 	    $nettoSum = round($Netto,2) * $dc->activeRecord->count;
 	    $bruttoSum = round($Brutto,2) * $dc->activeRecord->count;
-	    
+
 		$this->Database->prepare('UPDATE `tl_iao_agreements` SET `price_netto`=?, `price_brutto`=? WHERE `id`=?')
 			->limit(1)
 			->execute($nettoSum, $bruttoSum, $dc->id);
@@ -791,7 +795,7 @@ class tl_iao_agreements extends \iao\iaoBackend
 	public function getEndDateValue($varValue, DataContainer $dc)
 	{
 		if($varValue != '') return $varValue;
-		
+
 		$agreement_date = ($dc->activeRecord->agreement_date) ? $dc->activeRecord->agreement_date : time() ;
 		$beginn_date = ($dc->activeRecord->beginn_date) ? $dc->activeRecord->beginn_date : $agreement_date;
 		$periode = ($dc->activeRecord->periode) ? $dc->activeRecord->periode : $GLOBALS['IAO']['default_agreement_cycle'];

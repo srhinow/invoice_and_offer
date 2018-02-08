@@ -4,6 +4,8 @@
  */
 namespace iao;
 
+use Contao\Database as DB;
+
 /**
  *
  * @copyright  Sven Rhinow 2011-2017
@@ -28,11 +30,11 @@ class iao extends \Backend
     {
         if($id)
         {
-            $dbObj = $this->Database->prepare('SELECT * FROM `tl_iao_settings` WHERE `id`=?')
+            $dbObj = DB::getInstance()->prepare('SELECT * FROM `tl_iao_settings` WHERE `id`=?')
                 ->limit(1)
                 ->execute($id);
         } else {
-            $dbObj = $this->Database->prepare('SELECT * FROM `tl_iao_settings` WHERE `fallback`=?')
+            $dbObj = DB::getInstance()->prepare('SELECT * FROM `tl_iao_settings` WHERE `fallback`=?')
                 ->limit(1)
                 ->execute(1);
         }
@@ -45,7 +47,7 @@ class iao extends \Backend
      * @param integer
      * @return float
      */
-    public function getNettoPrice($brutto,$vat)
+    public function getNettoPrice($brutto, $vat)
     {
         return ($brutto * 100) / ($vat + 100);
     }
@@ -84,9 +86,9 @@ class iao extends \Backend
 
     /**
      * replace ##-Placeholder
-     * @param string
-     * @param object
-     * @return text
+     * @param $text string
+     * @param $dcObj object
+     * @return $text string
      */
     public function replacePlaceholder($text,$dcObj)
     {
@@ -120,13 +122,13 @@ class iao extends \Backend
     /**
      * replace Insert-Tags from IAO - DB-Tables
      *
-     * @param string
-     * return
+     * @param $strBuffer string
+     * @param $sector string
+     * @param $id integer
+     * return string
      */
     public function changeIAOTags($strBuffer,$sector,$id)
     {
-        $this->import('Database');
-
         $tags = preg_split('/\{\{([^\}]+)\}\}/', $strBuffer, -1, PREG_SPLIT_DELIM_CAPTURE);
         $strBuffer = '';
         $arrCache = array();
@@ -149,6 +151,7 @@ class iao extends \Backend
                 continue;
             }
 
+
             $parts = trimsplit('::', $strTag);
             $parts[0] = strip_tags($parts[0]);
             $parts[1] = strip_tags($parts[1]);
@@ -165,40 +168,40 @@ class iao extends \Backend
                     switch(strtolower($sector))
                     {
                         case 'invoice':
-                            $this->infoObj = $this->Database->prepare('SELECT `m`.* FROM `tl_member` `m` LEFT JOIN `tl_iao_invoice` `i` ON `m`.`id` = `i`.`member` WHERE `i`.`id`=?')
+                            $objInfo = DB::getInstance()->prepare('SELECT `m`.* FROM `tl_member` `m` LEFT JOIN `tl_iao_invoice` `i` ON `m`.`id` = `i`.`member` WHERE `i`.`id`=?')
                                 ->limit(1)
                                 ->execute($id);
 
-                            $this->infoObj->gender = ($this->infoObj->gender == 'male') ? $GLOBALS['TL_LANG']['tl_iao']['salution']['male'] : $GLOBALS['TL_LANG']['tl_iao']['salution']['female'];
-
-                            $arrCache[$strTag] = $this->infoObj->$parts[1];
+                            $objInfo->gender = ($objInfo->gender == 'male') ? $GLOBALS['TL_LANG']['tl_iao']['salution']['male'] : $GLOBALS['TL_LANG']['tl_iao']['salution']['female'];
+                            $arrCache[$strTag] = $objInfo->{$parts[1]};
                             break;
+
                         case 'offer':
-                            $this->infoObj = $this->Database->prepare('SELECT `m`.* FROM `tl_member` `m` LEFT JOIN `tl_iao_offer` `o` ON `m`.`id` = `o`.`member` WHERE `o`.`id`=?')
+                            $objInfo = DB::getInstance()->prepare('SELECT `m`.* FROM `tl_member` `m` LEFT JOIN `tl_iao_offer` `o` ON `m`.`id` = `o`.`member` WHERE `o`.`id`=?')
                                 ->limit(1)
                                 ->execute($id);
 
-                            $this->infoObj->gender = ($this->infoObj->gender == 'male') ? $GLOBALS['TL_LANG']['tl_iao']['salution']['male'] : $GLOBALS['TL_LANG']['tl_iao']['salution']['female'];
-
-                            $arrCache[$strTag] = $this->infoObj->$parts[1];
+                            $objInfo->gender = ($objInfo->gender == 'male') ? $GLOBALS['TL_LANG']['tl_iao']['salution']['male'] : $GLOBALS['TL_LANG']['tl_iao']['salution']['female'];
+                            $arrCache[$strTag] = $objInfo->{$parts[1]};
                             break;
+
                         case 'credit':
-                            $this->infoObj = $this->Database->prepare('SELECT `m`.* FROM `tl_member` `m` LEFT JOIN `tl_iao_credit` `c` ON `m`.`id` = `c`.`member` WHERE `c`.`id`=?')
+                            $objInfo = DB::getInstance()->prepare('SELECT `m`.* FROM `tl_member` `m` LEFT JOIN `tl_iao_credit` `c` ON `m`.`id` = `c`.`member` WHERE `c`.`id`=?')
                                 ->limit(1)
                                 ->execute($id);
 
-                            $this->infoObj->gender = ($this->infoObj->gender == 'male') ? $GLOBALS['TL_LANG']['tl_iao']['salution']['male'] : $GLOBALS['TL_LANG']['tl_iao']['salution']['female'];
-
-                            $arrCache[$strTag] = $this->infoObj->$parts[1];
-
+                            $objInfo->gender = ($objInfo->gender == 'male') ? $GLOBALS['TL_LANG']['tl_iao']['salution']['male'] : $GLOBALS['TL_LANG']['tl_iao']['salution']['female'];
+                            $arrCache[$strTag] = $objInfo->{$parts[1]};
                             break;
+
                         case 'reminder':
-                            $this->infoObj = $this->Database->prepare('SELECT `m`.* FROM `tl_member` `m` LEFT JOIN `tl_iao_reminder` `r` ON `m`.`id` = `r`.`member` WHERE `r`.`id`=?')
+                            $objInfo = DB::getInstance()->prepare('SELECT `m`.* FROM `tl_member` `m` LEFT JOIN `tl_iao_reminder` `r` ON `m`.`id` = `r`.`member` WHERE `r`.`id`=?')
                                 ->limit(1)
                                 ->execute($id);
 
-                            $this->infoObj->gender = ($this->infoObj->gender == 'male') ? $GLOBALS['TL_LANG']['tl_iao']['salution']['male'] : $GLOBALS['TL_LANG']['tl_iao']['salution']['female'];
-                            $arrCache[$strTag] = $this->infoObj->$parts[1];
+                            $objInfo->gender = ($objInfo->gender == 'male') ? $GLOBALS['TL_LANG']['tl_iao']['salution']['male'] : $GLOBALS['TL_LANG']['tl_iao']['salution']['female'];
+
+                            $arrCache[$strTag] = $objInfo->{$parts[1]};
                             break;
                     }
                     break;
@@ -208,33 +211,35 @@ class iao extends \Backend
                     switch(strtolower($sector))
                     {
                         case 'invoice':
-                            $this->infoObj = $this->Database->prepare('SELECT `i`.* FROM `tl_iao_invoice` `i`  WHERE `i`.`id`=?')
+                            $objInfo = DB::getInstance()->prepare('SELECT `i`.* FROM `tl_iao_invoice` `i`  WHERE `i`.`id`=?')
                                 ->limit(1)
                                 ->execute($id);
 
-                            $this->infoObj->expiry_date = date($GLOBALS['TL_CONFIG']['dateFormat'],$this->infoObj->expiry_date);
-                            $this->infoObj->brutto = $this->getPriceStr($this->infoObj->price_brutto);
-                            $this->infoObj->netto = $this->getPriceStr($this->infoObj->price_netto);
+                            $objInfo->expiry_date = date($GLOBALS['TL_CONFIG']['dateFormat'],$objInfo->expiry_date);
+                            $objInfo->brutto = $this->getPriceStr($objInfo->price_brutto);
+                            $objInfo->netto = $this->getPriceStr($objInfo->price_netto);
 
-                            $arrCache[$strTag] = $this->infoObj->$parts[1];
+                            $arrCache[$strTag] = $objInfo->{$parts[1]};
                             break;
+
                         case 'reminder':
-                            $this->infoObj = $this->Database->prepare('SELECT `i`.* FROM `tl_iao_invoice` `i` LEFT JOIN `tl_iao_reminder` `r` ON `i`.`id` = `r`.`invoice_id` WHERE `r`.`id`=?')
+                            $objInfo = DB::getInstance()->prepare('SELECT `i`.* FROM `tl_iao_invoice` `i` LEFT JOIN `tl_iao_reminder` `r` ON `i`.`id` = `r`.`invoice_id` WHERE `r`.`id`=?')
                                 ->limit(1)
                                 ->execute($id);
 
-                            $this->infoObj->expiry_date = date($GLOBALS['TL_CONFIG']['dateFormat'],$this->infoObj->expiry_date);
-                            $this->infoObj->brutto = $this->getPriceStr($this->infoObj->price_brutto);
-                            $this->infoObj->netto = $this->getPriceStr($this->infoObj->price_netto);
+                            $objInfo->expiry_date = date($GLOBALS['TL_CONFIG']['dateFormat'],$objInfo->expiry_date);
+                            $objInfo->brutto = $this->getPriceStr($objInfo->price_brutto);
+                            $objInfo->netto = $this->getPriceStr($objInfo->price_netto);
 
-                            $arrCache[$strTag] = $this->infoObj->$parts[1];
+                            $arrCache[$strTag] = $objInfo->{$parts[1]};
                             break;
+
                         case 'project':
-                            $this->infoObj = $this->Database->prepare('SELECT `p`.* FROM `tl_iao_invoice` `i` LEFT JOIN `tl_iao_projects` `p` ON `p`.`id` = `i`.`pid` WHERE `i`.`id`=?')
+                            $objInfo = DB::getInstance()->prepare('SELECT `p`.* FROM `tl_iao_invoice` `i` LEFT JOIN `tl_iao_projects` `p` ON `p`.`id` = `i`.`pid` WHERE `i`.`id`=?')
                                 ->limit(1)
                                 ->execute($id);
 
-                            $arrCache[$strTag] = $this->infoObj->$parts[1];
+                            $arrCache[$strTag] = $objInfo->{$parts[1]};
                             break;
                     }
                     break;
@@ -244,20 +249,18 @@ class iao extends \Backend
                     switch(strtolower($sector))
                     {
                         case 'reminder':
-                            $this->infoObj = $this->Database->prepare('SELECT `r`.* FROM `tl_iao_reminder` `r`  WHERE `r`.`id`=?')
+                            $objInfo = DB::getInstance()->prepare('SELECT `r`.* FROM `tl_iao_reminder` `r`  WHERE `r`.`id`=?')
                                 ->limit(1)
                                 ->execute($id);
 
-                            $this->infoObj->periode_date = date($GLOBALS['TL_CONFIG']['dateFormat'],$this->infoObj->periode_date);
-                            $step = !strlen($this->infoObj->step) ? 1 : $this->infoObj->step;
+                            $objInfo->periode_date = date($GLOBALS['TL_CONFIG']['dateFormat'],$objInfo->periode_date);
+                            $objInfo->step = !strlen($objInfo->step) ? 1 : $objInfo->step;
+                            $objInfo->postageStr = (((int)($objInfo->postage) <= 0)) ? '' : $this->getPriceStr($objInfo->postage);
+                            $objInfo->taxStr = ((int)($objInfo->tax) > 0) ? $objInfo->tax.'%' : '';
+                            $objInfo->sum = $this->getReminderSum($id);
+                            $objInfo->sumStr = $this->getPriceStr($objInfo->sum);
 
-                            $this->infoObj->postageStr = (((int)($this->infoObj->postage) <= 0)) ? '' : $this->getPriceStr($this->infoObj->postage);
-                            $this->infoObj->taxStr = ((int)($this->infoObj->tax) > 0) ? $this->infoObj->tax.'%' : '';
-
-                            $this->infoObj->sum = $this->getReminderSum($id);
-                            $this->infoObj->sumStr = $this->getPriceStr($this->infoObj->sum);
-
-                            $arrCache[$strTag] = $this->infoObj->$parts[1];
+                            $arrCache[$strTag] = $objInfo->{$parts[1]};
                             break;
                     }
                     break;
@@ -266,30 +269,33 @@ class iao extends \Backend
                     switch(strtolower($sector))
                     {
                         case 'credit':
-                            $this->infoObj = $this->Database->prepare('SELECT `tl_iao_credit`.* FROM `tl_iao_credit` `c`  WHERE `c`.`id`=?')
+                            $objInfo = DB::getInstance()->prepare('SELECT `tl_iao_credit`.* FROM `tl_iao_credit` `c`  WHERE `c`.`id`=?')
                                 ->limit(1)
                                 ->execute($id);
-                            $arrCache[$strTag] = $this->infoObj->$parts[1];
+
+                            $arrCache[$strTag] = $objInfo->{$parts[1]};
                             break;
                     }
                     break;
+
                 case 'project':
-                    $this->infoObj = $this->Database->prepare('SELECT * FROM `tl_iao_projects` WHERE `id`=?')
+                    $objInfo = DB::getInstance()->prepare('SELECT * FROM `tl_iao_projects` WHERE `id`=?')
                         ->limit(1)
                         ->execute($id);
 
-                    $arrCache[$strTag] = $this->infoObj->$parts[1];
-
+                    $arrCache[$strTag] = $objInfo->{$parts[1]};
                     break;
+
                 case 'agreement':
-                    $this->infoObj = $this->Database->prepare('SELECT * FROM `tl_iao_agreements` WHERE `id`=?')
+
+                    $objInfo = DB::getInstance()->prepare('SELECT * FROM `tl_iao_agreements` WHERE `id`=?')
                         ->limit(1)
                         ->execute($id);
 
-                    if($parts[2] == 'date_format') $arrCache[$strTag] = date( $GLOBALS['TL_CONFIG']['dateFormat'], $this->infoObj->$parts[1]);
-                    else $arrCache[$strTag] = $this->infoObj->$parts[1];
-
+                    if($parts[2] == 'date_format') $arrCache[$strTag] = date( $GLOBALS['TL_CONFIG']['dateFormat'], $objInfo->{$parts[1]});
+                    else $arrCache[$strTag] = $objInfo->{$parts[1]};
                     break;
+
                 case 'iao':
                     switch(strtolower($parts[1]))
                     {
@@ -309,7 +315,7 @@ class iao extends \Backend
         if((int) $id > 0 && strlen($table) > 0)
         {
             //Posten-Template holen
-            return $this->Database->prepare('SELECT * FROM '.$table.' WHERE id=?')
+            return DB::getInstance()->prepare('SELECT * FROM '.$table.' WHERE id=?')
                 ->limit(1)
                 ->execute($id);
         }
@@ -326,7 +332,7 @@ class iao extends \Backend
         //wenn type oder id fehlen abbrechen
         if((int) $id < 1 || strlen($type) < 1) return;
 
-        $dataObj = $this->Database->prepare('SELECT * FROM `tl_iao_'.$type.'` WHERE `id`=?')->limit(1)->execute($id);
+        $dataObj = DB::getInstance()->prepare('SELECT * FROM `tl_iao_'.$type.'` WHERE `id`=?')->limit(1)->execute($id);
         if($dataObj->numRows < 1) return;
         $row = $dataObj->row();
 

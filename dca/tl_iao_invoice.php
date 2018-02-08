@@ -617,7 +617,7 @@ class tl_iao_invoice extends \iao\iaoBackend
 		$settingId = ($objProject !== null && $objProject->setting_id != 0) ? $objProject->setting_id : 1;
 		$settings = $this->getSettings($settingId);
 		$invoiceId = $this->generateInvoiceNumber(0, $settings);
-		$invoiceIdStr = $this->generateInvoiceNumberStr('', $invoiceId, time(), $settings);
+		$invoiceIdStr = $this->generateInvoiceNumberStr($invoiceId, time(), $settings);
 		$set = array
 		(
 			'invoice_id' => $invoiceId,
@@ -947,28 +947,7 @@ class tl_iao_invoice extends \iao\iaoBackend
 		$settings = $this->getSettings($dc->activeRecord->setting_id);
 		$tstamp = ($dc->activeRecord->date) ?: time();
 
-		return $this->generateInvoiceNumberStr($varValue, $dc->activeRecord->invoice_id, $tstamp, $settings);
-	}
-
-	/**
-	 * generate a Invoice-number-string if not set
-	 * @param string
-	 * @param integer
-	 * @param integer
-	 * @param array
-	 * @return string
-	 */
-	public function generateInvoiceNumberStr($varValue, $invoiceId, $tstamp, $settings)
-	{
-
-		if(strlen($varValue) < 1)
-		{
-			$format = $settings['iao_invoice_number_format'];
-			$format =  str_replace('{date}',date('Ymd',$tstamp),$format);
-			$format =  str_replace('{nr}',$invoiceId, $format);
-			$varValue = $format;
-		}
-		return $varValue;
+		return (strlen($varValue)>0)? $varValue : $this->generateInvoiceNumberStr($dc->activeRecord->invoice_id, $tstamp, $settings);
 	}
 
 	/**
@@ -981,48 +960,6 @@ class tl_iao_invoice extends \iao\iaoBackend
 	{
 		$settings = $this->getSettings($dc->activeRecord->setting_id);
 		return $this->generateInvoiceNumber($varValue, $settings);
-	}
-	
-	/**
-	 * generate a invoice-number if not set
-	 * @param integer
-	 * @param array
-	 * @return string
-	 */
-	public function generateInvoiceNumber($varValue, $settings)
-	{
-		$autoNr = false;
-		$varValue = (int) $varValue;
-
-		// Generate invoice_id if there is none
-		if($varValue == 0)
-		{
-			$autoNr = true;
-			$objNr = $this->Database->prepare("SELECT `invoice_id` FROM `tl_iao_invoice` ORDER BY `invoice_id` DESC")
-									->limit(1)
-									->execute();
-
-			if($objNr->numRows < 1 || $objNr->invoice_id == 0)  $varValue = $settings['iao_invoice_startnumber'];
-			else  $varValue =  $objNr->invoice_id +1;
-	    }
-	    else
-	    {
-			$objNr = $this->Database->prepare("SELECT `invoice_id` FROM `tl_iao_invoice` WHERE `id`=? OR `invoice_id`=?")
-									->limit(1)
-									->execute(\Input::get('id'), $varValue);
-
-			// Check whether the InvoiceNumber exists
-			if ($objNr->numRows > 1 )
-			{
-				if (!$autoNr)
-				{
-					throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'], $varValue));
-				}
-
-				$varValue .= '-' . \Input::get('id');
-			}
-		}
-	    return $varValue;
 	}
 
     /**
