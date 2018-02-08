@@ -17,32 +17,32 @@
 
 
 $GLOBALS['TL_LANG']['tl_iao_agreements']['setting_id']	=	array('Konfiguration','');
-$GLOBALS['TL_LANG']['tl_iao_agreements']['pid']	=	array('Projekt','das entsprechende Projekt auswählen.');
+$GLOBALS['TL_LANG']['tl_iao_agreements']['pid']	=	array('Projekt','Optional können sie hier das entsprechende Projekt auswählen.');
 $GLOBALS['TL_LANG']['tl_iao_agreements']['title'] = array('Bezeichnung','Bezeichnung des Elementes');
 $GLOBALS['TL_LANG']['tl_iao_agreements']['agreement_pdf_file'] = array('Vertrag','Vertrag als PDF-Datei zuweisen.');
 $GLOBALS['TL_LANG']['tl_iao_agreements']['member'] = array('Kunde','Adresse aus gespeicherten Kunden in nachstehendes Feld befüllen');
 $GLOBALS['TL_LANG']['tl_iao_agreements']['address_text'] = array('Mahnungs-Adresse','Adresse die in der Mahnungs-PDF-Datei geschrieben wird.');
 $GLOBALS['TL_LANG']['tl_iao_agreements']['published'] = array('veröffentlicht','');
 $GLOBALS['TL_LANG']['tl_iao_agreements']['status'] = array('Status dieses Vertrages','');
-$GLOBALS['TL_LANG']['tl_iao_agreements']['periode'] = array('Periode','geben Sie die Periode in Form von strtotime ein z.B. +1 year = 1 Jahr weiter, +2 months = weitere 2 Monate');
+$GLOBALS['TL_LANG']['tl_iao_agreements']['periode'] = array('Periode','Geben Sie die Periode in Form von strtotime ein z.B. +1 year = 1 Jahr weiter, +2 months = weitere 2 Monate');
 $GLOBALS['TL_LANG']['tl_iao_agreements']['agreement_date'] = array('Vertrag seit','');
 $GLOBALS['TL_LANG']['tl_iao_agreements']['beginn_date'] = array('Zyklusbeginn','');
 $GLOBALS['TL_LANG']['tl_iao_agreements']['end_date'] = array('Zyklusende','');
 $GLOBALS['TL_LANG']['tl_iao_agreements']['terminated_date'] = array('gekündigt zum','');
 $GLOBALS['TL_LANG']['tl_iao_agreements']['new_generate'] = array('den neuen Zyklus setzen','');
 $GLOBALS['TL_LANG']['tl_iao_agreements']['sendEmail'] = array('Email-Erinnerung einrichten','');
-$GLOBALS['TL_LANG']['tl_iao_agreements']['remind_before'] = array('erinnern vor Ablauf des Vertrags-Zyklus','Die Angaben im strtotime-Format z.B. -3 weeks');
-$GLOBALS['TL_LANG']['tl_iao_agreements']['email_from'] = array('Email-Sender','');
-$GLOBALS['TL_LANG']['tl_iao_agreements']['email_to'] = array('Email-Empfänger','');
+$GLOBALS['TL_LANG']['tl_iao_agreements']['remind_before'] = array('erinnern vor Ablauf des Vertrags-Zyklus','Die Angaben müssen im strtotime-Format (z.B. -3 weeks) gesetzt werden.');
+$GLOBALS['TL_LANG']['tl_iao_agreements']['email_from'] = array('Email-Sender','Die Absendeadresse sollte hier zur Domain gehören, sonst kann es sein das der Server diese Email nicht sendet.');
+$GLOBALS['TL_LANG']['tl_iao_agreements']['email_to'] = array('Email-Empfänger','Die Emailadresse, zur der die Erinnerung das eine Vertragsperiode endet, gesendet werden soll.');
 $GLOBALS['TL_LANG']['tl_iao_agreements']['email_subject'] = array('Email-Betreff','');
 $GLOBALS['TL_LANG']['tl_iao_agreements']['email_text'] = array('Email-Text','');
 $GLOBALS['TL_LANG']['tl_iao_agreements']['before_template'] = array('Text vor den Posten','Eine Auswahl an Rechnungsvorlagen');
 $GLOBALS['TL_LANG']['tl_iao_agreements']['after_template'] = array('Text nach den Posten','Eine Auswahl an Rechnungsvorlagen');
 $GLOBALS['TL_LANG']['tl_iao_agreements']['posten_template'] = array('Posten-Template','Eine Auswahl an Rechnungsposten');
 $GLOBALS['TL_LANG']['tl_iao_agreements']['notice'] = array('Notiz','');
-$GLOBALS['TL_LANG']['tl_iao_agreements']['price'] = array('Preis','geben Sie hier den Preis an.');
+$GLOBALS['TL_LANG']['tl_iao_agreements']['price'] = array('Preis','Geben Sie hier den Preis an.');
 $GLOBALS['TL_LANG']['tl_iao_agreements']['vat_incl'] = array('Preis-Angabe mit oder ohne MwSt.','(brutto / netto)');
-$GLOBALS['TL_LANG']['tl_iao_agreements']['count'] = array('Anzahl','die Anzahl wird mit dem Preis multipliziert');
+$GLOBALS['TL_LANG']['tl_iao_agreements']['count'] = array('Anzahl','Die Anzahl wird mit dem Preis multipliziert.');
 $GLOBALS['TL_LANG']['tl_iao_agreements']['amountStr'] = array('Art der Anzahl','');
 $GLOBALS['TL_LANG']['tl_iao_agreements']['vat'] = array('MwSt.','Art der MwSt. zu diesem Posten.');
 
