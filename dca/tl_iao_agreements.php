@@ -307,7 +307,7 @@ $GLOBALS['TL_DCA']['tl_iao_agreements'] = array
 			'sorting'                 => true,
 			'flag'                    => 11,
 			'inputType'               => 'select',
-			'options_callback'        => array('tl_iao_agreements', 'getMembers'),
+			'options_callback'        => array('tl_iao_agreements', 'getMemberOptions'),
 			'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>true,'submitOnChange'=>true, 'chosen'=>true),
 			'save_callback' => array
 			(
@@ -357,6 +357,7 @@ $GLOBALS['TL_DCA']['tl_iao_agreements'] = array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_agreements']['remind_before'],
 			'exclude'                 => true,
+			'default'                 => '-3 weeks',
 			'inputType'               => 'text',
 			'eval'                    => array('mandatory'=>true, 'maxlength'=>255,'tl_class'=>'clr'),
 			'sql'                     => "varchar(32) NOT NULL default ''"
@@ -439,14 +440,15 @@ class tl_iao_agreements extends \iao\iaoBackend
 {
     protected $settings = array();
 
-	/**
-	 * Import the back end user object
-	 */
-	public function __construct()
-	{
-		parent::__construct();
-		$this->import('BackendUser', 'User');
-	}
+    /**
+     * Import the back end user object
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->import('BackendUser', 'User');
+        $this->import('iao');
+    }
 
 	/**
 	* get all default iao-Settings
@@ -528,29 +530,6 @@ class tl_iao_agreements extends \iao\iaoBackend
 			->limit(1)
 			->execute($text,$dc->id);
 		}
-		return $varValue;
-	}
-
-
-	/**
-	 * get all members to valid groups
-	 * @param object
-	 * @throws Exception
-	 */
-	public function getMembers(DataContainer $dc)
-	{
-		$varValue= array();
-
-		if(!$this->settings['iao_costumer_group'])  return $varValue;
-
-		$member = $this->Database->prepare('SELECT `id`,`groups`,`firstname`,`lastname`,`company` FROM `tl_member` WHERE `iao_group`')
-								->execute($this->settings['iao_costumer_group']);
-
-		while($member->next())
-		{
-			$varValue[$member->id] =  $member->firstname.' '.$member->lastname.' ('.$member->company.')';
-		}
-
 		return $varValue;
 	}
 
