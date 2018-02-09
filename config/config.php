@@ -13,7 +13,7 @@
  * invoice_and_offer Version
  */
 @define('IAO_VERSION', '1.2');
-@define('IAO_BUILD', '16');
+@define('IAO_BUILD', '17');
 @define('IAO_PATH','system/modules/invoice_and_offer');
 
 
