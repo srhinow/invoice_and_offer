@@ -725,7 +725,7 @@ class tl_iao_offer extends \iao\iaoBackend
 			//Insert Invoice-Entry
 			$set = array
 			(
-				'pid' => (\Input::get('projId')) ? : '',
+				'pid' => (\Input::get('projId')) ? : $row['pid'],
 				'tstamp' => time(),
 				'invoice_tstamp' => time(),
 				'title' => $row['title'],
