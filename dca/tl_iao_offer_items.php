@@ -607,8 +607,8 @@ class tl_iao_offer_items extends \iao\iaoBackend
 							->execute();
 
 			$newPostenID = $newposten->insertId;
-
-			$this->redirect('contao/main.php?do=iao_setup&mod=iao_templates_items&table=tl_iao_templates_items&act=edit&id='.$newPostenID);
+            $redirectUrl = $this->addToUrl('do=iao_setup&mod=iao_templates_items&table=tl_iao_templates_items&act=edit&id='.$newPostenID);
+			$this->redirect($redirectUrl);
 		}
 
 		$href.='&amp;ptid='.$row['id'];
