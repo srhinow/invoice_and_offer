@@ -27,6 +27,7 @@ $GLOBALS['TL_LANG']['tl_iao_templates_items']['count'] = array('Anzahl','die Anz
 $GLOBALS['TL_LANG']['tl_iao_templates_items']['amountStr'] = array('Art der Anzahl','');
 $GLOBALS['TL_LANG']['tl_iao_templates_items']['operator'] = array('Zahlungsart','soll dieser Posten hinzugefügt oder abgezogen werden?');
 $GLOBALS['TL_LANG']['tl_iao_templates_items']['vat'] = array('MwSt.','Art der MwSt. zu diesem Posten.');
+$GLOBALS['TL_LANG']['tl_iao_templates_items']['published'] = array('veröffentlicht');
 $GLOBALS['TL_LANG']['tl_iao_templates_items']['new'] = array('Neue Posten-Vorlage','Eine neue Vorlage anlegen');
 $GLOBALS['TL_LANG']['tl_iao_templates_items']['edit'] = array('Posten-Vorlage bearbeiten','Vorlage ID %s bearbeiten');
 $GLOBALS['TL_LANG']['tl_iao_templates_items']['copy'] = array('Posten-Vorlage duplizieren','Vorlage ID %s duplizieren');
@@ -36,8 +37,7 @@ $GLOBALS['TL_LANG']['tl_iao_templates_items']['title_legend'] = 'Grundeinstellun
 $GLOBALS['TL_LANG']['tl_iao_templates_items']['item_legend'] = 'Posten-Daten';
 $GLOBALS['TL_LANG']['tl_iao_templates_items']['publish_legend'] = 'Veröffentlichung';
 
-$GLOBALS['TL_LANG']['tl_iao_templates_items']['amountStr_options'] = array('piece'=>'Stück','flaterate'=>'Pauschale', 'days'=>'Tag(e)','hour'=>'Stunde(n)', 'minutes'=>'Minute(n)','year'=>'Jahr(e)');
 $GLOBALS['TL_LANG']['tl_iao_templates_items']['vat_incl_percents'] = array(1 => 'netto', 2 => 'brutto');
-$GLOBALS['TL_LANG']['tl_iao_templates_items']['vat_options'] = array(19 => '19% MwSt.', 7 => '7% MwSt.', 0=>'ohne MwSt.');
 $GLOBALS['TL_LANG']['tl_iao_templates_items']['operators'] = array('+' => '+ (addieren)', '-' => '- (subtrahieren)');
 $GLOBALS['TL_LANG']['tl_iao_templates_items']['type_options'] = array('item'=>'Eintrag','devider'=>'PDF-Trenner');
+$GLOBALS['TL_LANG']['tl_iao_templates_items']['position_options'] = array('offer'=>'Angebot', 'credit'=>'Gutschrift', 'invoice'=>'Rechnung');
