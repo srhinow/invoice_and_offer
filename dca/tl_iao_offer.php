@@ -172,9 +172,13 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 			'sorting'                 => true,
 			'flag'                    => 11,
 			'inputType'               => 'select',
-			'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>false, 'chosen'=>true),
+			'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>false, 'chosen'=>true,'submitOnChange'=>true),
 			'sql'                     => "int(10) unsigned NOT NULL default '0'",
-			'relation'                => array('type'=>'belongsTo', 'load'=>'eager')
+			'relation'                => array('type'=>'belongsTo', 'load'=>'eager'),
+            'save_callback' => array
+            (
+                array('tl_iao_offer', 'fillMemberAndAddressFields')
+            ),
 		),
 		'tstamp' => array
 		(
@@ -278,7 +282,7 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 			'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>true,'submitOnChange'=>true, 'chosen'=>true),
 			'save_callback' => array
 			(
-				array('tl_iao_offer', 'fillAdressText')
+				array('tl_iao_offer', 'fillAddressSaveCallback')
 			),
 			'sql'					  => "varbinary(128) NOT NULL default ''"
 		),
@@ -524,28 +528,79 @@ class tl_iao_offer extends \iao\iaoBackend
 		return ((int)$varValue == 0) ? time() : $varValue;
 	}
 
+    /**
+     * fill Member And Address-Text
+     * @param $varValue integer
+     * @param $dc object
+     * @return $value string
+     */
+    public function fillMemberAndAddressFields($varValue, DataContainer $dc)
+    {
+        if((strlen($varValue) < 1)) return $varValue;
+
+        $objProj = iao\IaoProjectsModel::findProjectByIdOrAlias($varValue);
+        if(is_object($objProj))
+        {
+            if((int) $objProj->member > 0)
+            {
+                $addressText = $this->getAddressText($objProj->member);
+                $set = array(
+                    'member' => $objProj->member,
+                    'address_text' => $addressText
+                );
+
+//                $dc->activeRecord->address_text = $addressText;
+
+            } else {
+                $set = array(
+                    'member' => '',
+                    'address_text' => ''
+                );
+            }
+
+            $this->Database->prepare("UPDATE `tl_iao_offer` %s WHERE `id`=?")
+                ->limit(1)
+                ->set($set)
+                ->execute($dc->id);
+
+        }
+
+        return $varValue;
+    }
 	/**
 	 * fill Adress-Text
 	 * @param object
 	 * @throws Exception
 	 */
-	public function fillAdressText($varValue, DataContainer $dc)
+	public function fillAddressSaveCallback($varValue, DataContainer $dc)
 	{
-		if(trim(strip_tags($dc->activeRecord->address_text)) == '')
-		{
-			if(strlen($varValue) <= 0) return $varValue;
+        if(strlen($varValue) < 1) return $varValue;
 
-			$objMember = \MemberModel::findById($varValue);
+        $text = $this->getAddressText($varValue);
 
-			$text = '<p>'.$objMember->company.'<br />'.($objMember->gender!='' ? $GLOBALS['TL_LANG']['tl_iao_offer']['gender'][$objMember->gender].' ':'').($objMember->title ? $objMember->title.' ':'').$objMember->firstname.' '.$objMember->lastname.'<br />'.$objMember->street.'</p>';
-			$text .='<p>'.$objMember->postal.' '.$objMember->city.'</p>';
-
-			$this->Database->prepare('UPDATE `tl_iao_offer` SET `address_text`=? WHERE `id`=?')
-					->limit(1)
-					->execute($text,$dc->id);
-		}
+        $this->Database->prepare('UPDATE `tl_iao_offer` SET `address_text`=? WHERE `id`=?')
+                ->limit(1)
+                ->execute($text,$dc->id);
 
 		return $varValue;
+	}
+
+	/**
+	 * get address text
+     * @param $memberId integer
+	 * @throws Exception
+	 */
+	public function getAddressText($memberId)
+	{
+        $text = '';
+        $objMember = \MemberModel::findById((int) $memberId);
+
+        if(is_object($objMember)) {
+            $text = '<p>'.$objMember->company.'<br />'.($objMember->gender!='' ? $GLOBALS['TL_LANG']['tl_iao_offer']['gender'][$objMember->gender].' ':'').($objMember->title ? $objMember->title.' ':'').$objMember->firstname.' '.$objMember->lastname.'<br />'.$objMember->street.'</p>';
+            $text .='<p>'.$objMember->postal.' '.$objMember->city.'</p>';
+        }
+
+		return $text;
 	}
 
 	/**
@@ -594,11 +649,8 @@ class tl_iao_offer extends \iao\iaoBackend
 		return $varValue;
 	}
 
-
-
-
 	/**
-	 * get all invoice before template
+	 * get all offer before template
 	 * @param object
 	 * @throws Exception
 	 */
@@ -653,7 +705,7 @@ class tl_iao_offer extends \iao\iaoBackend
 	}
 
 	/**
-	 * Generate a button and return it as string
+	 * generate invoice from this offer
 	 * @param array
 	 * @param string
 	 * @param string
