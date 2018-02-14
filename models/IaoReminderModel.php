@@ -78,7 +78,7 @@ class IaoReminderModel extends \Model
 	 * @param integer $intOffset   	An optional offset
 	 * @param array   $arrOptions  	An optional options array
 	 *
-	 * @return iaoInvoiceModel[]|iaoInvoiceModel|null A collection of models or null if there are no news
+	 * @return null A collection of models or null if there are no news
 	 */
 	public static function findPublishedByMember($memberId, $status='', $intLimit=0, $intOffset=0, array $arrOptions=array())
 	{
@@ -115,7 +115,7 @@ class IaoReminderModel extends \Model
 	/**
 	 * Count published reminder by their member (Frontend-User) ID
 	 *
-	 * @param integer $pid    		An Project-ID from actual FrontendUser
+	 * @param integer $memberId    		An Project-ID from actual FrontendUser
 	 * @param string  $status		optional filter
 	 * @param array   $arrOptions  	An optional options array
 	 *
@@ -198,7 +198,7 @@ class IaoReminderModel extends \Model
 	 *
 	 * @return integer The number of news items
 	 */
-	public static function countPublishedByPid($pid , $status='', $status='', array $arrOptions=array())
+	public static function countPublishedByPid($pid , $status='', array $arrOptions=array())
 	{
 		if (empty($pid))
 		{

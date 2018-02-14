@@ -185,7 +185,7 @@ class IaoAgreementsModel extends \Model
 	 *
 	 * @return integer The number of news items
 	 */
-	public static function countPublishedByPid($pid , $status='', $status='', array $arrOptions=array())
+	public static function countPublishedByPid($pid , $status='', array $arrOptions=array())
 	{
 		if (empty($pid))
 		{

@@ -1,7 +1,10 @@
 <?php
+namespace iao;
+
+use Contao\Database as DB;
 
 /**
- * @copyright  Sven Rhinow 2011-2017
+ * @copyright  Sven Rhinow 2011-2018
  * @author     sr-tag Sven Rhinow Webentwicklung <http://www.sr-tag.de>
  * @package    invoice_and_offer
  * @license    LGPL
@@ -23,12 +26,12 @@ $GLOBALS['TL_DCA']['tl_iao_agreements'] = array
 		'enableVersioning'            => false,
 		'onload_callback' => array
 		(
-			array('tl_iao_agreements','IAOSettings'),
-			array('tl_iao_agreements', 'checkPermission'),
+			array('\iao\iaoDcaAgreements','IAOSettings'),
+			array('\iao\iaoDcaAgreements', 'checkPermission'),
 		),
 		'onsubmit_callback'	    => array
 		(
-		    array('tl_iao_agreements','saveNettoAndBrutto')
+		    array('\iao\iaoDcaAgreements','saveNettoAndBrutto')
 		),
 		'sql' => array
 		(
@@ -54,7 +57,7 @@ $GLOBALS['TL_DCA']['tl_iao_agreements'] = array
 		(
 			'fields'                  => array('title','beginn_date','end_date','price_brutto'),
 			'format'                  => '%s (aktuelle Laufzeit: %s - %s)',
-			'label_callback'          => array('tl_iao_agreements', 'listEntries'),
+			'label_callback'          => array('\iao\iaoDcaAgreements', 'listEntries'),
 		),
 		'global_operations' => array
 		(
@@ -87,14 +90,14 @@ $GLOBALS['TL_DCA']['tl_iao_agreements'] = array
 				'label'               => &$GLOBALS['TL_LANG']['tl_iao_agreements']['invoice'],
 				'href'                => 'key=addInvoice',
 				'icon'                => 'system/modules/invoice_and_offer/html/icons/kontact_todo.png',
-				'button_callback'     => array('tl_iao_agreements', 'addInvoice')
+				'button_callback'     => array('\iao\iaoDcaAgreements', 'addInvoice')
 			),
 			'pdf' => array
 			(
 				'label'               => &$GLOBALS['TL_LANG']['tl_iao_agreements']['pdf'],
 				'href'                => 'key=pdf',
 				'icon'                => 'iconPDF.gif',
-				'button_callback'     => array('tl_iao_agreements', 'showPDF')
+				'button_callback'     => array('\iao\iaoDcaAgreements', 'showPDF')
 			),
 			'delete' => array
 			(
@@ -154,7 +157,7 @@ $GLOBALS['TL_DCA']['tl_iao_agreements'] = array
 			'sorting'                 => true,
 			'flag'                    => 11,
 			'inputType'               => 'select',
-			'options_callback'        => array('tl_iao_agreements', 'getSettingOptions'),
+			'options_callback'        => array('\iao\iaoDcaAgreements', 'getSettingOptions'),
 			'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>false, 'chosen'=>true),
 			'sql'                     => "int(10) unsigned NOT NULL default '0'"
 		),
@@ -178,7 +181,7 @@ $GLOBALS['TL_DCA']['tl_iao_agreements'] = array
 			'inputType'               => 'text',
 			'eval'                    => array('rgxp'=>'date', 'datepicker'=>$this->getDatePickerString(), 'tl_class'=>'w50 wizard'),
 			'load_callback'			=> array (
-				array('tl_iao_agreements','getAgreementValue')
+				array('\iao\iaoDcaAgreements','getAgreementValue')
 			),
 			'sql'                     => "int(10) unsigned NOT NULL default '0'"
 		),
@@ -190,7 +193,7 @@ $GLOBALS['TL_DCA']['tl_iao_agreements'] = array
 			'inputType'               => 'text',
 			'eval'                    => array('mandatory'=>true, 'maxlength'=>255,'tl_class'=>'w50'),
 			'load_callback'			=> array (
-				array('tl_iao_agreements','getPeriodeValue')
+				array('\iao\iaoDcaAgreements','getPeriodeValue')
 			),
 			'sql'                     => "varchar(255) NOT NULL default ''"
 		),
@@ -202,7 +205,7 @@ $GLOBALS['TL_DCA']['tl_iao_agreements'] = array
 			'eval'                    => array('rgxp'=>'date', 'datepicker'=>$this->getDatePickerString(), 'tl_class'=>'w50 wizard'),
 			'load_callback'				=> array
 			(
-				array('tl_iao_agreements','getBeginnDateValue')
+				array('\iao\iaoDcaAgreements','getBeginnDateValue')
 			),
 			'sql'                     => "varchar(255) NOT NULL default ''"
 		),
@@ -214,7 +217,7 @@ $GLOBALS['TL_DCA']['tl_iao_agreements'] = array
 			'eval'                    => array('rgxp'=>'date', 'datepicker'=>$this->getDatePickerString(), 'tl_class'=>'w50 wizard'),
 			'load_callback'				=> array
 			(
-				array('tl_iao_agreements','getEndDateValue')
+				array('\iao\iaoDcaAgreements','getEndDateValue')
 			),
 			'sql'                     => "varchar(255) NOT NULL default ''"
 		),
@@ -226,7 +229,7 @@ $GLOBALS['TL_DCA']['tl_iao_agreements'] = array
 			'eval'                    => array('tl_class'=>'clr'),
 			'save_callback'				=> array
 			(
-				array('tl_iao_agreements','generateNewCycle')
+				array('\iao\iaoDcaAgreements','generateNewCycle')
 			),
 			'sql'                     => "char(1) NOT NULL default ''"
 		),
@@ -263,7 +266,7 @@ $GLOBALS['TL_DCA']['tl_iao_agreements'] = array
 			'filter'                  => true,
 			'flag'                    => 1,
 			'inputType'               => 'select',
-			'options_callback'        => array('tl_iao_agreements', 'getTaxRatesOptions'),
+			'options_callback'        => array('\iao\iaoDcaAgreements', 'getTaxRatesOptions'),
 			'eval'                    => array('tl_class'=>'w50'),
 			'sql'					  => "int(10) unsigned NOT NULL default '19'"
 		),
@@ -294,7 +297,7 @@ $GLOBALS['TL_DCA']['tl_iao_agreements'] = array
 			'filter'                  => true,
 			'flag'                    => 1,
 			'inputType'               => 'select',
-			'options_callback'        => array('tl_iao_agreements', 'getItemUnitsOptions'),
+			'options_callback'        => array('\iao\iaoDcaAgreements', 'getItemUnitsOptions'),
             'eval'                    => array('tl_class'=>'w50','submitOnChange'=>false),
 			'sql'					  => "varchar(64) NOT NULL default ''"
 		),
@@ -307,11 +310,11 @@ $GLOBALS['TL_DCA']['tl_iao_agreements'] = array
 			'sorting'                 => true,
 			'flag'                    => 11,
 			'inputType'               => 'select',
-			'options_callback'        => array('tl_iao_agreements', 'getMemberOptions'),
+			'options_callback'        => array('\iao\iaoDcaAgreements', 'getMemberOptions'),
 			'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>true,'submitOnChange'=>true, 'chosen'=>true),
 			'save_callback' => array
 			(
-				array('tl_iao_agreements', 'fillAdressText')
+				array('\iao\iaoDcaAgreements', 'fillAdressText')
 			),
 			'sql'                     => "varbinary(128) NOT NULL default ''"
 		),
@@ -401,7 +404,7 @@ $GLOBALS['TL_DCA']['tl_iao_agreements'] = array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_agreements']['before_template'],
 			'inputType'               => 'select',
-			'options_callback'        => array('tl_iao_agreements', 'getBeforeTemplate'),
+			'options_callback'        => array('\iao\iaoDcaAgreements', 'getBeforeTemplate'),
 			'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>true,'submitOnChange'=>false, 'chosen'=>true),
 			'sql'					  => "int(10) unsigned NOT NULL default '0'"
 		),
@@ -409,7 +412,7 @@ $GLOBALS['TL_DCA']['tl_iao_agreements'] = array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_agreements']['after_template'],
 			'inputType'               => 'select',
-			'options_callback'        => array('tl_iao_agreements', 'getAfterTemplate'),
+			'options_callback'        => array('\iao\iaoDcaAgreements', 'getAfterTemplate'),
 			'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>true, 'submitOnChange'=>false, 'chosen'=>true),
 			'sql'					  => "int(10) unsigned NOT NULL default '0'"
 		),
@@ -417,7 +420,7 @@ $GLOBALS['TL_DCA']['tl_iao_agreements'] = array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iao_agreements']['posten_template'],
 			'inputType'               => 'select',
-			'options_callback'        => array('tl_iao_agreements', 'getPostenTemplate'),
+			'options_callback'        => array('\iao\iaoDcaAgreements', 'getPostenTemplate'),
 			'eval'                    => array('tl_class'=>'w50', 'includeBlankOption'=>true, 'submitOnChange'=>false, 'chosen'=>true),
 			'sql'					  => "int(10) unsigned NOT NULL default '0'"
 		),
@@ -434,9 +437,10 @@ $GLOBALS['TL_DCA']['tl_iao_agreements'] = array
 );
 
 /**
- * Class tl_iao_agreements
+ * Class iaoDcaAgreements
+ * @package iao
  */
-class tl_iao_agreements extends \iao\iaoBackend
+class iaoDcaAgreements extends \iao\iaoBackend
 {
     protected $settings = array();
 
@@ -452,7 +456,7 @@ class tl_iao_agreements extends \iao\iaoBackend
 	/**
 	* get all default iao-Settings
 	*/
-	public function IAOSettings(DataContainer $dc)
+	public function IAOSettings(\DataContainer $dc)
 	{
 	    $this->settings = $this->getSettings($GLOBALS['IAO']['default_settings_id']);
 	}
@@ -472,7 +476,6 @@ class tl_iao_agreements extends \iao\iaoBackend
     */
     public function listEntries($arrRow)
     {
-
 		$return = '
 		<div class="comment_wrap">
 		<div class="cte_type agreement_status' . $arrRow['status'] . '"><strong>' . $arrRow['title'].'</strong></div>
@@ -488,9 +491,9 @@ class tl_iao_agreements extends \iao\iaoBackend
 	 * fill date-Field if this empty
 	 * @param mixed
 	 * @param object
-	 * @return date
+	 * @return integer
 	 */
-	public function  generateExecuteDate($varValue, DataContainer $dc)
+	public function  generateExecuteDate($varValue, \DataContainer $dc)
 	{
 		$altdate = ($dc->activeRecord->invoice_tstamp) ? $dc->activeRecord->invoice_tstamp : time();
 		return ($varValue==0) ? $altdate : $varValue;
@@ -502,34 +505,28 @@ class tl_iao_agreements extends \iao\iaoBackend
 	 * @param object
 	 * @return string
 	 */
-	public function  getPeriodeValue($varValue, DataContainer $dc)
+	public function  getPeriodeValue($varValue, \DataContainer $dc)
 	{
 		return ($varValue == '') ? '+1 year' : $varValue;
 	}
 
 	/**
-	 * fill Adress-Text
-	 * @param object
-	 * @throws Exception
+     * fill Adress-Text
+     * @param $intMember integer
+     * @param $dc object
+     * @return integer
 	 */
-	public function fillAdressText($varValue, DataContainer $dc)
+	public function fillAdressText($intMember, \DataContainer $dc)
 	{
-		if(strip_tags($dc->activeRecord->address_text)=='')
+		if(strip_tags($dc->activeRecord->address_text) == '')
 		{
-			if(strlen($varValue)<=0) return $varValue;
+            $text = $this->getAdressText($intMember);
 
-			$objMember = $this->Database->prepare('SELECT * FROM `tl_member` WHERE `id`=?')
-						->limit(1)
-						->execute($varValue);
-
-			$text = '<p>'.$objMember->company.'<br />'.($objMember->gender!='' ? $GLOBALS['TL_LANG']['tl_iao_invoice']['gender'][$objMember->gender].' ':'').($objMember->title ? $objMember->title.' ':'').$objMember->firstname.' '.$objMember->lastname.'<br />'.$objMember->street.'</p>';
-			$text .='<p>'.$objMember->postal.' '.$objMember->city.'</p>';
-
-			$this->Database->prepare('UPDATE `tl_iao_agreements` SET `address_text`=? WHERE `id`=?')
+			DB::getInstance()->prepare('UPDATE `tl_iao_agreements` SET `address_text`=? WHERE `id`=?')
 			->limit(1)
 			->execute($text,$dc->id);
 		}
-		return $varValue;
+		return $intMember;
 	}
 
 	/**
@@ -550,11 +547,12 @@ class tl_iao_agreements extends \iao\iaoBackend
 
 	/**
 	 * Generate a button and return it as string
-	 * @param array
-	 * @param string
-	 * @param string
-	 * @param string
-	 * @param string
+	 * @param $row array
+	 * @param $href string
+	 * @param $label string
+	 * @param $title string
+	 * @param $icon string
+     * @throws \Exception
 	 * @return string
 	 */
     public function addInvoice($row, $href, $label, $title, $icon)
@@ -585,14 +583,14 @@ class tl_iao_agreements extends \iao\iaoBackend
 				'price_netto' => $row['price_netto'],
 				'price_brutto' => $row['price_brutto'],
 				'before_template' => $row['before_template'],
-				'before_text' => $this->changeIAOTags($beforeTemplObj->text,'',$row['pid']),
+				'before_text' => $this->changeIAOTags($beforeTemplObj->text,'agreement',(object) $row),
 				'after_template' => $row['after_template'],
-				'after_text' => $this->changeIAOTags($afterTemplObj->text,'',$row['pid']),
+				'after_text' => $this->changeIAOTags($afterTemplObj->text,'agreement',(object) $row),
 				'agreement_id' => $row['id'],
 
 		    );
 
-			$result = $this->Database->prepare('INSERT INTO `tl_iao_invoice` %s')
+			$result = DB::getInstance()->prepare('INSERT INTO `tl_iao_invoice` %s')
 							->set($set)
 							->execute();
 
@@ -606,11 +604,14 @@ class tl_iao_agreements extends \iao\iaoBackend
 
 				if($postenTemplObj->numRows > 0)
 				{
-					$headline = $this->changeIAOTags($postenTemplObj->headline,'',$row['id']);
+					$headline = $this->changeIAOTags($postenTemplObj->headline,'agreement',(object) $row);
 					$date = $postenTemplObj->date;
 					$time = $postenTemplObj->time;
-					$text = $this->changeIAOTags($postenTemplObj->text,'',$row['id']);
-				}
+					$text = $this->changeIAOTags($postenTemplObj->text,'agreement',(object) $row);
+				} else {
+				    $headline = $text = '';
+				    $time = $date = 0;
+                }
 
 				//Insert Invoice-Entry
 				$postenset = array
@@ -633,11 +634,18 @@ class tl_iao_agreements extends \iao\iaoBackend
 					'posten_template' => $row['posten_template']
 				);
 
-				$newposten = $this->Database->prepare('INSERT INTO `tl_iao_invoice_items` %s')
+				$newposten = DB::getInstance()->prepare('INSERT INTO `tl_iao_invoice_items` %s')
 									->set($postenset)
 									->execute();
 
-				$this->redirect($this->addToUrl('do=iao_invoice&mode=2&table=tl_iao_invoice&s2e=1&id='.$newInvoiceID.'&act=edit') );
+                if($newposten->insertId < 1)
+                {
+                    throw new \Exception('Es konnte kein Rechnungs-Element angelegt werden.');
+                }
+
+                $redirectUrl = $this->addToUrl('do=iao_invoice&mode=2&table=tl_iao_invoice&s2e=1&id='.$newInvoiceID.'&act=edit');
+                $redirectUrl = str_replace('key=addInvoice&amp;','', $redirectUrl);
+				$this->redirect($redirectUrl);
 			}
 
 		}
@@ -646,16 +654,15 @@ class tl_iao_agreements extends \iao\iaoBackend
 		$link = (\Input::get('onlyproj') == 1) ? 'do=iao_agreements&amp;id='.$row['id'].'&amp;projId='.\Input::get('id') : 'do=iao_agreements&amp;id='.$row['id'].'';
 		$link = $this->addToUrl($href.'&amp;'.$link);
 		$link = str_replace('table=tl_iao_agreements&amp;','',$link);
-		return '<a href="'.$link.'" title="'.specialchars($title).'">'.$this->generateImage($icon, $label).'</a> ';
+		return '<a href="'.$link.'" title="'.specialchars($title).'">'.\Image::getHtml($icon, $label).'</a> ';
 	}
 
 	/**
 	 * save the price_netto and price_brutto from actuell item
-	 * @param mixed
 	 * @param object
 	 * @return string
 	 */
-	public function saveNettoAndBrutto(DataContainer $dc)
+	public function saveNettoAndBrutto(\DataContainer $dc)
 	{
 		// Return if there is no active record (override all)
 		if (!$dc->activeRecord)
@@ -681,19 +688,19 @@ class tl_iao_agreements extends \iao\iaoBackend
 	    $nettoSum = round($Netto,2) * $dc->activeRecord->count;
 	    $bruttoSum = round($Brutto,2) * $dc->activeRecord->count;
 
-		$this->Database->prepare('UPDATE `tl_iao_agreements` SET `price_netto`=?, `price_brutto`=? WHERE `id`=?')
+		DB::getInstance()->prepare('UPDATE `tl_iao_agreements` SET `price_netto`=?, `price_brutto`=? WHERE `id`=?')
 			->limit(1)
 			->execute($nettoSum, $bruttoSum, $dc->id);
 	}
 
 	/**
 	 * Return the "toggle visibility" button
-	 * @param array
-	 * @param string
-	 * @param string
-	 * @param string
-	 * @param string
-	 * @param string
+	 * @param $row array
+	 * @param $href string
+	 * @param $label string
+	 * @param $title string
+	 * @param $icon string
+	 * @param $attributes string
 	 * @return string
 	 */
 	public function toggleIcon($row, $href, $label, $title, $icon, $attributes)
@@ -704,7 +711,6 @@ class tl_iao_agreements extends \iao\iaoBackend
 		{
 			$this->toggleVisibility($this->Input->get('tid'), ($this->Input->get('state')));
 			$this->redirect($this->getReferer());
-
 		}
 
 		$href .= '&amp;tid='.$row['id'].'&amp;state='.($row['status']==1 ? 2 : 1);
@@ -735,7 +741,8 @@ class tl_iao_agreements extends \iao\iaoBackend
 			$this->redirect('contao/main.php?act=error');
 		}
 
-		$this->createInitialVersion('tl_iao_agreements', $intId);
+        $objVersions = new \Versions('tl_iao_agreements', $intId);
+        $objVersions->initialize();
 
 		// Trigger the save_callback
 		if (is_array($GLOBALS['TL_DCA']['tl_iao_agreements']['fields']['status']['save_callback']))
@@ -750,30 +757,37 @@ class tl_iao_agreements extends \iao\iaoBackend
 		$visibility = $blnVisible==1 ? '1' : '2';
 
 		// Update the database
-		$this->Database->prepare("UPDATE tl_iao_agreements SET status=? WHERE id=?")
+		DB::getInstance()->prepare("UPDATE tl_iao_agreements SET status=? WHERE id=?")
 					   ->execute($visibility, $intId);
 
 		//get reminder-Data
-		$remindObj = $this->Database->prepare('SELECT * FROM `tl_iao_agreements` WHERE `id`=?')
-									->limit(1)
-									->execute($intId);
+		$remindObj = IaoReminderModel::findById($intId);
 
-		if($remindObj->numRows)
+		if(is_object($remindObj))
 		{
-			$dbObj = $this->Database->prepare("UPDATE `tl_iao_invoice` SET `status`=?, `notice` = `notice`+?  WHERE id=?")
+			DB::getInstance()->prepare("UPDATE `tl_iao_invoice` SET `status`=?, `notice` = `notice`+?  WHERE id=?")
 									->execute($visibility, $remindObj->notice, $remindObj->invoice_id);
 		}
 
-		$this->createNewVersion('tl_iao_agreements', $intId);
+        $objVersions->create();
 	}
 
-	public function getAgreementValue($varValue, DataContainer $dc)
+    /**
+     * @param $varValue
+     * @param \DataContainer $dc
+     * @return int
+     */
+	public function getAgreementValue($varValue, \DataContainer $dc)
 	{
-
 		return ($varValue == '0') ? time() : $varValue ;
 	}
 
-	public function getBeginnDateValue($varValue, DataContainer $dc)
+    /**
+     * @param $varValue
+     * @param \DataContainer $dc
+     * @return int
+     */
+	public function getBeginnDateValue($varValue, \DataContainer $dc)
 	{
 		$agreement_date = ($dc->activeRecord->agreement_date) ? $dc->activeRecord->agreement_date : time() ;
 		$beginn_date = ($varValue == '') ? $agreement_date : $varValue ;
@@ -785,23 +799,30 @@ class tl_iao_agreements extends \iao\iaoBackend
 			'end_date' => $end_date
 		);
 
-		$this->Database->prepare('UPDATE `tl_iao_agreements` %s WHERE `id`=?')
+		DB::getInstance()->prepare('UPDATE `tl_iao_agreements` %s WHERE `id`=?')
 					->set($set)
 					->execute($dc->id);
 
 		return $beginn_date;
 	}
 
-	public function getEndDateValue($varValue, DataContainer $dc)
+    /**
+     * @param $varValue
+     * @param \DataContainer $dc
+     * @return false|int
+     */
+	public function getEndDateValue($varValue, \DataContainer $dc)
 	{
 		if($varValue != '') return $varValue;
 
 		$agreement_date = ($dc->activeRecord->agreement_date) ? $dc->activeRecord->agreement_date : time() ;
 		$beginn_date = ($dc->activeRecord->beginn_date) ? $dc->activeRecord->beginn_date : $agreement_date;
 		$periode = ($dc->activeRecord->periode) ? $dc->activeRecord->periode : $GLOBALS['IAO']['default_agreement_cycle'];
+
 		// wenn der Wert nicht manuell verändert wurde die Periode berechnen
 		return ($varValue == $dc->activeRecord->end_date) ? strtotime($periode.' -1 day', $beginn_date) : $varValue ;
 	}
+
 	/**
 	 * Generate a "PDF" button and return it as string
 	 * @param array
@@ -820,7 +841,7 @@ class tl_iao_agreements extends \iao\iaoBackend
 
 		// Wenn keine PDF-Vorlage dann kein PDF-Link
 	    $objPdf = 	\FilesModel::findByUuid($row['agreement_pdf_file']);
-		if(strlen($objPdf->path) < 1 || !file_exists(TL_ROOT . '/' . $objPdf->path) ) return;  // template file not found
+		if(strlen($objPdf->path) < 1 || !file_exists(TL_ROOT . '/' . $objPdf->path) ) return false;  // template file not found
 
 		$pdfFile = TL_ROOT . '/' . $objPdf->path;
 
@@ -845,7 +866,12 @@ class tl_iao_agreements extends \iao\iaoBackend
 		return $button;
 	}
 
-	public function generateNewCycle($varValue, DataContainer $dc)
+    /**
+     * @param $varValue
+     * @param \DataContainer $dc
+     * @return string
+     */
+	public function generateNewCycle($varValue, \DataContainer $dc)
 	{
 		if($varValue == 1)
 		{
@@ -877,7 +903,7 @@ class tl_iao_agreements extends \iao\iaoBackend
 	 * @param object
 	 * @throws Exception
 	 */
-	public function getPostenTemplate(DataContainer $dc)
+	public function getPostenTemplate(\DataContainer $dc)
 	{
 		$varValue= array();
 
@@ -894,13 +920,13 @@ class tl_iao_agreements extends \iao\iaoBackend
 	/**
 	 * get all invoice before template
 	 * @param object
-	 * @throws Exception
+	 * @return array
 	 */
-	public function getBeforeTemplate(DataContainer $dc)
+	public function getBeforeTemplate(\DataContainer $dc)
 	{
 		$varValue= array();
 
-		$all = $this->Database->prepare('SELECT `id`,`title` FROM `tl_iao_templates` WHERE `position`=?')
+		$all = DB::getInstance()->prepare('SELECT `id`,`title` FROM `tl_iao_templates` WHERE `position`=?')
 				->execute('invoice_before_text');
 
 		while($all->next())
@@ -914,13 +940,13 @@ class tl_iao_agreements extends \iao\iaoBackend
 	/**
 	 * get all invoice after template
 	 * @param object
-	 * @throws Exception
+	 * @return array
 	 */
-	public function getAfterTemplate(DataContainer $dc)
+	public function getAfterTemplate(\DataContainer $dc)
 	{
 		$varValue= array();
 
-		$all = $this->Database->prepare('SELECT `id`,`title` FROM `tl_iao_templates` WHERE `position`=?')
+		$all = DB::getInstance()->prepare('SELECT `id`,`title` FROM `tl_iao_templates` WHERE `position`=?')
 				->execute('invoice_after_text');
 
 		while($all->next())
@@ -930,6 +956,4 @@ class tl_iao_agreements extends \iao\iaoBackend
 
 	    return $varValue;
 	}
-
-
 }

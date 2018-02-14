@@ -73,6 +73,7 @@ class iao extends \Backend
     {
         return ($netto * $vat) / 100;
     }
+
     /**
      * Get formatet price-string
      * @param float
@@ -90,23 +91,23 @@ class iao extends \Backend
      * @param $dcObj object
      * @return $text string
      */
-    public function replacePlaceholder($text,$dcObj)
-    {
-        if(stristr($text,'##project##'))
-        {
-            $projObj = $this->Database->prepare('SELECT * FROM `tl_iao_projects` WHERE `id`=?')->limit(1)->execute($dcObj->activeRecord->pid);
-
-            if($projObj->numRows > 0) $text = str_replace('##project##', $projObj->title, $text);
-        }
-        $text = str_replace('##datum##', date('d.m.Y'), $text);
-
-        return $text;
-    }
+//    public function replacePlaceholder($text,$dcObj)
+//    {
+//        if(stristr($text,'##project##'))
+//        {
+//            $projObj = $this->Database->prepare('SELECT * FROM `tl_iao_projects` WHERE `id`=?')->limit(1)->execute($dcObj->activeRecord->pid);
+//
+//            if($projObj->numRows > 0) $text = str_replace('##project##', $projObj->title, $text);
+//        }
+//        $text = str_replace('##datum##', date('d.m.Y'), $text);
+//
+//        return $text;
+//    }
 
     /**
      * change Contao-Placeholder with html-characters
-     * @param integer
-     * @return integer
+     * @param string
+     * @return string
      */
     public function changeTags($text)
     {
@@ -124,10 +125,10 @@ class iao extends \Backend
      *
      * @param $strBuffer string
      * @param $sector string
-     * @param $id integer
-     * return string
+     * @param $obj object
+     * @return string
      */
-    public function changeIAOTags($strBuffer,$sector,$id)
+    public function changeIAOTags($strBuffer,$sector,$obj)
     {
         $tags = preg_split('/\{\{([^\}]+)\}\}/', $strBuffer, -1, PREG_SPLIT_DELIM_CAPTURE);
         $strBuffer = '';
@@ -163,125 +164,64 @@ class iao extends \Backend
             {
                 // get table - Data
                 case 'member':
+                    $objInfo = DB::getInstance()->prepare('SELECT `m`.* FROM `tl_member` `m` WHERE `m`.`id`=?')
+                        ->limit(1)
+                        ->execute($obj->member);
 
-                    //relative from this section
-                    switch(strtolower($sector))
-                    {
-                        case 'invoice':
-                            $objInfo = DB::getInstance()->prepare('SELECT `m`.* FROM `tl_member` `m` LEFT JOIN `tl_iao_invoice` `i` ON `m`.`id` = `i`.`member` WHERE `i`.`id`=?')
-                                ->limit(1)
-                                ->execute($id);
+                    $objInfo->gender = ($objInfo->gender == 'male') ? $GLOBALS['TL_LANG']['tl_iao']['gender']['male'] : $GLOBALS['TL_LANG']['tl_iao']['gender']['female'];
+                    $arrCache[$strTag] = $objInfo->{$parts[1]};
 
-                            $objInfo->gender = ($objInfo->gender == 'male') ? $GLOBALS['TL_LANG']['tl_iao']['salution']['male'] : $GLOBALS['TL_LANG']['tl_iao']['salution']['female'];
-                            $arrCache[$strTag] = $objInfo->{$parts[1]};
-                            break;
-
-                        case 'offer':
-                            $objInfo = DB::getInstance()->prepare('SELECT `m`.* FROM `tl_member` `m` LEFT JOIN `tl_iao_offer` `o` ON `m`.`id` = `o`.`member` WHERE `o`.`id`=?')
-                                ->limit(1)
-                                ->execute($id);
-
-                            $objInfo->gender = ($objInfo->gender == 'male') ? $GLOBALS['TL_LANG']['tl_iao']['salution']['male'] : $GLOBALS['TL_LANG']['tl_iao']['salution']['female'];
-                            $arrCache[$strTag] = $objInfo->{$parts[1]};
-                            break;
-
-                        case 'credit':
-                            $objInfo = DB::getInstance()->prepare('SELECT `m`.* FROM `tl_member` `m` LEFT JOIN `tl_iao_credit` `c` ON `m`.`id` = `c`.`member` WHERE `c`.`id`=?')
-                                ->limit(1)
-                                ->execute($id);
-
-                            $objInfo->gender = ($objInfo->gender == 'male') ? $GLOBALS['TL_LANG']['tl_iao']['salution']['male'] : $GLOBALS['TL_LANG']['tl_iao']['salution']['female'];
-                            $arrCache[$strTag] = $objInfo->{$parts[1]};
-                            break;
-
-                        case 'reminder':
-                            $objInfo = DB::getInstance()->prepare('SELECT `m`.* FROM `tl_member` `m` LEFT JOIN `tl_iao_reminder` `r` ON `m`.`id` = `r`.`member` WHERE `r`.`id`=?')
-                                ->limit(1)
-                                ->execute($id);
-
-                            $objInfo->gender = ($objInfo->gender == 'male') ? $GLOBALS['TL_LANG']['tl_iao']['salution']['male'] : $GLOBALS['TL_LANG']['tl_iao']['salution']['female'];
-
-                            $arrCache[$strTag] = $objInfo->{$parts[1]};
-                            break;
-                    }
                     break;
                 case 'invoice':
+                    $invoiceId = false;
+                    $sector = strtolower($sector);
 
                     //relative from this section
-                    switch(strtolower($sector))
-                    {
-                        case 'invoice':
-                            $objInfo = DB::getInstance()->prepare('SELECT `i`.* FROM `tl_iao_invoice` `i`  WHERE `i`.`id`=?')
-                                ->limit(1)
-                                ->execute($id);
+                    if($sector == 'invoice') $invoiceId = $obj->id;
+                    elseif($sector == 'reminder') $invoiceId = $obj->invoice_id;
 
-                            $objInfo->expiry_date = date($GLOBALS['TL_CONFIG']['dateFormat'],$objInfo->expiry_date);
-                            $objInfo->brutto = $this->getPriceStr($objInfo->price_brutto);
-                            $objInfo->netto = $this->getPriceStr($objInfo->price_netto);
+                    if($invoiceId) {
+                        $objInfo = DB::getInstance()->prepare('SELECT `i`.* FROM `tl_iao_invoice` `i`  WHERE `i`.`id`=?')
+                            ->limit(1)
+                            ->execute($invoiceId);
 
-                            $arrCache[$strTag] = $objInfo->{$parts[1]};
-                            break;
+                        $objInfo->expiry_date = date($GLOBALS['TL_CONFIG']['dateFormat'], $objInfo->expiry_date);
+                        $objInfo->brutto = $this->getPriceStr($objInfo->price_brutto);
+                        $objInfo->netto = $this->getPriceStr($objInfo->price_netto);
 
-                        case 'reminder':
-                            $objInfo = DB::getInstance()->prepare('SELECT `i`.* FROM `tl_iao_invoice` `i` LEFT JOIN `tl_iao_reminder` `r` ON `i`.`id` = `r`.`invoice_id` WHERE `r`.`id`=?')
-                                ->limit(1)
-                                ->execute($id);
-
-                            $objInfo->expiry_date = date($GLOBALS['TL_CONFIG']['dateFormat'],$objInfo->expiry_date);
-                            $objInfo->brutto = $this->getPriceStr($objInfo->price_brutto);
-                            $objInfo->netto = $this->getPriceStr($objInfo->price_netto);
-
-                            $arrCache[$strTag] = $objInfo->{$parts[1]};
-                            break;
-
-                        case 'project':
-                            $objInfo = DB::getInstance()->prepare('SELECT `p`.* FROM `tl_iao_invoice` `i` LEFT JOIN `tl_iao_projects` `p` ON `p`.`id` = `i`.`pid` WHERE `i`.`id`=?')
-                                ->limit(1)
-                                ->execute($id);
-
-                            $arrCache[$strTag] = $objInfo->{$parts[1]};
-                            break;
+                        $arrCache[$strTag] = $objInfo->{$parts[1]};
                     }
                     break;
                 case 'reminder':
 
-                    //relative from this section
-                    switch(strtolower($sector))
-                    {
-                        case 'reminder':
-                            $objInfo = DB::getInstance()->prepare('SELECT `r`.* FROM `tl_iao_reminder` `r`  WHERE `r`.`id`=?')
-                                ->limit(1)
-                                ->execute($id);
+                    $objInfo = DB::getInstance()->prepare('SELECT `r`.* FROM `tl_iao_reminder` `r`  WHERE `r`.`id`=?')
+                        ->limit(1)
+                        ->execute($obj->id);
 
-                            $objInfo->periode_date = date($GLOBALS['TL_CONFIG']['dateFormat'],$objInfo->periode_date);
-                            $objInfo->step = !strlen($objInfo->step) ? 1 : $objInfo->step;
-                            $objInfo->postageStr = (((int)($objInfo->postage) <= 0)) ? '' : $this->getPriceStr($objInfo->postage);
-                            $objInfo->taxStr = ((int)($objInfo->tax) > 0) ? $objInfo->tax.'%' : '';
-                            $objInfo->sum = $this->getReminderSum($id);
-                            $objInfo->sumStr = $this->getPriceStr($objInfo->sum);
+                    $objInfo->periode_date = date($GLOBALS['TL_CONFIG']['dateFormat'],$objInfo->periode_date);
+                    $objInfo->step = !strlen($objInfo->step) ? 1 : $objInfo->step;
+                    $objInfo->postageStr = (((int)($objInfo->postage) <= 0)) ? '' : $this->getPriceStr($objInfo->postage);
+                    $objInfo->taxStr = ((int)($objInfo->tax) > 0) ? $objInfo->tax.'%' : '';
+                    $objInfo->sum = $this->getReminderSum($obj->id);
+                    $objInfo->sumStr = $this->getPriceStr($objInfo->sum);
 
-                            $arrCache[$strTag] = $objInfo->{$parts[1]};
-                            break;
-                    }
+                    $arrCache[$strTag] = $objInfo->{$parts[1]};
                     break;
-                case 'credit':
-                    //relative from this section
-                    switch(strtolower($sector))
-                    {
-                        case 'credit':
-                            $objInfo = DB::getInstance()->prepare('SELECT `tl_iao_credit`.* FROM `tl_iao_credit` `c`  WHERE `c`.`id`=?')
-                                ->limit(1)
-                                ->execute($id);
 
-                            $arrCache[$strTag] = $objInfo->{$parts[1]};
-                            break;
-                    }
+                case 'credit':
+
+                    $objInfo = DB::getInstance()->prepare('SELECT `tl_iao_credit`.* FROM `tl_iao_credit` `c`  WHERE `c`.`id`=?')
+                        ->limit(1)
+                        ->execute($obj->id);
+
+                    $arrCache[$strTag] = $objInfo->{$parts[1]};
                     break;
 
                 case 'project':
+                    // holt alle Projektdaten anhand der Eltern-ID (pid) aus den bereichen invoice_offer_credit etc. die ein Projekt zugeordnet sein können.
                     $objInfo = DB::getInstance()->prepare('SELECT * FROM `tl_iao_projects` WHERE `id`=?')
                         ->limit(1)
-                        ->execute($id);
+                        ->execute($obj->pid);
 
                     $arrCache[$strTag] = $objInfo->{$parts[1]};
                     break;
@@ -290,7 +230,7 @@ class iao extends \Backend
 
                     $objInfo = DB::getInstance()->prepare('SELECT * FROM `tl_iao_agreements` WHERE `id`=?')
                         ->limit(1)
-                        ->execute($id);
+                        ->execute($obj->id);
 
                     if($parts[2] == 'date_format') $arrCache[$strTag] = date( $GLOBALS['TL_CONFIG']['dateFormat'], $objInfo->{$parts[1]});
                     else $arrCache[$strTag] = $objInfo->{$parts[1]};
@@ -310,6 +250,11 @@ class iao extends \Backend
         return $strBuffer;
     }
 
+    /**
+     * @param string $table
+     * @param $id
+     * @return bool|DB\Result|\Database\Result|object
+     */
     public function getTemplateObject($table='tl_iao_templates', $id)
     {
         if((int) $id > 0 && strlen($table) > 0)

@@ -5,7 +5,7 @@
  */
 namespace iao;
 
-
+use Contao\BackendUser as User;
 
 /**
  * Class iaoBackend
@@ -23,25 +23,27 @@ abstract class iaoBackend extends \iao\iao
 	*/
 	public function checkIaoModulePermission($table)
 	{
-		if ($this->User->isAdmin)
+		$User = User::getInstance();
+
+	    if ($User->isAdmin)
 		{
 			return;
 		}
 
 		// Set root IDs
-		if (!is_array($this->User->iaomodules) || count($this->User->iaomodules) < 1)
+		if (!is_array($User->iaomodules) || count($User->iaomodules) < 1)
 		{
 			$root = array(0);
 		}
 		else
 		{
-			$root = $this->User->iaomodules;
+			$root = $User->iaomodules;
 		}
 
 		$GLOBALS['TL_DCA'][$table]['list']['sorting']['root'] = $root;
 
 		// Check permissions to add archives
-		if (!$this->User->hasAccess('create', 'newp'))
+		if (!$User->hasAccess('create', 'newp'))
 		{
 			$GLOBALS['TL_DCA'][$table]['config']['closed'] = true;
 		}
@@ -52,7 +54,7 @@ abstract class iaoBackend extends \iao\iao
 			case 'create':
 			case 'select':
 				// Allow
-			break;
+			    break;
 
 			case 'edit':
 				// Dynamically add the record to the user profile
@@ -335,7 +337,7 @@ abstract class iaoBackend extends \iao\iao
 	 * @param object
 	 * @return array
 	 */
-	public function getSettingOptions($dc)
+	public function getSettingOptions(\DataContainer $dc)
 	{
 		$varValue= array();
 
@@ -374,6 +376,7 @@ abstract class iaoBackend extends \iao\iao
 	 */
 	public function fillReminderFields($invoiceID = 0, $reminderObj)
 	{
+        $settings = [];
 
 		$objMember = $this->Database->prepare('SELECT `m`.*,`i`.`price_brutto`,`i`.`address_text`,`i`.`invoice_id_str` FROM `tl_iao_invoice` as `i` LEFT JOIN `tl_member` as `m` ON `i`.member = `m`.`id` WHERE `i`.`id`=?')
 									->limit(1)
@@ -427,7 +430,7 @@ abstract class iaoBackend extends \iao\iao
 						->execute($reminderObj->id);
 
 		//set sum after other facts is saved
-		$text_finish = $this->changeIAOTags($settings['iao_reminder_'.$newStep.'_text'],'reminder',$reminderObj->id);
+		$text_finish = $this->changeIAOTags($settings['iao_reminder_'.$newStep.'_text'],'reminder',$reminderObj);
 		$text_finish = $this->changeTags($text_finish);
 
 		$set = array
@@ -525,6 +528,7 @@ abstract class iaoBackend extends \iao\iao
     {
         $autoNr = false;
         $varValue = (int) $varValue;
+        $id = \Input::get('id');
 
         // Generate invoice_id if there is none
         if((int) $varValue == 0)
@@ -539,7 +543,7 @@ abstract class iaoBackend extends \iao\iao
         {
             $objNr = $this->Database->prepare("SELECT `invoice_id` FROM `tl_iao_invoice` WHERE `id`=? OR `invoice_id`=?")
                 ->limit(1)
-                ->execute(\Input::get('id'), $varValue);
+                ->execute($id, $varValue);
 
             // Check whether the InvoiceNumber exists
             if ($objNr->numRows > 1 )
@@ -549,10 +553,27 @@ abstract class iaoBackend extends \iao\iao
                     throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'], $varValue));
                 }
 
-                $varValue .= '-' . \Input::get('id');
+                $varValue .= '-' . $id;
             }
         }
         return $varValue;
     }
 
+    /**
+     * genriert HTML für das Anschrift-Feld für Rechnung, Angebot,Gutschrift etc.
+     * @param $intMember
+     * @return string
+     */
+    public function getAdressText($intMember) {
+
+        $text = '';
+        if((int) $intMember < 1) return $text;
+
+        $objMember = \MemberModel::findById($intMember);
+
+        $text = '<p>'.$objMember->company.'<br />'.($objMember->gender!='' ? $GLOBALS['TL_LANG']['tl_iao']['gender'][$objMember->gender].' ':'').($objMember->title ? $objMember->title.' ':'').$objMember->firstname.' '.$objMember->lastname.'<br />'.$objMember->street.'</p>';
+        $text .='<p>'.$objMember->postal.' '.$objMember->city.'</p>';
+
+        return $text;
+    }
 }

@@ -15,7 +15,7 @@
 @define('IAO_VERSION', '1.2');
 @define('IAO_BUILD', '17');
 @define('IAO_PATH','system/modules/invoice_and_offer');
-
+@define('IAO_PDFCLASS_FILE', IAO_PATH.'classes/iaoPDF.php');
 
 /**
  * DEFAULT IAO VALUES 

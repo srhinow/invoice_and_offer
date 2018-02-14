@@ -1,5 +1,7 @@
 <?php
+namespace iao;
 
+use Contao\Database as DB;
 /**
  * @copyright  Sven Rhinow 2011-2013
  * @author     sr-tag Sven Rhinow Webentwicklung <http://www.sr-tag.de>
@@ -25,14 +27,14 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 		'enableVersioning'            => false,
 		'onload_callback' => array
 		(
-			array('tl_iao_offer', 'generateOfferPDF'),
-			array('tl_iao_offer', 'checkPermission'),
-			array('tl_iao_offer', 'updateExpiryToTstmp')
+			array('iao\iaoDcaOffer', 'generateOfferPDF'),
+			array('iao\iaoDcaOffer', 'checkPermission'),
+			array('iao\iaoDcaOffer', 'updateExpiryToTstmp')
 		),
 		'oncreate_callback' => array
 		(
-			array('tl_iao_offer', 'preFillFields'),
-			array('tl_iao_offer', 'setMemmberfieldsFromProject'),
+			array('iao\iaoDcaOffer', 'preFillFields'),
+			array('iao\iaoDcaOffer', 'setMemmberfieldsFromProject'),
 		),
 		'sql' => array
 		(
@@ -58,7 +60,7 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 		(
 			'fields'                  => array('title','offer_id_str'),
 			'format'                  => '%s (%s)',
-			'label_callback'          => array('tl_iao_offer', 'listEntries'),
+			'label_callback'          => array('iao\iaoDcaOffer', 'listEntries'),
 		),
 		'global_operations' => array
 		(
@@ -98,7 +100,7 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 				'label'               => &$GLOBALS['TL_LANG']['tl_iao_offer']['editheader'],
 				'href'                => 'act=edit',
 				'icon'                => 'header.gif',
-				'button_callback'     => array('tl_iao_offer', 'editHeader'),
+				'button_callback'     => array('iao\iaoDcaOffer', 'editHeader'),
 				// 'attributes'          => 'class="edit-header"'
 			),
 			'copy' => array
@@ -125,21 +127,21 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 				'label'               => &$GLOBALS['TL_LANG']['tl_iao_offer']['invoice'],
 				'href'                => 'key=addInvoice',
 				'icon'                => 'system/modules/invoice_and_offer/html/icons/kontact_todo.png',
-				'button_callback'     => array('tl_iao_offer', 'addInvoice')
+				'button_callback'     => array('iao\iaoDcaOffer', 'addInvoice')
 			),
 			'toggle' => array
 			(
 				'label'               => &$GLOBALS['TL_LANG']['tl_iao_credit']['toggle'],
 				'icon'                => 'ok.gif',
 				#'attributes'          => 'onclick="Backend.getScrollOffset(); return AjaxRequest.toggleVisibility(this, %s);"',
-				'button_callback'     => array('tl_iao_offer', 'toggleIcon')
+				'button_callback'     => array('iao\iaoDcaOffer', 'toggleIcon')
 			),
 			'pdf' => array
 			(
 				'label'               => &$GLOBALS['TL_LANG']['tl_iao_offer']['pdf'],
 				'href'                => 'do=iao_offer&key=pdf',
 				'icon'                => 'iconPDF.gif',
-				'button_callback'     => array('tl_iao_offer', 'showPDFButton')
+				'button_callback'     => array('iao\iaoDcaOffer', 'showPDFButton')
 			)
 		)
 	),
@@ -177,7 +179,7 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 			'relation'                => array('type'=>'belongsTo', 'load'=>'eager'),
             'save_callback' => array
             (
-                array('tl_iao_offer', 'fillMemberAndAddressFields')
+                array('iao\iaoDcaOffer', 'fillMemberAndAddressFields')
             ),
 		),
 		'tstamp' => array
@@ -196,7 +198,7 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 			'sorting'                 => true,
 			'flag'                    => 11,
 			'inputType'               => 'select',
-			'options_callback'        => array('tl_iao_offer', 'getSettingOptions'),
+			'options_callback'        => array('iao\iaoDcaOffer', 'getSettingOptions'),
 			'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>false, 'chosen'=>true),
 			'sql'                     => "int(10) unsigned NOT NULL default '0'"
 		),
@@ -217,7 +219,7 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 			'eval'                    => array('rgxp'=>'datim', 'doNotCopy'=>true, 'datepicker'=>$this->getDatePickerString(), 'tl_class'=>'w50 wizard'),
 			'load_callback' => array
 			(
-				array('tl_iao_offer', 'generateOfferTstamp')
+				array('iao\iaoDcaOffer', 'generateOfferTstamp')
 			),
 			'sql'                     => "int(10) unsigned NOT NULL default '0'"
 		),
@@ -229,7 +231,7 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 			'eval'                    => array('rgxp'=>'date', 'doNotCopy'=>true, 'datepicker'=>$this->getDatePickerString(), 'tl_class'=>'w50 wizard'),
 			'load_callback' => array
 			(
-				array('tl_iao_offer', 'generateExpiryDate')
+				array('iao\iaoDcaOffer', 'generateExpiryDate')
 			),
 			'sql'                     => "varchar(255) NOT NULL default ''"
 		),
@@ -242,7 +244,7 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 			'eval'                    => array('rgxp'=>'alnum', 'doNotCopy'=>true, 'spaceToUnderscore'=>true, 'maxlength'=>128, 'tl_class'=>'w50'),
 			'save_callback' => array
 			(
-				array('tl_iao_offer', 'setFieldOfferNumber')
+				array('iao\iaoDcaOffer', 'setFieldOfferNumber')
 			),
 			'sql'					  => "int(10) unsigned NOT NULL default '0'"
 		),
@@ -255,7 +257,7 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 			'eval'                    => array('doNotCopy'=>true, 'spaceToUnderscore'=>true, 'maxlength'=>128, 'tl_class'=>'w50'),
 			'save_callback' => array
 			(
-				array('tl_iao_offer', 'setFieldOfferNumberStr')
+				array('iao\iaoDcaOffer', 'setFieldOfferNumberStr')
 			),
 			'sql'					  => "varchar(255) NOT NULL default ''"
 		),
@@ -278,11 +280,11 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 			'flag'                    => 11,
 			'inputType'               => 'select',
 			// 'foreignKey'              => 'tl_member.company',
-			'options_callback'        => array('tl_iao_offer', 'getMemberOptions'),
+			'options_callback'        => array('iao\iaoDcaOffer', 'getMemberOptions'),
 			'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>true,'submitOnChange'=>true, 'chosen'=>true),
 			'save_callback' => array
 			(
-				array('tl_iao_offer', 'fillAddressSaveCallback')
+				array('iao\iaoDcaOffer', 'fillAddressSaveCallback')
 			),
 			'sql'					  => "varbinary(128) NOT NULL default ''"
 		),
@@ -303,11 +305,11 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 			'sorting'                 => true,
 			'flag'                    => 11,
 			'inputType'               => 'select',
-			'options_callback'        => array('tl_iao_offer', 'getBeforeTemplate'),
+			'options_callback'        => array('iao\iaoDcaOffer', 'getBeforeTemplate'),
 			'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>true,'submitOnChange'=>true, 'chosen'=>true),
 			'save_callback' => array
 			(
-				array('tl_iao_offer', 'fillBeforeText')
+				array('iao\iaoDcaOffer', 'fillBeforeText')
 			),
 			'sql'					  => "int(10) unsigned NOT NULL default '0'"
 		),
@@ -328,11 +330,11 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 			'sorting'                 => true,
 			'flag'                    => 11,
 			'inputType'               => 'select',
-			'options_callback'        => array('tl_iao_offer', 'getAfterTemplate'),
+			'options_callback'        => array('iao\iaoDcaOffer', 'getAfterTemplate'),
 			'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>true,'submitOnChange'=>true, 'chosen'=>true),
 			'save_callback' => array
 			(
-				array('tl_iao_offer', 'fillAfterText')
+				array('iao\iaoDcaOffer', 'fillAfterText')
 			),
 			'sql'					  => "int(10) unsigned NOT NULL default '0'"
 		),
@@ -432,7 +434,7 @@ $GLOBALS['TL_DCA']['tl_iao_offer'] = array
 /**
  * Class tl_iao_offer
  */
-class tl_iao_offer extends \iao\iaoBackend
+class iaoDcaOffer extends iaoBackend
 {
 
 	protected $settings = array();
@@ -444,9 +446,7 @@ class tl_iao_offer extends \iao\iaoBackend
 	{
 		parent::__construct();
 		$this->import('BackendUser', 'User');
-		$this->import('iao');
 	}
-
 
 	/**
 	 * Check permissions to edit table tl_iao_offer
@@ -464,7 +464,7 @@ class tl_iao_offer extends \iao\iaoBackend
 	*/
 	public function preFillFields($table, $id, $set)
 	{
-		$objProject = iao\IaoProjectsModel::findProjectByIdOrAlias($set['pid']);
+		$objProject = IaoProjectsModel::findProjectByIdOrAlias($set['pid']);
 		$settingId = ($objProject !== null && $objProject->setting_id != 0) ? $objProject->setting_id : 1;
 		$settings = $this->getSettings($settingId);
 
@@ -477,7 +477,7 @@ class tl_iao_offer extends \iao\iaoBackend
 			'offer_id_str' => $offerIdStr
 		);
 
-		$this->Database->prepare('UPDATE '.$table.' %s WHERE `id`=?')
+		DB::getInstance()->prepare('UPDATE '.$table.' %s WHERE `id`=?')
 						->set($set)
 						->limit(1)
 						->execute($id);
@@ -487,9 +487,9 @@ class tl_iao_offer extends \iao\iaoBackend
 	 * fill date-Field if this empty
 	 * @param mixed
 	 * @param object
-	 * @return date
+	 * @return int
 	 */
-	public function  generateExpiryDate($varValue, DataContainer $dc)
+	public function  generateExpiryDate($varValue, \DataContainer $dc)
 	{
 		$settings = $this->getSettings($dc->activeRecord->setting_id);
 
@@ -502,16 +502,19 @@ class tl_iao_offer extends \iao\iaoBackend
 		return  $varValue;
 	}
 
-	public function updateExpiryToTstmp(DataContainer $dc)
+    /**
+     * @param \DataContainer $dc
+     */
+	public function updateExpiryToTstmp(\DataContainer $dc)
 	{
-		$offerObj = $this->Database->prepare('SELECT * FROM `tl_iao_offer`')
-								   ->execute();
+		$offerObj = IaoOfferModel::findAll();
+
 	   	while($offerObj->next())
    		{
    			if(!stripos($offerObj->expiry_date,'-')) continue;
 
 			$set = array('expiry_date' => strtotime($offerObj->expiry_date));
-			$this->Database->prepare('UPDATE `tl_iao_offer` %s WHERE `id`=?')
+			DB::getInstance()->prepare('UPDATE `tl_iao_offer` %s WHERE `id`=?')
 						->set($set)
 						->execute($offerObj->id);
    		}
@@ -521,9 +524,9 @@ class tl_iao_offer extends \iao\iaoBackend
 	 * fill date-Field if this empty
 	 * @param mixed
 	 * @param object
-	 * @return date
+	 * @return integer
 	 */
-	public function  generateOfferTstamp($varValue, DataContainer $dc)
+	public function  generateOfferTstamp($varValue, \DataContainer $dc)
 	{
 		return ((int)$varValue == 0) ? time() : $varValue;
 	}
@@ -534,31 +537,30 @@ class tl_iao_offer extends \iao\iaoBackend
      * @param $dc object
      * @return $value string
      */
-    public function fillMemberAndAddressFields($varValue, DataContainer $dc)
+    public function fillMemberAndAddressFields($varValue, \DataContainer $dc)
     {
         if((strlen($varValue) < 1)) return $varValue;
 
-        $objProj = iao\IaoProjectsModel::findProjectByIdOrAlias($varValue);
+        $objProj = IaoProjectsModel::findProjectByIdOrAlias($varValue);
         if(is_object($objProj))
         {
             if((int) $objProj->member > 0)
             {
                 $addressText = $this->getAddressText($objProj->member);
-                $set = array(
+
+                $set = [
                     'member' => $objProj->member,
                     'address_text' => $addressText
-                );
-
-//                $dc->activeRecord->address_text = $addressText;
+                ];
 
             } else {
-                $set = array(
+                $set = [
                     'member' => '',
                     'address_text' => ''
-                );
+                ];
             }
 
-            $this->Database->prepare("UPDATE `tl_iao_offer` %s WHERE `id`=?")
+            DB::getInstance()->prepare("UPDATE `tl_iao_offer` %s WHERE `id`=?")
                 ->limit(1)
                 ->set($set)
                 ->execute($dc->id);
@@ -569,16 +571,17 @@ class tl_iao_offer extends \iao\iaoBackend
     }
 	/**
 	 * fill Adress-Text
-	 * @param object
-	 * @throws Exception
+     * @param $varValue mixed
+	 * @param $dc object
+	 * @return mixed
 	 */
-	public function fillAddressSaveCallback($varValue, DataContainer $dc)
+	public function fillAddressSaveCallback($varValue, \DataContainer $dc)
 	{
         if(strlen($varValue) < 1) return $varValue;
 
         $text = $this->getAddressText($varValue);
 
-        $this->Database->prepare('UPDATE `tl_iao_offer` SET `address_text`=? WHERE `id`=?')
+        DB::getInstance()->prepare('UPDATE `tl_iao_offer` SET `address_text`=? WHERE `id`=?')
                 ->limit(1)
                 ->execute($text,$dc->id);
 
@@ -588,7 +591,7 @@ class tl_iao_offer extends \iao\iaoBackend
 	/**
 	 * get address text
      * @param $memberId integer
-	 * @throws Exception
+	 * @return string
 	 */
 	public function getAddressText($memberId)
 	{
@@ -604,61 +607,76 @@ class tl_iao_offer extends \iao\iaoBackend
 	}
 
 	/**
-	 * fill Text before
-	 * @param object
-	 * @throws Exception
+     * fill Text before if this field is empty
+     * @param $varValue integer
+     * @param $dc object
+     * @return integer
 	 */
-	public function fillBeforeText($varValue, DataContainer $dc)
+	public function fillBeforeText($varValue, \DataContainer $dc)
 	{
 		if(strip_tags($dc->activeRecord->before_text) == '')
 		{
 			if(strlen($varValue)<=0) return $varValue;
 
-			$objTemplate = $this->Database->prepare('SELECT * FROM `tl_iao_templates` WHERE `id`=?')
-							->limit(1)
-							->execute($varValue);
+            //hole das ausgewähte Template
+            $objTemplate = IaoTemplatesModel::findById($varValue);
 
-			$text = $this->replacePlaceholder($objTemplate->text,$dc);
+            //hole den aktuellen Datensatz als DB-Object
+            $objDbOffer = IaoOfferModel::findById($dc->id);
 
-			$this->Database->prepare('UPDATE `tl_iao_offer` SET `before_text`=? WHERE `id`=?')
-					->limit(1)
-					->execute($text,$dc->id);
+			$text = $this->changeIAOTags($objTemplate->text, 'offer', $objDbOffer);
+
+            // schreibe das Textfeld
+            $set =['before_text' => $text];
+			DB::getInstance()->prepare('UPDATE `tl_iao_offer` %s WHERE `id`=?')
+                ->set($set)
+                ->limit(1)
+                ->execute($dc->id);
 		}
 		return $varValue;
 	}
 
 	/**
-	 * fill Text after
-	 * @param object
-	 * @throws Exception
+     * fill Text after if this field is empty
+     * @param $varValue integer
+     * @param $dc object
+     * @return integer
 	 */
-	public function fillAfterText($varValue, DataContainer $dc)
+	public function fillAfterText($varValue, \DataContainer $dc)
 	{
-		if(strip_tags($dc->activeRecord->after_text)=='')
+		if(strip_tags($dc->activeRecord->after_text) == '')
 		{
-			if(strlen($varValue)<=0) return $varValue;
+			if(strlen($varValue) < 1) return $varValue;
 
-			$objTemplate = $this->Database->prepare('SELECT `text` FROM `tl_iao_templates` WHERE `id`=?')
-						->limit(1)
-						->execute($varValue);
+            //hole das ausgewähte Template
+            $objTemplate = IaoTemplatesModel::findById($varValue);
 
-			$this->Database->prepare('UPDATE `tl_iao_offer` SET `after_text`=? WHERE `id`=?')
-					->limit(1)
-					->execute($objTemplate->text,$dc->id);
+            //hole den aktuellen Datensatz als DB-Object
+            $objDbOffer = IaoOfferModel::findById($dc->id);
+
+            // ersetzte evtl. Platzhalter
+            $text = $this->changeIAOTags($objTemplate->text,'offer', $objDbOffer);
+
+            // schreibe das Textfeld
+            $set =['after_text' => $text];
+			DB::getInstance()->prepare('UPDATE `tl_iao_offer` SET `after_text`=? WHERE `id`=?')
+				->set($set)
+                ->limit(1)
+				->execute($text,$dc->id);
 		}
 		return $varValue;
 	}
 
 	/**
-	 * get all offer before template
-	 * @param object
-	 * @throws Exception
+     * get all template with position = 'offer_before_text'
+     * @param object
+     * @return array
 	 */
-	public function getBeforeTemplate(DataContainer $dc)
+	public function getBeforeTemplate(\DataContainer $dc)
 	{
 		$varValue= array();
 
-		$all = $this->Database->prepare('SELECT `id`,`title` FROM `tl_iao_templates` WHERE `position`=?')
+		$all = DB::getInstance()->prepare('SELECT `id`,`title` FROM `tl_iao_templates` WHERE `position`=?')
 					->execute('offer_before_text');
 
 		while($all->next())
@@ -670,15 +688,15 @@ class tl_iao_offer extends \iao\iaoBackend
 	}
 
 	/**
-	 * get all invoice after template
-	 * @param object
-	 * @throws Exception
+     * get all template with position = 'offer_after_text'
+     * @param object
+     * @return array
 	 */
-	public function getAfterTemplate(DataContainer $dc)
+	public function getAfterTemplate(\DataContainer $dc)
 	{
 		$varValue= array();
 
-		$all = $this->Database->prepare('SELECT `id`,`title` FROM `tl_iao_templates` WHERE `position`=?')
+		$all = DB::getInstance()->prepare('SELECT `id`,`title` FROM `tl_iao_templates` WHERE `position`=?')
 					->execute('offer_after_text');
 
 		while($all->next())
@@ -706,11 +724,11 @@ class tl_iao_offer extends \iao\iaoBackend
 
 	/**
 	 * generate invoice from this offer
-	 * @param array
-	 * @param string
-	 * @param string
-	 * @param string
-	 * @param string
+	 * @param $row array
+	 * @param $href string
+	 * @param $label string
+	 * @param $title string
+	 * @param $icon string
 	 * @return string
 	 */
     public function addInvoice($row, $href, $label, $title, $icon)
@@ -737,7 +755,7 @@ class tl_iao_offer extends \iao\iaoBackend
 				'notice' => $row['notice'],
 		    );
 
-			$result = $this->Database->prepare('INSERT INTO `tl_iao_invoice` %s')
+			$result = DB::getInstance()->prepare('INSERT INTO `tl_iao_invoice` %s')
 							->set($set)
 							->execute();
 
@@ -746,14 +764,13 @@ class tl_iao_offer extends \iao\iaoBackend
 			//Insert Postions for this Entry
 			if($newInvoiceID)
 			{
-				$posten = $this->Database->prepare('SELECT * FROM `tl_iao_offer_items` WHERE `pid`=? ')
+				$posten = DB::getInstance()->prepare('SELECT * FROM `tl_iao_offer_items` WHERE `pid`=? ')
 								->execute($row['id']);
 
-				while($posten->next())
+				if(is_object($posten)) while($posten->next())
 				{
 					//Insert Invoice-Entry
-					$postenset = array
-					(
+					$postenset = [
 						'pid' => $newInvoiceID,
 						'tstamp' => $posten->tstamp,
 						'type' => $posten->type,
@@ -772,15 +789,18 @@ class tl_iao_offer extends \iao\iaoBackend
 						'published' => $posten->published,
 						'vat' => $posten->vat,
 						'vat_incl' => $posten->vat_incl
-					);
+                    ];
 
-					$newposten = $this->Database->prepare('INSERT INTO `tl_iao_invoice_items` %s')
+					DB::getInstance()->prepare('INSERT INTO `tl_iao_invoice_items` %s')
 									->set($postenset)
 									->execute();
 				}
 
 				// Update the database
-				$this->Database->prepare("UPDATE tl_iao_offer SET status='2' WHERE id=?")
+                $set = ['status'=>'2'];
+
+				DB::getInstance()->prepare("UPDATE tl_iao_offer %s WHERE id=?")
+                                ->set($set)
 								->execute($row['id']);
 
 				$this->redirect($this->addToUrl('do=iao_invoice&table=tl_iao_invoice&id='.$newInvoiceID.'&act=edit') );
@@ -790,14 +810,14 @@ class tl_iao_offer extends \iao\iaoBackend
 		$link = (\Input::get('onlyproj') == 1) ? 'do=iao_offer&amp;id='.$row['id'].'&amp;projId='.\Input::get('id') : 'do=iao_offer&amp;id='.$row['id'].'';
 		$link = $this->addToUrl($href.'&amp;'.$link);
 		$link = str_replace('table=tl_iao_offer&amp;','',$link);
-		return '<a href="'.$link.'" title="'.specialchars($title).'">'.$this->generateImage($icon, $label).'</a> ';
+		return '<a href="'.$link.'" title="'.specialchars($title).'">'.\Image::getHtml($icon, $label).'</a> ';
 	}
 
-	/**
-	* wenn GET-Parameter passen dann wird eine PDF erzeugt
-	*
-	*/
-	public function generateOfferPDF(DataContainer $dc)
+    /**
+     * wenn GET-Parameter passen dann wird eine PDF erzeugt
+     * @param \DataContainer $dc
+     */
+	public function generateOfferPDF(\DataContainer $dc)
 	{
 		if(\Input::get('key') == 'pdf' && (int) \Input::get('id') > 0) $this->generatePDF((int) \Input::get('id'), 'offer');
 	}
@@ -820,7 +840,7 @@ class tl_iao_offer extends \iao\iaoBackend
 
 		// Wenn keine PDF-Vorlage dann kein PDF-Link
 	    $objPdfTemplate = 	\FilesModel::findByUuid($settings['iao_offer_pdf']);			
-		if(strlen($objPdfTemplate->path) < 1 || !file_exists(TL_ROOT . '/' . $objPdfTemplate->path) ) return;  // template file not found
+		if(strlen($objPdfTemplate->path) < 1 || !file_exists(TL_ROOT . '/' . $objPdfTemplate->path) ) return false;  // template file not found
 
 		$href = 'contao/main.php?do=iao_offer&amp;key=pdf&amp;id='.$row['id'];
 		return '<a href="'.$href.'" title="'.specialchars($title).'">'.\Image::getHtml($icon, $label).'</a> ';
@@ -833,7 +853,7 @@ class tl_iao_offer extends \iao\iaoBackend
 	* @param object
 	* @return string
 	*/
-	public function setFieldOfferNumberStr($varValue, DataContainer $dc)
+	public function setFieldOfferNumberStr($varValue, \DataContainer $dc)
 	{
 		$settings = $this->getSettings($dc->activeRecord->setting_id);
 		$tstamp = ($dc->activeRecord->tstamp)?: time();
@@ -851,7 +871,6 @@ class tl_iao_offer extends \iao\iaoBackend
 	 */
 	public function generateOfferNumberStr($varValue, $offerId, $tstamp, $settings)
 	{
-
 		if(strlen($varValue) < 1)
 		{
 			$format = 		$settings['iao_offer_number_format'];
@@ -868,7 +887,7 @@ class tl_iao_offer extends \iao\iaoBackend
 	* @param object
 	* @return string
 	*/
-	public function setFieldOfferNumber($varValue, DataContainer $dc)
+	public function setFieldOfferNumber($varValue, \DataContainer $dc)
 	{
 		$settings = $this->getSettings($dc->activeRecord->setting_id);
 		return $this->generateOfferNumber($varValue, $settings);
@@ -889,7 +908,7 @@ class tl_iao_offer extends \iao\iaoBackend
 		if($varValue == 0)
 		{
 			$autoNr = true;
-			$objNr = $this->Database->prepare("SELECT `offer_id` FROM `tl_iao_offer` ORDER BY `offer_id` DESC")
+			$objNr = DB::getInstance()->prepare("SELECT `offer_id` FROM `tl_iao_offer` ORDER BY `offer_id` DESC")
 									->limit(1)
 									->execute();
 
@@ -898,7 +917,7 @@ class tl_iao_offer extends \iao\iaoBackend
 		}
 		else
 		{
-			$objNr = $this->Database->prepare("SELECT `offer_id` FROM `tl_iao_offer` WHERE `id`=? OR `offer_id`=?")
+			$objNr = DB::getInstance()->prepare("SELECT `offer_id` FROM `tl_iao_offer` WHERE `id`=? OR `offer_id`=?")
 									->limit(1)
 									->execute(\Input::get('id'),$varValue);
 
@@ -907,7 +926,7 @@ class tl_iao_offer extends \iao\iaoBackend
 			{
 				if (!$autoNr)
 				{
-					throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'], $varValue));
+					throw new \Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'], $varValue));
 				}
 
 				$varValue .= '-' . \Input::get('id');
@@ -926,7 +945,7 @@ class tl_iao_offer extends \iao\iaoBackend
 	{
 		$settings = $this->getSettings($arrRow['settings_id']);
 
-		$result = $this->Database->prepare("SELECT `firstname`,`lastname`,`company` FROM `tl_member`  WHERE id=?")
+		$result = DB::getInstance()->prepare("SELECT `firstname`,`lastname`,`company` FROM `tl_member`  WHERE id=?")
 						->limit(1)
 						->execute($arrRow['member']);
 
@@ -989,9 +1008,10 @@ class tl_iao_offer extends \iao\iaoBackend
 			$this->redirect('contao/main.php?act=error');
 		}
 
-		$this->createInitialVersion('tl_iao_offer', $intId);
+        $objVersions = new \Versions('tl_iao_offer', $intId);
+        $objVersions->initialize();
 
-		// Trigger the save_callback
+        // Trigger the save_callback
 		if (is_array($GLOBALS['TL_DCA']['tl_iao_offer']['fields']['status']['save_callback']))
 		{
 			foreach ($GLOBALS['TL_DCA']['tl_iao_offer']['fields']['status']['save_callback'] as $callback)
@@ -1002,10 +1022,12 @@ class tl_iao_offer extends \iao\iaoBackend
 		}
 
 		// Update the database
-		$this->Database->prepare("UPDATE tl_iao_offer SET status='" . ($blnVisible==1 ? '1' : '2') . "' WHERE id=?")
+        $set = ['status'=>($blnVisible==1 ? '1' : '2')];
+
+		DB::getInstance()->prepare("UPDATE tl_iao_offer %s WHERE id=?")
+                        ->set($set)
 						->execute($intId);
 
-		$objVersions = new \Versions('tl_iao_offer', $intId);
         $objVersions->create();
 	}
 }

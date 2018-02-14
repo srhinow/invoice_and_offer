@@ -1,7 +1,10 @@
 <?php
+namespace iao;
+
+use Contao\Database as DB;
 
 /**
- * @copyright  Sven Rhinow 2011-2017
+ * @copyright  Sven Rhinow 2011-2018
  * @author     sr-tag Sven Rhinow Webentwicklung <http://www.sr-tag.de>
  * @package    invoice_and_offer
  * @license    LGPL
@@ -25,13 +28,13 @@ $GLOBALS['TL_DCA']['tl_iao_credit'] = array
 		'enableVersioning'            => false,
 		'onload_callback' => array
 		(
-			array('tl_iao_credit', 'generateCreditPDF'),
-			array('tl_iao_credit', 'checkPermission'),
+			array('iao\iaoDcaCredit', 'generateCreditPDF'),
+			array('iao\iaoDcaCredit', 'checkPermission'),
 		),
 		'oncreate_callback' => array
 		(
-			array('tl_iao_credit', 'preFillFields'),
-			array('tl_iao_credit', 'setMemmberfieldsFromProject'),
+			array('iao\iaoDcaCredit', 'preFillFields'),
+			array('iao\iaoDcaCredit', 'setMemmberfieldsFromProject'),
 		),
 		'sql' => array
 		(
@@ -57,7 +60,7 @@ $GLOBALS['TL_DCA']['tl_iao_credit'] = array
 		(
 			'fields'                  => array('title','credit_id_str'),
 			'format'                  => '%s (%s)',
-			'label_callback'          => array('tl_iao_credit', 'listEntries'),
+			'label_callback'          => array('iao\iaoDcaCredit', 'listEntries'),
 		),
 		'global_operations' => array
 		(
@@ -83,7 +86,7 @@ $GLOBALS['TL_DCA']['tl_iao_credit'] = array
 				'label'               => &$GLOBALS['TL_LANG']['tl_iao_credit']['editheader'],
 				'href'                => 'act=edit',
 				'icon'                => 'header.gif',
-				'button_callback'     => array('tl_iao_credit', 'editHeader'),
+				'button_callback'     => array('iao\iaoDcaCredit', 'editHeader'),
 				// 'attributes'          => 'class="edit-header"'
 			),
 			'copy' => array
@@ -110,14 +113,14 @@ $GLOBALS['TL_DCA']['tl_iao_credit'] = array
 			(
 				'label'               => &$GLOBALS['TL_LANG']['tl_iao_credit']['toggle'],
 				'icon'                => 'ok.gif',
-				'button_callback'     => array('tl_iao_credit', 'toggleIcon')
+				'button_callback'     => array('iao\iaoDcaCredit', 'toggleIcon')
 			),
 			'pdf' => array
 			(
 				'label'               => &$GLOBALS['TL_LANG']['tl_iao_credit']['pdf'],
 				'href'                => 'key=pdf',
 				'icon'                => 'iconPDF.gif',
-				'button_callback'     => array('tl_iao_credit', 'showPDFButton')
+				'button_callback'     => array('iao\iaoDcaCredit', 'showPDFButton')
 			)
 		)
 	),
@@ -170,7 +173,7 @@ $GLOBALS['TL_DCA']['tl_iao_credit'] = array
 			'sorting'                 => true,
 			'flag'                    => 11,
 			'inputType'               => 'select',
-			'options_callback'        => array('tl_iao_credit', 'getSettingOptions'),
+			'options_callback'        => array('iao\iaoDcaCredit', 'getSettingOptions'),
 			'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>false, 'chosen'=>true),
 			'sql'                     => "int(10) unsigned NOT NULL default '0'"
 		),
@@ -191,7 +194,7 @@ $GLOBALS['TL_DCA']['tl_iao_credit'] = array
 			'eval'                    => array('rgxp'=>'datim', 'doNotCopy'=>true, 'datepicker'=>$this->getDatePickerString(), 'tl_class'=>'w50 wizard'),
 			'load_callback' => array
 			(
-				array('tl_iao_credit', 'generateCreditTstamp')
+				array('iao\iaoDcaCredit', 'generateCreditTstamp')
 			),
 			'sql'                     => "int(10) unsigned NOT NULL default '0'"
 		),
@@ -203,7 +206,7 @@ $GLOBALS['TL_DCA']['tl_iao_credit'] = array
 			'eval'                    => array('rgxp'=>'date', 'doNotCopy'=>true, 'datepicker'=>$this->getDatePickerString(), 'tl_class'=>'w50 wizard'),
 			'load_callback' => array
 			(
-				array('tl_iao_credit', 'generateExpiryDate')
+				array('iao\iaoDcaCredit', 'generateExpiryDate')
 			),
 			'sql'                     => "varchar(255) NOT NULL default ''"
 		),
@@ -215,7 +218,7 @@ $GLOBALS['TL_DCA']['tl_iao_credit'] = array
 			'eval'                    => array('rgxp'=>'alnum', 'doNotCopy'=>true, 'spaceToUnderscore'=>true, 'maxlength'=>128, 'tl_class'=>'w50'),
 			'save_callback' => array
 			(
-				array('tl_iao_credit', 'generateCreditNumber')
+				array('iao\iaoDcaCredit', 'setFieldCreditNumber')
 			),
 			'sql'					  => "int(10) unsigned NOT NULL default '0'"
 		),
@@ -227,7 +230,7 @@ $GLOBALS['TL_DCA']['tl_iao_credit'] = array
 			'eval'                    => array('doNotCopy'=>true, 'spaceToUnderscore'=>true, 'maxlength'=>128, 'tl_class'=>'w50'),
 			'save_callback' => array
 			(
-				array('tl_iao_credit', 'createCreditNumberStr')
+				array('iao\iaoDcaCredit', 'createCreditNumberStr')
 			),
 			'sql'					  => "varchar(255) NOT NULL default ''"
 		),
@@ -247,11 +250,11 @@ $GLOBALS['TL_DCA']['tl_iao_credit'] = array
 			'sorting'                 => true,
 			'flag'                    => 11,
 			'inputType'               => 'select',
-			'options_callback'        => array('tl_iao_credit', 'getMemberOptions'),
+			'options_callback'        => array('iao\iaoDcaCredit', 'getMemberOptions'),
 			'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>true,'submitOnChange'=>true, 'chosen'=>true),
 			'save_callback' => array
 			(
-				array('tl_iao_credit', 'fillAdressText')
+				array('iao\iaoDcaCredit', 'fillAdressText')
 			),
 			'sql'					  => "varbinary(128) NOT NULL default ''"
 		),
@@ -273,11 +276,11 @@ $GLOBALS['TL_DCA']['tl_iao_credit'] = array
 			'sorting'                 => true,
 			'flag'                    => 11,
 			'inputType'               => 'select',
-			'options_callback'        => array('tl_iao_credit', 'getBeforeTemplate'),
+			'options_callback'        => array('iao\iaoDcaCredit', 'getBeforeTemplate'),
 			'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>true,'submitOnChange'=>true),
 			'save_callback' => array
 			(
-				array('tl_iao_credit', 'fillBeforeText')
+				array('iao\iaoDcaCredit', 'fillBeforeTextFromTemplate')
 			),
 			'sql'					  => "int(10) unsigned NOT NULL default '0'"
 		),
@@ -299,11 +302,11 @@ $GLOBALS['TL_DCA']['tl_iao_credit'] = array
 			'sorting'                 => true,
 			'flag'                    => 11,
 			'inputType'               => 'select',
-			'options_callback'        => array('tl_iao_credit', 'getAfterTemplate'),
+			'options_callback'        => array('iao\iaoDcaCredit', 'getAfterTemplate'),
 			'eval'                    => array('tl_class'=>'w50','includeBlankOption'=>true,'submitOnChange'=>true),
 			'save_callback' => array
 			(
-				array('tl_iao_credit', 'fillAfterText')
+				array('iao\iaoDcaCredit', 'fillAfterTextFromTemplate')
 			),
 			'sql'					  => "int(10) unsigned NOT NULL default '0'"
 		),
@@ -387,9 +390,10 @@ $GLOBALS['TL_DCA']['tl_iao_credit'] = array
 
 
 /**
- * Class tl_iao_credit
+ * Class iaoDcaCredit
+ * @package iao
  */
-class tl_iao_credit  extends \iao\iaoBackend
+class iaoDcaCredit  extends \iao\iaoBackend
 {
 
 	protected $settings = array();
@@ -428,7 +432,7 @@ class tl_iao_credit  extends \iao\iaoBackend
 			'credit_id_str' => $creditIdStr
 		);
 
-		$this->Database->prepare('UPDATE '.$table.' %s WHERE `id`=?')
+        DB::getInstance()->prepare('UPDATE '.$table.' %s WHERE `id`=?')
 						->set($set)
 						->limit(1)
 						->execute($id);
@@ -438,20 +442,20 @@ class tl_iao_credit  extends \iao\iaoBackend
 	 * fill date-Field if this empty
 	 * @param mixed
 	 * @param object
-	 * @return date
+	 * @return integer
 	 */
-	public function  generateCreditDate($varValue, DataContainer $dc)
+	public function  generateCreditDate($varValue, \DataContainer $dc)
 	{
-		return ($varValue==0) ? date('Y-m-d') : $varValue;
+		return ($varValue==0) ? date($GLOBALS['TL_CONFIG']['dateFormat']) : $varValue;
 	}
 
 	/**
 	 * fill date-Field if this empty
-	 * @param mixed
-	 * @param object
-	 * @return date
+	 * @param $varValue mixed
+	 * @param $dc object
+	 * @return mixed
 	 */
-	public function  generateExpiryDate($varValue, DataContainer $dc)
+	public function  generateExpiryDate($varValue, \DataContainer $dc)
 	{
 		$settings = $this->getSettings($dc->activeRecord->setting_id);
 
@@ -464,73 +468,77 @@ class tl_iao_credit  extends \iao\iaoBackend
 	    return  $varValue;
 	}
 
-	public function updateExpiryToTstmp(DataContainer $dc)
+    /**
+     * @param \DataContainer $dc
+     */
+	public function updateExpiryToTstmp(\DataContainer $dc)
 	{
-		$creditObj = $this->Database->prepare('SELECT * FROM `tl_iao_credit`')
-								   ->execute();
-	   	while($creditObj->next())
-   		{
-   			if(!stripos($creditObj->expiry_date,'-')) continue;
+        $objCredits = IaoCreditModel::findAll();
 
-			$set = array('expiry_date' => strtotime($creditObj->expiry_date));
-			$this->Database->prepare('UPDATE `tl_iao_credit` %s WHERE `id`=?')
+        if(is_object($objCredits)) while($objCredits->next())
+   		{
+   			if(!stripos($objCredits->expiry_date,'-')) continue;
+
+			$set = array('expiry_date' => strtotime($objCredits->expiry_date));
+            DB::getInstance()->prepare('UPDATE `tl_iao_credit` %s WHERE `id`=?')
 						->set($set)
-						->execute($creditObj->id);
+						->execute($objCredits->id);
    		}
 	}
 
 	/**
 	 * fill date-Field if this empty
-	 * @param mixed
-	 * @param object
-	 * @return date
+	 * @param $varValue mixed
+	 * @param $dc object
+	 * @return integer
 	 */
-	public function  generateCreditTstamp($varValue, DataContainer $dc)
+	public function  generateCreditTstamp($varValue, \DataContainer $dc)
 	{
 		return ((int)$varValue == 0) ? time() : $varValue;
 	}
 
 	/**
 	 * fill Adress-Text
-	 * @param object
-	 * @throws Exception
+     * @param $intMember integer
+	 * @param $dc object
+	 * @return integer
 	 */
-	public function fillAdressText($varValue, DataContainer $dc)
+	public function fillAdressText($intMember, \DataContainer $dc)
 	{
 		if(trim(strip_tags($dc->activeRecord->address_text)) == '')
 		{
-			if(strlen($varValue) <= 0) return $varValue;
+            $text = $this->getAdressText($intMember);
 
-			$objMember = \MemberModel::findById($varValue);
-
-			$text = '<p>'.$objMember->company.'<br />'.($objMember->gender!='' ? $GLOBALS['TL_LANG']['tl_iao_credit']['gender'][$objMember->gender].' ':'').($objMember->title ? $objMember->title.' ':'').$objMember->firstname.' '.$objMember->lastname.'<br />'.$objMember->street.'</p>';
-			$text .='<p>'.$objMember->postal.' '.$objMember->city.'</p>';
-
-			$this->Database->prepare('UPDATE `tl_iao_credit` SET `address_text`=? WHERE `id`=?')
+			DB::getInstance()->prepare('UPDATE `tl_iao_credit` SET `address_text`=? WHERE `id`=?')
 				   ->limit(1)
-				   ->execute($text,$dc->id);
+				   ->execute($text, $dc->id);
 		}
-		return $varValue;
+		return $intMember;
 	}
 
 	/**
-	 * fill Text before
-	 * @param object
-	 * @throws Exception
+	 * fill Text before if this field is empty
+     * @param $varValue integer
+	 * @param $dc object
+	 * @return integer
 	 */
-	public function fillBeforeText($varValue, DataContainer $dc)
+	public function fillBeforeTextFromTemplate($varValue, \DataContainer $dc)
 	{
-		if(strip_tags($dc->activeRecord->before_text)=='')
+		if(strip_tags($dc->activeRecord->before_text) == '')
 		{
 			if(strlen($varValue)<=0) return $varValue;
 
-		    $objTemplate = $this->Database->prepare('SELECT * FROM `tl_iao_templates` WHERE `id`=?')
-						->limit(1)
-						->execute($varValue);
+			//hole das ausgewähte Template
+            $objTemplate = IaoTemplatesModel::findById($varValue);
 
-			$text = $this->replacePlaceholder($objTemplate->text, $dc);
+            //hole den aktuellen Datensatz als DB-Object
+            $objDbCredit = IaoCreditModel::findById($dc->id);
 
-		    $this->Database->prepare('UPDATE `tl_iao_credit` SET `before_text`=? WHERE `id`=?')
+            // ersetzte evtl. Platzhalter
+			$text = $this->changeIAOTags($objTemplate->text, 'credit' , $objDbCredit);
+
+			// schreibe das Textfeld
+		    DB::getInstance()->prepare('UPDATE `tl_iao_credit` SET `before_text`=? WHERE `id`=?')
 				   ->limit(1)
 				   ->execute($text, $dc->id);
 		}
@@ -538,22 +546,28 @@ class tl_iao_credit  extends \iao\iaoBackend
 	}
 
 	/**
-	 * fill Text after
-	 * @param object
-	 * @throws Exception
+     * fill Text after if this field is empty
+     * @param $varValue integer
+     * @param $dc object
+     * @return integer
 	 */
-	public function fillAfterText($varValue, DataContainer $dc)
+	public function fillAfterTextFromTemplate($varValue, \DataContainer $dc)
 	{
 
 		if(strip_tags($dc->activeRecord->after_text)=='')
 		{
 			if(strlen($varValue)<=0) return $varValue;
 
-			$objTemplate = $this->Database->prepare('SELECT `text` FROM `tl_iao_templates` WHERE `id`=?')
-						->limit(1)
-						->execute($varValue);
+            //hole das ausgewähte Template
+            $objTemplate = IaoTemplatesModel::findById($varValue);
 
-		    $this->Database->prepare('UPDATE `tl_iao_credit` SET `after_text`=? WHERE `id`=?')
+            //hole den aktuellen Datensatz als DB-Object
+            $objDbCredit = IaoCreditModel::findById($dc->id);
+
+            // ersetzte evtl. Platzhalter
+            $text = $this->changeIAOTags($objTemplate->text, 'credit' , $objDbCredit);
+
+		    DB::getInstance()->prepare('UPDATE `tl_iao_credit` SET `after_text`=? WHERE `id`=?')
 				   ->limit(1)
 				   ->execute($objTemplate->text,$dc->id);
 		}
@@ -562,15 +576,15 @@ class tl_iao_credit  extends \iao\iaoBackend
 
 
 	/**
-	 * get all invoice before template
+	 * get all template with position = 'credit_before_text'
 	 * @param object
-	 * @throws Exception
+	 * @return array
 	 */
-	public function getBeforeTemplate(DataContainer $dc)
+	public function getBeforeTemplate(\DataContainer $dc)
 	{
 		$varValue= array();
 
-		$all = $this->Database->prepare('SELECT `id`,`title` FROM `tl_iao_templates` WHERE `position`=?')
+		$all = DB::getInstance()->prepare('SELECT `id`,`title` FROM `tl_iao_templates` WHERE `position`=?')
 		->execute('credit_before_text');
 
 		while($all->next())
@@ -582,15 +596,15 @@ class tl_iao_credit  extends \iao\iaoBackend
 	}
 
 	/**
-	 * get all invoice after template
+	 * get all credit after template
 	 * @param object
-	 * @throws Exception
+	 * @return array
 	 */
-	public function getAfterTemplate(DataContainer $dc)
+	public function getAfterTemplate(\DataContainer $dc)
 	{
 		$varValue= array();
 
-		$all = $this->Database->prepare('SELECT `id`,`title` FROM `tl_iao_templates` WHERE `position`=?')
+		$all = DB::getInstance()->prepare('SELECT `id`,`title` FROM `tl_iao_templates` WHERE `position`=?')
 		->execute('credit_after_text');
 
 		while($all->next())
@@ -620,7 +634,7 @@ class tl_iao_credit  extends \iao\iaoBackend
 	* wenn GET-Parameter passen dann wird eine PDF erzeugt
 	*
 	*/
-	public function generateCreditPDF(DataContainer $dc)
+	public function generateCreditPDF(\DataContainer $dc)
 	{
 		if(\Input::get('key') == 'pdf' && (int) \Input::get('id') > 0) $this->generatePDF((int) \Input::get('id'), 'credit');
 	}
@@ -653,7 +667,7 @@ class tl_iao_credit  extends \iao\iaoBackend
 	* @param object
 	* @return string
 	*/
-	public function setFieldCreditNumberStr($varValue, DataContainer $dc)
+	public function setFieldCreditNumberStr($varValue, \DataContainer $dc)
 	{
 		$settings = $this->getSettings($dc->activeRecord->setting_id);
 		$tstamp = ($dc->activeRecord->date) ?: time();
@@ -688,7 +702,7 @@ class tl_iao_credit  extends \iao\iaoBackend
 	* @param object
 	* @return string
 	*/
-	public function setFieldInvoiceNumber($varValue, DataContainer $dc)
+	public function setFieldCreditNumber($varValue, \DataContainer $dc)
 	{
 		$settings = $this->getSettings($dc->activeRecord->setting_id);
 		return $this->generateCreditNumber($varValue, $settings);
@@ -696,7 +710,7 @@ class tl_iao_credit  extends \iao\iaoBackend
 	
 
 	/**
-	 * Autogenerate an article alias if it has not been set yet
+	 * Autogenerate an credit number if it has not been set yet
 	 * @param mixed
 	 * @param object
 	 * @return string
@@ -705,12 +719,12 @@ class tl_iao_credit  extends \iao\iaoBackend
 	{
 		$autoNr = false;
 		$varValue = (int) $varValue;
+        $id = \Input::get('id');
 
 		// Generate credit_id if there is none
 		if($varValue == 0)
 		{
-			$autoNr = true;
-			$objNr = $this->Database->prepare("SELECT `credit_id` FROM `tl_iao_credit` ORDER BY `credit_id` DESC")
+			$objNr = DB::getInstance()->prepare("SELECT `credit_id` FROM `tl_iao_credit` ORDER BY `credit_id` DESC")
 			->limit(1)
 			->execute();
 
@@ -719,19 +733,19 @@ class tl_iao_credit  extends \iao\iaoBackend
 	    }
 	    else
 	    {
-			$objNr = $this->Database->prepare("SELECT `credit_id` FROM `tl_iao_credit` WHERE `id`=? OR `credit_id`=?")
+			$objNr = DB::getInstance()->prepare("SELECT `credit_id` FROM `tl_iao_credit` WHERE `id`=? OR `credit_id`=?")
 			->limit(1)
-			->execute($dc->id,$varValue);
+			->execute($id, $varValue);
 
 			// Check whether the CreditNumber exists
 			if ($objNr->numRows > 1 )
 			{
 				if (!$autoNr)
 				{
-					throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'], $varValue));
+					throw new \Exception(sprintf($GLOBALS['TL_LANG']['ERR']['aliasExists'], $varValue));
 				}
 
-				$varValue .= '-' . $dc->id;
+				$varValue .= '-' . $id;
 			}
 	    }
 
@@ -745,8 +759,7 @@ class tl_iao_credit  extends \iao\iaoBackend
      */
     public function listEntries($arrRow)
     {
-		$this->import('Database');
-		$result = $this->Database->prepare("SELECT `firstname`,`lastname`,`company` FROM `tl_member`  WHERE id=?")
+		$result = DB::getInstance()->prepare("SELECT `firstname`,`lastname`,`company` FROM `tl_member`  WHERE id=?")
 		->limit(1)
 		->execute($arrRow['member']);
 
@@ -788,7 +801,7 @@ class tl_iao_credit  extends \iao\iaoBackend
 			$icon = 'logout.gif';
 		}
 
-		return '<a href="'.$this->addToUrl($href).'" title="'.$GLOBALS['TL_LANG']['tl_iao_credit']['toggle'].'"'.$attributes.'>'.$this->generateImage($icon, $label).'</a> ';
+		return '<a href="'.$this->addToUrl($href).'" title="'.$GLOBALS['TL_LANG']['tl_iao_credit']['toggle'].'"'.$attributes.'>'.\Image::getHtml($icon, $label).'</a> ';
 	}
 
 	/**
@@ -809,7 +822,8 @@ class tl_iao_credit  extends \iao\iaoBackend
 			$this->redirect('contao/main.php?act=error');
 		}
 
-		$this->createInitialVersion('tl_iao_credit', $intId);
+        $objVersions = new \Versions('tl_iao_credit', $intId);
+        $objVersions->initialize();
 
 		// Trigger the save_callback
 		if (is_array($GLOBALS['TL_DCA']['tl_iao_credit']['fields']['status']['save_callback']))
@@ -820,11 +834,11 @@ class tl_iao_credit  extends \iao\iaoBackend
 				$blnVisible = $this->$callback[0]->$callback[1]($blnVisible, $this);
 			}
 		}
-
+        $status = ($blnVisible==1 ) ? '1' : '2';
 		// Update the database
-		$this->Database->prepare("UPDATE tl_iao_credit SET status='" . ($blnVisible==1 ? '1' : '2') . "' WHERE id=?")
-		->execute($intId);
+		DB::getInstance()->prepare("UPDATE tl_iao_credit SET status=? WHERE id=?")
+		->execute($status, $intId);
 
-		$this->createNewVersion('tl_iao_credit', $intId);
+        $objVersions->create();
 	}
 }
